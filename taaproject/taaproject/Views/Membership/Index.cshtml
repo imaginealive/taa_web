@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Project's member";
+}
+
+
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<table class="table table-hover">
+    <tbody>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>E-Mail</th>
+            <th>Level</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Anawat Mattamoltol</td>
+            <td>Anawat@kkumail.com</td>
+            <td>Admin</td>
+            <td><a asp-action="Edit">Edit</a></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+
+<form class="form-inline">
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-addon">E-Mail</div>
+            <input type="email" class="form-control" id="emailInput" placeholder="username@email.com">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Invite</button>
+</form>
