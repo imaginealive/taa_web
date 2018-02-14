@@ -55,6 +55,96 @@ namespace taaproject.Controllers
             return View(nameof(Detail));
         }
 
+        public IActionResult AddNewStory()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddNewStory(string Name, string Description)
+        {
+            var isValidData = !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Description);
+            if (!isValidData)
+            {
+                ViewBag.ErrorMessage = "Name or Description can not be empty";
+                return View();
+            }
+
+            return View(nameof(Detail));
+        }
+
+        public IActionResult AddNewTask()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddNewTask(string Name, string Description)
+        {
+            var isValidData = !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Description);
+            if (!isValidData)
+            {
+                ViewBag.ErrorMessage = "Name or Description can not be empty";
+                return View();
+            }
+
+            return View(nameof(Detail));
+        }
+
+        public IActionResult EditFeature()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult EditFeature(string Description, string AssignmentMember, string inlineRadioOptions)
+        {
+            var isValidData = !string.IsNullOrEmpty(Description) && !string.IsNullOrEmpty(AssignmentMember) && !string.IsNullOrEmpty(inlineRadioOptions);
+            if (!isValidData)
+            {
+                ViewBag.ErrorMessage = "Description or AssignmentMember or InlineRadioOptions can not be empty";
+                return View();
+            }
+
+            return View(nameof(Detail));
+        }
+
+        public IActionResult EditStory()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult EditStory(string Description, string AssignmentMember, string inlineRadioOptions)
+        {
+            var isValidData = !string.IsNullOrEmpty(Description) && !string.IsNullOrEmpty(AssignmentMember) && !string.IsNullOrEmpty(inlineRadioOptions);
+            if (!isValidData)
+            {
+                ViewBag.ErrorMessage = "Description or AssignmentMember or InlineRadioOptions can not be empty";
+                return View();
+            }
+
+            return View(nameof(Detail));
+        }
+
+        public IActionResult EditTask()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult EditTask(string Description, string AssignmentMember, string inlineRadioOptions)
+        {
+            var isValidData = !string.IsNullOrEmpty(Description) && !string.IsNullOrEmpty(AssignmentMember) && !string.IsNullOrEmpty(inlineRadioOptions);
+            if (!isValidData)
+            {
+                ViewBag.ErrorMessage = "Description or AssignmentMember or InlineRadioOptions can not be empty";
+                return View();
+            }
+
+            return View(nameof(Detail));
+        }
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";

@@ -1,0 +1,30 @@
+﻿
+@{
+    ViewData["Title"] = "Add New Story";
+}
+
+<div style="margin: 2em 0em">
+    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+    <h2>Add new story</h2>
+    <hr />
+
+    <form asp-controller="Home" asp-action="AddNewStory" method="post" style="margin-top: 1em">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h2>Story</h2>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="Name">Name</label>
+                    <input type="text" class="form-control" id="Name" name="Name" placeholder="Feature name...">
+                </div>
+                <div class="form-group">
+                    <label for="Description">Description</label>
+                    <textarea class="form-control" id="Description" name="Description" placeholder="Description..." rows="10"></textarea>
+                </div>
+                <p class="text-danger"><i>@ViewBag.ErrorMessage</i></p>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </form>
+</div>

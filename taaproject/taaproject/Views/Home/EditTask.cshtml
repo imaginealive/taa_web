@@ -1,0 +1,51 @@
+﻿
+@{
+    ViewData["Title"] = "Edit Task";
+}
+
+<div style="margin: 2em 0em">
+    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+    <h2>Edit task</h2>
+    <hr />
+
+    <form asp-controller="Home" asp-action="EditTask" method="post" style="margin-top: 1em">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h2>Task</h2>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label>Name</label>
+                    <p>Design wirefarm</p>
+                </div>
+                <div class="form-group">
+                    <label for="Description">Description</label><br />
+                    <textarea class="form-control" id="Description" name="Description" rows="10">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Assignment member</label>
+                    <select class="form-control" name="AssignmentMember">
+                        <option>นายสมชาย สกุลดี (Master manager)</option>
+                        <option>นางสาวชาติชัย ศรีสวัส (Feature manager)</option>
+                        <option>นายสมมาตร เลขามิตร (Story manager)</option>
+                        <option>นางอรทัย ม้วนศิริ (Task manager)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <label class="radio-inline">
+                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked> New
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Active
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3"> Done
+                    </label>
+                </div>
+                <p class="text-danger"><i>@ViewBag.ErrorMessage</i></p>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
