@@ -32,7 +32,9 @@ namespace taaproject.Controllers
 
         public IActionResult Delete()
         {
-            return View();
+            ViewData["Message"] = "Delete project completed.";
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult AddNewFeature()
