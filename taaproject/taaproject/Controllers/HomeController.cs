@@ -35,6 +35,24 @@ namespace taaproject.Controllers
             return View();
         }
 
+        public IActionResult AddNewFeature()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddNewFeature(string Name, string Description)
+        {
+            var isValidData = !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Description);
+            if (!isValidData)
+            {
+                ViewBag.ErrorMessage = "Name or Description can not be empty";
+                return View();
+            }
+
+            return View(nameof(Detail));
+        }
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
