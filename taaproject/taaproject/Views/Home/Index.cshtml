@@ -1,33 +1,27 @@
-﻿@{
+﻿@model List<taaproject.Services.ProjectService.ProjectModel>
+@{
     ViewData["Title"] = "Your project";
 }
 <h2>@ViewData["Title"] <a class="btn btn-info" asp-action="Create">New Project</a></h2>
 <hr />
+@foreach (var item in Model)
+{
+    <div class="well row clearfix">
+        <div class="col-md-3 text-center">
+            <img src="https://dummyimage.com/200x200/000/fff" />
+        </div>
+        <div class="col-md-9">
+            <dl>
+                <dt>@item.ProjectName</dt>
+                <dd>@item.Description</dd>
+            </dl>
+            <a class="btn btn-primary" asp-action="Detail" asp-route-id="@item._id">View</a>
+            <a class="btn btn-danger pull-right" asp-action="Delete" asp-route-id="@item._id">Delete</a>
+        </div>
+    </div>
+}
 
-<div class="well row clearfix">
-    <div class="col-md-3 text-center">
-        <img src="https://dummyimage.com/200x200/000/fff" />
-    </div>
-    <div class="col-md-9">
-        <dl>
-            <dt>Simple Project</dt>
-            <dd>Excepteur vivamus distinctio? Torquent necessitatibus, eros sodales fugit, inceptos, vero, vestibulum sollicitudin! Minima, quaerat ultricies aliqua, semper? Aenean? Congue magna, unde molestiae quae tortor? Eos gravida quibusdam duis mi iusto. Egestas eaque deleniti placerat provident explicabo imperdiet porro laborum voluptatum do harum! Commodi phasellus veritatis beatae labore laboriosam! Praesentium debitis? Porro sem! Dolor platea quaerat voluptatum, dui netus ornare voluptatum aliquet maiores nonummy! Corporis nec arcu, animi repellendus porta ad placerat, voluptatibus, vivamus eiusmod, omnis consectetur odit dolorem dictumst lacinia, senectus facilis similique inceptos? Occaecat adipisci! Eiusmod provident lacinia vehicula? Litora? Soluta repellendus volutpat. Tempus rem aliquip magnis pulvinar aperiam.</dd>
-        </dl>
-        <a class="btn btn-primary" asp-action="Detail">View</a>
-        <a class="btn btn-danger pull-right" asp-action="Delete">Delete</a>
-    </div>
-</div>
-
-<div class="well row clearfix">
-    <div class="col-md-3 text-center">
-        <img src="https://dummyimage.com/200x200/000/fff" />
-    </div>
-    <div class="col-md-9">
-        <dl>
-            <dt>Dummy Project</dt>
-            <dd>Condimentum minim vel dolores repellat, amet, libero natoque dui mi etiam hac morbi, atque montes, volutpat amet optio. Hendrerit nostrud? Numquam eu ultricies rem, necessitatibus laboris aptent similique, laudantium deleniti nam quis, quasi dolore ea anim, ex dignissim nullam? Orci labore alias ac primis, sint. Minim, fermentum voluptatum occaecati molestie nascetur proin per impedit pede? Mi! Primis lacinia sem excepturi earum delectus vitae mi ducimus nisl necessitatibus blanditiis ante. Ex, ab alias luctus occaecati, sed possimus laboriosam, asperiores tenetur incidunt! Optio recusandae repudiandae perferendis tempor natoque aenean pharetra. Distinctio arcu deleniti voluptate augue laborum eget? Habitant, ullamco risus purus doloribus.</dd>
-        </dl>
-        <a class="btn btn-primary" asp-action="Detail">View</a>
-        <a class="btn btn-danger pull-right" asp-action="Delete">Delete</a>
-    </div>
-</div>
+@if (Model == null || Model.Count == 0)
+{
+    <p class="text-center">ไม่มีโปรเจคที่คุณเป็นสมาชิก</p>
+}

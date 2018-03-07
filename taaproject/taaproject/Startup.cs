@@ -34,9 +34,12 @@ namespace taaproject
             //    .AddDefaultTokenProviders();
 
             services.AddIdentityWithMongoStores(Configuration.GetConnectionString("DefaultConnection")).AddDefaultTokenProviders();
-
+            //services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            var emailsettings = Configuration.GetSection(nameof(EmailSettings)).Get<EmailSettings>();
             // Add application services.
+            services.AddTransient<IEmailSettings>(x => emailsettings);
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<ProjectService, ProjectService>();
 
             services.AddMvc();
         }

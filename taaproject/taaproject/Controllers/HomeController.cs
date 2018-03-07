@@ -3,16 +3,39 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using taaproject.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace taaproject.Controllers
 {
+    using Microsoft.AspNetCore.Identity.MongoDB;
+    using taaproject.Services;
+    using static taaproject.Services.ProjectService;
+
+    [Authorize]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ProjectService _svc;
+
+        public HomeController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            ProjectService svc)
         {
-            return View();
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _svc = svc;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var model = await _svc.GetAllAllowProjectAsync(User);
+            return View(model.ToList());
         }
 
         public IActionResult Detail()
@@ -20,9 +43,27 @@ namespace taaproject.Controllers
             return View();
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(ProjectModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _svc.CreateProjectAsync(model, User);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                }
+            }
+            return View(model);
         }
 
         public IActionResult Edit()
