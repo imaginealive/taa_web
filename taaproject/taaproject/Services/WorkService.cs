@@ -115,7 +115,7 @@ namespace taaproject.Services
             return response;
         }
 
-        //public void CreateFeature(string project_id, ClaimsPrincipal User)
+        //public void CreateFeature(FeatureModel model, ClaimsPrincipal User){}
 
         private async Task CreateCollectionAsync(string collection_name)
         {
@@ -157,6 +157,9 @@ namespace taaproject.Services
 
             [Display(Name = "Assign By")]
             public string AssignBy { get; set; }
+
+            [Display(Name = "Create By")]
+            public string CreateBy { get; set; }
             public string Project_id { get; set; }
         }
 

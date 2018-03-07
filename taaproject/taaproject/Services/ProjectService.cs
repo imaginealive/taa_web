@@ -73,7 +73,7 @@ namespace taaproject.Services
             var adminList = admins.ToList();
             var project_collection = database.GetCollection<ProjectModel>(projectCollection);
             var projects = await project_collection.FindAsync(it => !it.DeletedDate.HasValue);
-            return projects.ToList().Select(pj =>
+            return projects.ToList().Where(it => memberList.Any(mb => mb.Project_id == it._id)).Select(pj =>
             {
                 return new ProjectViewModel
                 {
