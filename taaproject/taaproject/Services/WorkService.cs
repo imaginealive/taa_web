@@ -115,7 +115,7 @@ namespace taaproject.Services
             return response;
         }
 
-        public void CreateFeature(string project_id, ClaimsPrincipal User)
+        //public void CreateFeature(string project_id, ClaimsPrincipal User)
 
         private async Task CreateCollectionAsync(string collection_name)
         {
