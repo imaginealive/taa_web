@@ -5,34 +5,61 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using taaproject.Models;
+using taaproject.Services;
+using static taaproject.Services.ProjectService;
 
 namespace taaproject.Controllers
 {
     public class MembershipController : Controller
     {
-        public IActionResult Index()
+        private readonly MembershopServices _svc;
+
+        public MembershipController(MembershopServices svc)
         {
-            return View();
+            _svc = svc;
         }
 
-        public IActionResult Detail()
+        public async Task<IActionResult> Index(string projectid, string username)
         {
-            return View();
+            var isUsernameValid = !string.IsNullOrEmpty(username);
+            if (isUsernameValid)
+            {
+                var result = await _svc.InviteMembership(projectid, username);
+                if (!result) ViewBag.ErrorMessage = "ไม่สามารถเพิ่มสมาชิกคนดังกล่าวเข้าระบบได้";
+            }
+            var model = await _svc.GetMemberships(projectid);
+            ViewBag.ProjectId = projectid;
+            return View(model);
         }
 
-        public IActionResult Add()
+        //public IActionResult Detail()
+        //{
+        //    return View();
+        //}
+
+        //public IActionResult Add()
+        //{
+        //    return View();
+        //}
+
+        public async Task<IActionResult> Edit(string projectid, string username)
         {
-            return View();
+            var model = await _svc.GetMembership(projectid, username);
+            ViewBag.ProjectId = projectid;
+            return View(model);
         }
 
-        public IActionResult Edit()
+        [HttpPost]
+        public async Task<IActionResult> Edit(string projectid, MembershipModel model)
         {
-            return View();
+            var result = await _svc.ChangeMembershipInformation(model);
+            if (!result) ViewBag.ErrorMessage = "ไม่สามารถเปลี่ยนระดับผู้ใช้งานได้";
+            return RedirectToAction(nameof(Index), new { projectid = projectid });
         }
 
-        public IActionResult Delete()
-        {
-            return View();
-        }
+        //public IActionResult Delete()
+        //{
+        //    return View();
+        //}
     }
 }

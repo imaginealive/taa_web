@@ -1,43 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Project's member";
-}
+﻿@model IEnumerable<taaproject.Models.Membership.MembershipInformation>
 
+@{
+    ViewData["Title"] = "Project's member";
+    int count = 1;
+}
 
 <div style="margin: 2em 0em">
     <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
 
     <h2>@ViewData["Title"]</h2>
+
+    <br />
+    <h4>Invite person</h4>
+    <form asp-controller="Membership" asp-route-projectid="@ViewBag.ProjectId" asp-action="Index" class="form-inline">
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon">E-Mail</div>
+                <input type="email" class="form-control" id="username" name="username" placeholder="username@email.com">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Invite</button>
+        <h4 class="text-danger">@ViewBag.ErrorMessage</h4>
+    </form>
     <hr />
 
     <table class="table table-hover">
         <tbody>
             <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>E-Mail</th>
-                <th>Level</th>
-                <th></th>
-                <th></th>
+                <th>ลำดับ</th>
+                <th>ชื่อ</th>
+                <th>อีเมล์</th>
+                <th>ระดับผู้ใช้งาน</th>
+                <th>แก้ไข</th>
             </tr>
-            <tr>
-                <td>1</td>
-                <td>Anawat Mattamoltol</td>
-                <td>Anawat@kkumail.com</td>
-                <td>Admin</td>
-                <td><a asp-action="Edit">Edit</a></td>
-                <td></td>
-            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(count++)</td>
+                    <td>@item.MemberUserName</td>
+                    <td>@item.Email</td>
+                    <td>@item.Rank</td>
+                    <td><a asp-action="Edit" asp-route-projectid="@ViewBag.ProjectId" asp-route-username="@item.MemberUserName">Edit</a></td>
+                </tr>
+            }
         </tbody>
     </table>
-
-
-    <form class="form-inline">
-        <div class="form-group">
-            <div class="input-group">
-                <div class="input-group-addon">E-Mail</div>
-                <input type="email" class="form-control" id="emailInput" placeholder="username@email.com">
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Invite</button>
-    </form>
 </div>

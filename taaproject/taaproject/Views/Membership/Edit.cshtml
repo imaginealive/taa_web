@@ -1,14 +1,17 @@
-﻿@model MemberViewModel
+﻿@model taaproject.Services.ProjectService.MembershipModel
 
 @{
     ViewData["Title"] = "Edit member";
 }
 <div style="margin: 2em 0em">
-    <a class="btn btn-lg btn-default" asp-controller="Membership" asp-action="Index"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+    <a class="btn btn-lg btn-default" asp-controller="Membership" asp-action="Index" asp-route-projectid="@ViewBag.ProjectId"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
 
     <h2>@ViewData["Title"]</h2>
     <hr />
-    <form asp-action="Edit">
+    <form asp-action="Edit" asp-route-projectid="@ViewBag.ProjectId" method="post">
+        @Html.HiddenFor(it => it._id)
+        @Html.HiddenFor(it => it.Project_id)
+
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2>Member</h2>
@@ -16,22 +19,28 @@
             <div class="panel-body">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <label asp-for="MemberUserName" class="control-label"></label>
+                    <input asp-for="MemberUserName" class="form-control" readonly />
+                    <span asp-validation-for="MemberUserName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Email" class="control-label"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                    <label asp-for="Work" class="control-label"></label>
+                    <input asp-for="Work" class="form-control" />
+                    <span asp-validation-for="Work" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Level" class="control-label"></label>
-                    <select asp-for="Level" class="form-control">
-                        <option>Select</option>
-                        <option>Master</option>
-                        <option>Developer</option>
-                    </select>
+                    <label asp-for="Rank" class="control-label"></label>
+                    @if (Model.Rank.ToString() == "Admin")
+                {
+                    <input asp-for="Rank" class="form-control" readonly />
+            }
+            else
+            {
+                <select asp-for="Rank" class="form-control">
+                    <option value="@taaproject.Services.ProjectService.ProjectMemberRank.Master">Master</option>
+                    <option value="@taaproject.Services.ProjectService.ProjectMemberRank.Developer">Developer</option>
+                </select>
+        }
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Save" class="btn btn-primary" />

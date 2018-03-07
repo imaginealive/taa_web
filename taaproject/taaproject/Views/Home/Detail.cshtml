@@ -239,7 +239,8 @@
 
     <div class="clearfix">
         <div class="pull-left">
-            <a class="btn btn-lg btn-default" asp-controller="Membership" asp-action="Index"><span class="glyphicon glyphicon-user"></span> Manage member</a>
+            <!-- HACK: Fix projectid -->
+            <a class="btn btn-lg btn-default" asp-controller="Membership" asp-action="Index" asp-route-projectid="5e2f4ca6-e0f3-450d-acb7-839cd4c0d404"><span class="glyphicon glyphicon-user"></span> Manage member</a>
         </div>
         <div class="pull-right">
             <a class="btn btn-lg btn-primary" asp-controller="Home" asp-action="AddNewFeature"><span class="glyphicon glyphicon-plus"></span>  New feature</a>

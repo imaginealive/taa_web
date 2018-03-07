@@ -40,6 +40,7 @@ namespace taaproject
             services.AddTransient<IEmailSettings>(x => emailsettings);
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<ProjectService, ProjectService>();
+            services.AddTransient<MembershopServices, MembershopServices>();
 
             services.AddMvc();
         }
