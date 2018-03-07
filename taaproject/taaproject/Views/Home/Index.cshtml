@@ -1,7 +1,10 @@
-﻿@model List<taaproject.Services.ProjectService.ProjectModel>
+﻿@model List<taaproject.Models.HomeViewModels.ProjectViewModel>
 @{
     ViewData["Title"] = "Your project";
 }
+@inject SignInManager<Microsoft.AspNetCore.Identity.MongoDB.IdentityUser> SignInManager
+@inject UserManager<Microsoft.AspNetCore.Identity.MongoDB.IdentityUser> UserManager
+
 <h2>@ViewData["Title"] <a class="btn btn-info" asp-action="Create">New Project</a></h2>
 <hr />
 @foreach (var item in Model)
@@ -16,7 +19,10 @@
                 <dd>@item.Description</dd>
             </dl>
             <a class="btn btn-primary" asp-action="Detail" asp-route-id="@item._id">View</a>
-            <a class="btn btn-danger pull-right" asp-action="Delete" asp-route-id="@item._id">Delete</a>
+            @if (item.ProjectOwner == UserManager.GetUserName(User))
+            {
+                <a class="btn btn-danger pull-right" asp-action="Delete" asp-route-id="@item._id">Delete</a>
+            }
         </div>
     </div>
 }

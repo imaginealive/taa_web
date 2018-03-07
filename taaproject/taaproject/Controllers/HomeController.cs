@@ -8,12 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using taaproject.Models;
 using Microsoft.AspNetCore.Authorization;
+using static taaproject.Services.ProjectService;
+using taaproject.Models.HomeViewModels;
+using taaproject.Services;
 
 namespace taaproject.Controllers
 {
     using Microsoft.AspNetCore.Identity.MongoDB;
-    using taaproject.Services;
-    using static taaproject.Services.ProjectService;
 
     [Authorize]
     public class HomeController : Controller
@@ -34,13 +35,15 @@ namespace taaproject.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var model = await _svc.GetAllAllowProjectAsync(User);
-            return View(model.ToList());
+            var projects = await _svc.GetAllAllowProjectAsync(User);
+            var model = projects.ToList();
+            return View(model);
         }
 
-        public IActionResult Detail()
+        public async Task<IActionResult> Detail(string id)
         {
-            return View();
+            var model = await _svc.GetAllowProjectAsync(id, User);
+            return View(model);
         }
 
         [HttpGet]
@@ -71,11 +74,10 @@ namespace taaproject.Controllers
             return View();
         }
 
-        public IActionResult Delete()
+        public async Task<IActionResult> Delete(string id)
         {
-            ViewData["Message"] = "Delete project completed.";
-
-            return RedirectToAction("Index");
+            await _svc.DeleteProjectAsync(id, User);
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult AddNewFeature()

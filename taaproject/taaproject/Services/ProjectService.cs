@@ -11,6 +11,7 @@ namespace taaproject.Services
     using Microsoft.AspNetCore.Identity.MongoDB;
     using System.ComponentModel.DataAnnotations;
     using System.Security.Claims;
+    using taaproject.Models.HomeViewModels;
 
     public class ProjectService
     {
@@ -50,24 +51,86 @@ namespace taaproject.Services
                 _id = Guid.NewGuid().ToString(),
                 Project_id = model._id,
                 MemberUserName = _UserManager.GetUserName(User),
+                Work = "Unset",
                 Rank = ProjectMemberRank.Admin
             };
             await member_collection.InsertOneAsync(member);
         }
 
-        public async Task<IEnumerable<ProjectModel>> GetAllAllowProjectAsync(ClaimsPrincipal User)
+        public async Task<IEnumerable<ProjectViewModel>> GetAllAllowProjectAsync(ClaimsPrincipal User)
         {
+            await CreateCollectionAsync(projectCollection);
+            await CreateCollectionAsync(membershipCollection);
+
             var Username = _UserManager.GetUserName(User);
 
             var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
             var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username);
-            var beMemberList = beMember.ToList();
+            var memberList = beMember.ToList();
+            if (memberList == null || memberList.Count == 0) return null;
+
+            var admins = await member_collection.FindAsync(it => it.Rank == ProjectMemberRank.Admin);
+            var adminList = admins.ToList();
+            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var projects = await project_collection.FindAsync(it => !it.DeletedDate.HasValue);
+            return projects.ToList().Select(pj =>
+            {
+                return new ProjectViewModel
+                {
+                    _id = pj._id,
+                    ProjectName = pj.ProjectName,
+                    ProjectOwner = adminList.First(it => it.Project_id == pj._id).MemberUserName,
+                    CreateDate = pj.CreateDate,
+                    Description = string.IsNullOrEmpty(pj.Description) ? "-" : pj.Description
+                };
+            });
+        }
+
+        public async Task<ProjectViewModel> GetAllowProjectAsync(string project_id, ClaimsPrincipal User)
+        {
+            await CreateCollectionAsync(projectCollection);
+            await CreateCollectionAsync(membershipCollection);
+
+            var Username = _UserManager.GetUserName(User);
+
+            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == project_id);
+            var member = beMember.FirstOrDefault();
+            if (member == null) return null;
+            var admin = await member_collection.FindAsync(it => it.Rank == ProjectMemberRank.Admin && it.Project_id == project_id);
+            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var projects = await project_collection.FindAsync(it => !it.DeletedDate.HasValue && it._id == project_id);
+            var project = projects.FirstOrDefault();
+            if (project == null) return null;
+            return new ProjectViewModel
+            {
+                _id = project._id,
+                ProjectName = project.ProjectName,
+                ProjectOwner = admin.First().MemberUserName,
+                CreateDate = project.CreateDate,
+                Description = string.IsNullOrEmpty(project.Description) ? "-" : project.Description
+            };
+        }
+
+        public async Task DeleteProjectAsync(string project_id, ClaimsPrincipal User)
+        {
+            var Username = _UserManager.GetUserName(User);
+
+            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var beMember = await member_collection.FindAsync(it =>
+            it.MemberUserName == Username &&
+            it.Project_id == project_id &&
+            it.Rank == ProjectMemberRank.Admin);
+
+            var beAdmin = beMember.FirstOrDefault();
+            if (beAdmin == null) return;
 
             var project_collection = database.GetCollection<ProjectModel>(projectCollection);
-            var projects = await project_collection.FindAsync(it => true);
-            var projectList = projects.ToList();
 
-            return projectList.Where(pj => beMemberList.Any(it => it.Project_id == pj._id));
+            await project_collection.FindOneAndUpdateAsync(
+                Builders<ProjectModel>.Filter.Eq(it => it._id, project_id),
+                Builders<ProjectModel>.Update.Set(it => it.DeletedDate, DateTime.Now.Date)
+            );
         }
 
         private async Task CreateCollectionAsync(string collection_name)
@@ -99,7 +162,6 @@ namespace taaproject.Services
             public DateTime StartDate { get; set; }
             public DateTime? FinishDate { get; set; }
             public DateTime? DeletedDate { get; set; }
-            public string ProjectOwner { get; set; }
         }
 
         public class MembershipModel
