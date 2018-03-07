@@ -31,16 +31,16 @@
                 <div class="form-group">
                     <label asp-for="Rank" class="control-label"></label>
                     @if (Model.Rank.ToString() == "Admin")
-                {
-                    <input asp-for="Rank" class="form-control" readonly />
-            }
-            else
-            {
-                <select asp-for="Rank" class="form-control">
-                    <option value="@taaproject.Services.ProjectService.ProjectMemberRank.Master">Master</option>
-                    <option value="@taaproject.Services.ProjectService.ProjectMemberRank.Developer">Developer</option>
-                </select>
-        }
+                    {
+                        <input asp-for="Rank" class="form-control" readonly />
+                    }
+                    else
+                    {
+                        <select asp-for="Rank" class="form-control">
+                            <option value="@taaproject.Services.ProjectService.ProjectMemberRank.Master">Master</option>
+                            <option value="@taaproject.Services.ProjectService.ProjectMemberRank.Developer">Developer</option>
+                        </select>
+                    }
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Save" class="btn btn-primary" />

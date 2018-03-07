@@ -57,9 +57,11 @@ namespace taaproject.Controllers
             return RedirectToAction(nameof(Index), new { projectid = projectid });
         }
 
-        //public IActionResult Delete()
-        //{
-        //    return View();
-        //}
+        public async Task<IActionResult> Delete(string projectid, string username)
+        {
+            var result = await _svc.RemoveMembership(projectid, username);
+            if (!result) ViewBag.ErrorMessage = "ไม่สามารถลบผู้ใช้งานได้";
+            return RedirectToAction(nameof(Index), new { projectid = projectid });
+        }
     }
 }

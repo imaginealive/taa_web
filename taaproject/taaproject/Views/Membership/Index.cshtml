@@ -31,7 +31,7 @@
                 <th>ชื่อ</th>
                 <th>อีเมล์</th>
                 <th>ระดับผู้ใช้งาน</th>
-                <th>แก้ไข</th>
+                <th>แก้ไข/ลบ</th>
             </tr>
             @foreach (var item in Model)
             {
@@ -40,7 +40,13 @@
                     <td>@item.MemberUserName</td>
                     <td>@item.Email</td>
                     <td>@item.Rank</td>
-                    <td><a asp-action="Edit" asp-route-projectid="@ViewBag.ProjectId" asp-route-username="@item.MemberUserName">Edit</a></td>
+                    <td>
+                        <a class="btn btn-warning" asp-action="Edit" asp-route-projectid="@ViewBag.ProjectId" asp-route-username="@item.MemberUserName"><span class="glyphicon glyphicon-wrench"></span></a>
+                        @if (item.Rank != taaproject.Services.ProjectService.ProjectMemberRank.Admin)
+                        {
+                            <a class="btn btn-danger" asp-action="Delete" asp-route-projectid="@ViewBag.ProjectId" asp-route-username="@item.MemberUserName"><span class="glyphicon glyphicon-remove"></span></a>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

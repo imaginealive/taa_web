@@ -126,9 +126,25 @@ namespace taaproject.Services
             return true;
         }
 
-        public Task<bool> RemoveMembership(string projectid, string username)
+        public async Task<bool> RemoveMembership(string projectid, string username)
         {
-            throw new NotImplementedException();
+            var areDataValidation = !string.IsNullOrEmpty(projectid) && !string.IsNullOrEmpty(username);
+            if (!areDataValidation) return false;
+
+            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project = await project_collection.FindAsync(it => it._id == projectid);
+            var selectProject = project.FirstOrDefault();
+            var isProjectValid = selectProject != null;
+            if (!isProjectValid) return false;
+
+            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var members = await member_collection.FindAsync(it => it.MemberUserName == username && it.Project_id == projectid);
+            var selectmember = members.FirstOrDefault();
+            if (selectmember == null) return false;
+
+            var filter = Builders<MembershipModel>.Filter.Eq(it => it._id, selectmember._id);
+            await member_collection.DeleteOneAsync(filter);
+            return true;
         }
 
         public async Task<bool> ChangeMembershipInformation(MembershipModel request)
@@ -143,9 +159,6 @@ namespace taaproject.Services
             if (!areDataValidation) return false;
             
             var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
-            var members = await member_collection.FindAsync(it => it.MemberUserName == request.MemberUserName && it.Project_id == request.Project_id);
-            var selectmember = members.FirstOrDefault();
-            
             await member_collection.ReplaceOneAsync(it => it._id == request._id, request);
             return true;
         }
