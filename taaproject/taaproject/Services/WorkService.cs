@@ -33,6 +33,9 @@ namespace taaproject.Services
             var mongoCon = config.GetConnectionString("DefaultConnection");
             client = new MongoClient(mongoCon);
             database = client.GetDatabase("taa");
+
+            _UserManager = userManager;
+            _SignInManager = signInManager;
         }
 
         public async Task<IEnumerable<FeatureViewModel>> GetAllAllowWorkAsync(string project_id, ClaimsPrincipal User)

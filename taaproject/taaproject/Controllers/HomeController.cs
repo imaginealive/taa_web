@@ -50,6 +50,9 @@ namespace taaproject.Controllers
         public async Task<IActionResult> Detail(string id)
         {
             var model = await _svc.GetAllowProjectAsync(id, User);
+            var qry = await _WorkSVC.GetAllAllowWorkAsync(id, User);
+            ViewBag.Works = qry.ToList();
+            //ViewBag.Works = new List<string> { "hello", "world" };
             return View(model);
         }
 
