@@ -118,17 +118,60 @@ namespace taaproject.Services
             return response;
         }
 
-        public async Task<bool> CreateFeature(FeatureModel model)
+        public async Task<FeatureModel> GetFeature(string featureid)
         {
-            var isDataValid = model != null
-                && !string.IsNullOrEmpty(model.WorkName);
+            var isDataValid = !string.IsNullOrEmpty(featureid);
+            if (!isDataValid) return new FeatureModel();
+            
+            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            var features = await feature_collection.FindAsync(it => it._id == featureid);
+            var result = features.FirstOrDefault();
+            return result;
+        }
+
+        public async Task<bool> CreateFeature(FeatureModel request)
+        {
+            var isDataValid = request != null
+                && !string.IsNullOrEmpty(request.WorkName);
             if (!isDataValid) return false;
 
             var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
-            model._id = Guid.NewGuid().ToString();
-            model.CreateDate = DateTime.Now.Date;
-            await feature_collection.InsertOneAsync(model);
+            request._id = Guid.NewGuid().ToString();
+            request.CreateDate = DateTime.Now.Date;
+            await feature_collection.InsertOneAsync(request);
 
+            return true;
+        }
+
+        public async Task<bool> UpdateFeature(FeatureModel request, ClaimsPrincipal User)
+        {
+            var isDataValid = request != null
+                && !string.IsNullOrEmpty(request._id)
+                && !string.IsNullOrEmpty(request.WorkName)
+                && User != null;
+            if (!isDataValid) return false;
+            
+            var Username = _UserManager.GetUserName(User);
+            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == request.Project_id);
+            var member = beMember.FirstOrDefault();
+            if (member == null) return false;
+
+            request.AssignBy = member.MemberUserName;
+
+            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            await feature_collection.ReplaceOneAsync(it => it._id == request._id, request);
+            return true;
+        }
+        
+        public async Task<bool> RemoveFeature(string featureid)
+        {
+            var isDataValid = !string.IsNullOrEmpty(featureid);
+            if (!isDataValid) return false;
+            
+            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            var filter = Builders<FeatureModel>.Filter.Eq(it => it._id, featureid);
+            await feature_collection.DeleteOneAsync(filter);
             return true;
         }
 

@@ -10,7 +10,7 @@
     <hr />
 
     <form asp-controller="Home" asp-action="AddNewFeature" method="post" style="margin-top: 1em">
-        @Html.HiddenFor(it => it.Project_id);
+        @Html.HiddenFor(it => it.Project_id)
 
         <div class="panel panel-primary">
             <div class="panel-heading">
@@ -44,6 +44,7 @@
                 <div class="form-group">
                     <label asp-for="AssignTo"></label>
                     <select asp-for="AssignTo" class="form-control">
+                        <option value="@string.Empty">Unassign</option>
                         @foreach (var item in ViewBag.AssignmentList)
                         {
                             <option value="@item">@item</option>

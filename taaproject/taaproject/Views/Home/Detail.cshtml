@@ -62,7 +62,7 @@
                     <a data-toggle="collapse" data-parent="#accordionFeature" href="@("#collapse" + ++count)">
                         Feature @(count): @(item.WorkName)
                     </a>
-                    <a class="btn btn-sm" asp-controller="Home" asp-action="EditFeature"><span class="glyphicon glyphicon-pencil"></span></a>
+                    <a class="btn btn-sm" asp-controller="Home" asp-action="EditFeature" asp-route-featureid="@item._id"><span class="glyphicon glyphicon-pencil"></span></a>
                     <label class="pull-right">New</label>
                 </h4>
             </div>
@@ -72,6 +72,7 @@
                         @item.Description
                     </p>
                     <a class="btn btn-lg btn-success" asp-controller="Home" asp-action="AddNewStory"><span class="glyphicon glyphicon-plus"></span>  New Story</a>
+                    <a class="btn btn-lg btn-danger" asp-controller="Home" asp-action="RemoveFeature" asp-route-projectid="@Model._id" asp-route-featureid="@item._id"><span class="glyphicon glyphicon-remove"></span>  Remove</a>
                 </div>
             </div>
         </div>

@@ -1,48 +1,66 @@
-﻿
+﻿@model taaproject.Services.WorkService.FeatureModel
 @{
     ViewData["Title"] = "Edit Feature";
 }
 
 <div style="margin: 2em 0em">
-    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
-    <h2>Edit feature</h2>
+    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail" asp-route-id="@Model.Project_id"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+    <h2>Add new feature</h2>
     <hr />
 
     <form asp-controller="Home" asp-action="EditFeature" method="post" style="margin-top: 1em">
+        @Html.HiddenFor(it => it._id)
+        @Html.HiddenFor(it => it.Project_id)
+
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2>Feature</h2>
             </div>
             <div class="panel-body">
                 <div class="form-group">
-                    <label>Name</label>
-                    <p>Login system</p>
+                    <label asp-for="WorkName"></label>
+                    <input asp-for="WorkName" class="form-control" readonly>
+                    <span asp-validation-for="WorkName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label for="Description">Description</label><br />
-                    <textarea class="form-control" id="Description" name="Description" rows="10">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</textarea>
+                    <label asp-for="Description"></label>
+                    <textarea asp-for="Description" class="form-control" placeholder="Description..." rows="10"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label>Assignment member</label>
-                    <select class="form-control" name="AssignmentMember">
-                        <option>นายสมชาย สกุลดี (Master manager)</option>
-                        <option>นางสาวชาติชัย ศรีสวัส (Feature manager)</option>
+                    <label asp-for="StartDate"></label>
+                    <input asp-for="StartDate" class="form-control" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CloseDate"></label>
+                    <input asp-for="CloseDate" class="form-control" />
+                    <span asp-validation-for="CloseDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CreateBy"></label>
+                    <input asp-for="CreateBy" readonly class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="AssignTo"></label>
+                    <select asp-for="AssignTo" class="form-control">
+                        <option value="@string.Empty">Unassign</option>
+                        @foreach (var item in ViewBag.AssignmentList)
+                        {
+                            <option value="@item">@item</option>
+                        }
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
-                    <label class="radio-inline">
-                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked> New
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Active
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3"> Done
-                    </label>
+                    <label asp-for="Status"></label>
+                    <select asp-for="Status" class="form-control">
+                        <option value="@taaproject.Services.WorkService.WorkStatus.New.ToString()">New</option>
+                        <option value="@taaproject.Services.WorkService.WorkStatus.Active.ToString()">Active</option>
+                        <option value="@taaproject.Services.WorkService.WorkStatus.Done.ToString()">Done</option>
+                    </select>
                 </div>
                 <p class="text-danger"><i>@ViewBag.ErrorMessage</i></p>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Update</button>
             </div>
         </div>
     </form>

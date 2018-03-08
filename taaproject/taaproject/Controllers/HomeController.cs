@@ -52,7 +52,6 @@ namespace taaproject.Controllers
             var model = await _svc.GetAllowProjectAsync(id, User);
             var qry = await _WorkSVC.GetAllAllowWorkAsync(id, User);
             ViewBag.Works = qry.ToList();
-            //ViewBag.Works = new List<string> { "hello", "world" };
             return View(model);
         }
 
@@ -163,6 +162,53 @@ namespace taaproject.Controllers
             }
         }
 
+        public async Task<IActionResult> EditFeature(string featureid)
+        {
+            var model = await _WorkSVC.GetFeature(featureid);
+            var qry = await _membershipSVC.GetMemberships(model.Project_id);
+            ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditFeature(FeatureModel request)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _WorkSVC.UpdateFeature(request, User);
+                if (!result)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานหลักได้ กรุณาตรวจสอบข้อมูล";
+                    var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                    ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                    return View(request);
+                }
+                return RedirectToAction(nameof(Detail), new { id = request.Project_id });
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานหลักได้ กรุณาตรวจสอบข้อมูล";
+                var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                return View(request);
+            }
+
+            //var result = await _WorkSVC.UpdateFeature(request);
+            //if (!result)
+            //{
+            //    var qry = await _membershipSVC.GetMemberships(request.Project_id);
+            //    ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+            //    return View(request);
+            //}
+            //return RedirectToAction(nameof(Detail), new { id = request.Project_id });
+        }
+
+        public async Task<IActionResult> RemoveFeature(string projectid, string featureid)
+        {
+            await _WorkSVC.RemoveFeature(featureid);
+            return RedirectToAction(nameof(Detail), new { id = projectid });
+        }
+
         public IActionResult AddNewStory()
         {
             return View();
@@ -193,24 +239,6 @@ namespace taaproject.Controllers
             if (!isValidData)
             {
                 ViewBag.ErrorMessage = "Name or Description can not be empty";
-                return View();
-            }
-
-            return View(nameof(Detail));
-        }
-
-        public IActionResult EditFeature()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult EditFeature(string Description, string AssignmentMember, string inlineRadioOptions)
-        {
-            var isValidData = !string.IsNullOrEmpty(Description) && !string.IsNullOrEmpty(AssignmentMember) && !string.IsNullOrEmpty(inlineRadioOptions);
-            if (!isValidData)
-            {
-                ViewBag.ErrorMessage = "Description or AssignmentMember or InlineRadioOptions can not be empty";
                 return View();
             }
 
