@@ -41,6 +41,7 @@ namespace taaproject
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<ProjectService, ProjectService>();
             services.AddTransient<MembershopServices, MembershopServices>();
+            services.AddTransient<WorkService, WorkService>();
 
             services.AddMvc();
         }

@@ -15,6 +15,7 @@ using taaproject.Services;
 namespace taaproject.Controllers
 {
     using Microsoft.AspNetCore.Identity.MongoDB;
+    using static taaproject.Services.WorkService;
 
     [Authorize]
     public class HomeController : Controller
@@ -22,15 +23,21 @@ namespace taaproject.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ProjectService _svc;
+        private readonly MembershopServices _membershipSVC;
+        private readonly WorkService _WorkSVC;
 
         public HomeController(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ProjectService svc)
+            ProjectService svc,
+            MembershopServices membershipsvc,
+            WorkService worksvc)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _svc = svc;
+            _membershipSVC = membershipsvc;
+            _WorkSVC = worksvc;
         }
 
         public async Task<IActionResult> Index()
@@ -121,22 +128,36 @@ namespace taaproject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult AddNewFeature()
+        public async Task<IActionResult> AddNewFeature(string projectid)
         {
-            return View();
+            ViewBag.Username = _userManager.GetUserName(User);
+            var qry = await _membershipSVC.GetMemberships(projectid);
+            ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+            return View(new FeatureModel { Project_id = projectid });
         }
 
         [HttpPost]
-        public IActionResult AddNewFeature(string Name, string Description)
+        public async Task<IActionResult> AddNewFeature(FeatureModel request)
         {
-            var isValidData = !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Description);
-            if (!isValidData)
+            if (ModelState.IsValid)
             {
-                ViewBag.ErrorMessage = "Name or Description can not be empty";
-                return View();
+                var reulst = await _WorkSVC.CreateFeature(request);
+                if (!reulst)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถเพิ่มงานหลักได้ กรุณาตรวจสอบข้อมูล";
+                    var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                    ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                    return View(request);
+                }
+                return RedirectToAction(nameof(Detail), new { id = request.Project_id });
             }
-
-            return View(nameof(Detail));
+            else
+            {
+                ViewBag.ErrorMessage = "ไม่สามารถเพิ่มงานหลักได้ กรุณาตรวจสอบข้อมูล";
+                var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                return View(request);
+            }
         }
 
         public IActionResult AddNewStory()

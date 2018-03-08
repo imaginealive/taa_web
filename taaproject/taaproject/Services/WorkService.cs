@@ -115,7 +115,19 @@ namespace taaproject.Services
             return response;
         }
 
-        //public void CreateFeature(FeatureModel model, ClaimsPrincipal User){}
+        public async Task<bool> CreateFeature(FeatureModel model)
+        {
+            var isDataValid = model != null
+                && !string.IsNullOrEmpty(model.WorkName);
+            if (!isDataValid) return false;
+
+            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            model._id = Guid.NewGuid().ToString();
+            model.CreateDate = DateTime.Now.Date;
+            await feature_collection.InsertOneAsync(model);
+
+            return true;
+        }
 
         private async Task CreateCollectionAsync(string collection_name)
         {

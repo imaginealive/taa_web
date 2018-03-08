@@ -1,26 +1,58 @@
-﻿
+﻿@model taaproject.Services.WorkService.FeatureModel
+
 @{
     ViewData["Title"] = "Add New Feature";
 }
 
 <div style="margin: 2em 0em">
-    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail" asp-route-id="@Model.Project_id"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
     <h2>Add new feature</h2>
     <hr />
 
     <form asp-controller="Home" asp-action="AddNewFeature" method="post" style="margin-top: 1em">
+        @Html.HiddenFor(it => it.Project_id);
+
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2>Feature</h2>
             </div>
             <div class="panel-body">
                 <div class="form-group">
-                    <label for="Name">Name</label>
-                    <input type="text" class="form-control" id="Name" name="Name" placeholder="Feature name...">
+                    <label asp-for="WorkName"></label>
+                    <input asp-for="WorkName" class="form-control" placeholder="Feature name...">
+                    <span asp-validation-for="WorkName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label for="Description">Description</label>
-                    <textarea class="form-control" id="Description" name="Description" placeholder="Description..." rows="10"></textarea>
+                    <label asp-for="Description"></label>
+                    <textarea asp-for="Description" class="form-control" placeholder="Description..." rows="10"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="StartDate"></label>
+                    <input asp-for="StartDate" class="form-control" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CloseDate"></label>
+                    <input asp-for="CloseDate" class="form-control" />
+                    <span asp-validation-for="CloseDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CreateBy"></label>
+                    <input asp-for="CreateBy" value="@ViewBag.Username" readonly class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="AssignTo"></label>
+                    <select asp-for="AssignTo" class="form-control">
+                        @foreach (var item in ViewBag.AssignmentList)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Status"></label>
+                    <input asp-for="Status" value="@taaproject.Services.WorkService.WorkStatus.New.ToString()" readonly class="form-control" />
                 </div>
                 <p class="text-danger"><i>@ViewBag.ErrorMessage</i></p>
                 <button type="submit" class="btn btn-primary">Create</button>
