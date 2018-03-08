@@ -137,7 +137,7 @@ namespace taaproject.Services
 
             var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
             request._id = Guid.NewGuid().ToString();
-            request.CreateDate = DateTime.Now.Date;
+            request.CreateDate = DateTime.Now;
             await feature_collection.InsertOneAsync(request);
 
             return true;
