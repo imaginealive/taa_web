@@ -108,8 +108,37 @@ namespace taaproject.Services
                 ProjectName = project.ProjectName,
                 ProjectOwner = admin.First().MemberUserName,
                 CreateDate = project.CreateDate,
+                StartDate = project.StartDate,
+                FinishDate = project.FinishDate,
                 Description = string.IsNullOrEmpty(project.Description) ? "-" : project.Description
             };
+        }
+
+        public async Task UpdateProjectAsync(ProjectModel model, ClaimsPrincipal User)
+        {
+            var Username = _UserManager.GetUserName(User);
+
+            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var beMember = await member_collection.FindAsync(it =>
+            it.MemberUserName == Username &&
+            it.Project_id == model._id &&
+            (it.Rank == ProjectMemberRank.Admin
+            || it.Rank == ProjectMemberRank.Master));
+
+            var canUpdate = beMember.FirstOrDefault();
+            if (canUpdate == null) return;
+
+            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+
+            await project_collection.FindOneAndUpdateAsync(
+                Builders<ProjectModel>.Filter.Eq(it => it._id, model._id),
+                Builders<ProjectModel>.Update
+                .Set(it => it.ProjectName, model.ProjectName)
+                .Set(it => it.Description, model.Description)
+                .Set(it => it.StartDate, model.StartDate)
+                .Set(it => it.FinishDate, model.FinishDate)
+
+            );
         }
 
         public async Task DeleteProjectAsync(string project_id, ClaimsPrincipal User)
@@ -133,6 +162,7 @@ namespace taaproject.Services
             );
         }
 
+
         private async Task CreateCollectionAsync(string collection_name)
         {
             try
@@ -151,8 +181,7 @@ namespace taaproject.Services
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [Display(Name = "Project name")]
             public string ProjectName { get; set; }
-
-            [StringLength(300, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 0)]
+            
             [Display(Name = "Description")]
             public string Description { get; set; }
             public DateTime CreateDate { get; set; }
@@ -160,6 +189,9 @@ namespace taaproject.Services
             [DataType(DataType.DateTime)]
             [Display(Name = "Start Project Date")]
             public DateTime StartDate { get; set; }
+
+            [DataType(DataType.DateTime)]
+            [Display(Name = "Finish Project Date")]
             public DateTime? FinishDate { get; set; }
             public DateTime? DeletedDate { get; set; }
         }

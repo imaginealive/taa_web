@@ -1,15 +1,15 @@
-﻿@model ProjectViewModel
+﻿@model taaproject.Services.ProjectService.ProjectModel
 
 @{
     ViewData["Title"] = "Edit project";
 }
 
-
 <div style="margin: 2em 0em">
-    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+    <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Detail" asp-route-id="@Model._id"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
     <h2>@ViewData["Title"]</h2>
     <hr />
     <form asp-action="Edit">
+        <input asp-for="_id" hidden/>
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h2>Project</h2>
@@ -17,14 +17,24 @@
             <div class="panel-body">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <label asp-for="ProjectName" class="control-label"></label>
+                    <input asp-for="ProjectName" class="form-control" />
+                    <span asp-validation-for="ProjectName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
                     <textarea asp-for="Description" class="form-control"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="StartDate" class="control-label"></label>
+                    <input asp-for="StartDate" type="date" class="form-control">
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FinishDate" class="control-label"></label>
+                    <input asp-for="FinishDate" type="date" class="form-control">
+                    <span asp-validation-for="FinishDate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Edit" class="btn btn-primary" />

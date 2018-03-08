@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using taaproject.Models;
 using taaproject.Services;
@@ -10,6 +11,7 @@ using static taaproject.Services.ProjectService;
 
 namespace taaproject.Controllers
 {
+    [Authorize]
     public class MembershipController : Controller
     {
         private readonly MembershopServices _svc;

@@ -49,12 +49,20 @@ namespace taaproject.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var model = new ProjectModel { StartDate = DateTime.Now };
+            return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(ProjectModel model)
         {
+            var now = DateTime.UtcNow;
+            if (model.FinishDate.HasValue)
+                if (model.FinishDate < model.StartDate || model.FinishDate < now)
+                {
+                    ModelState.AddModelError(nameof(model.FinishDate), "วันหมดอายุต้องมากกว่าวันเริ่มใช้งาน");
+                }
+
             if (ModelState.IsValid)
             {
                 try
@@ -69,9 +77,42 @@ namespace taaproject.Controllers
             return View(model);
         }
 
-        public IActionResult Edit()
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
         {
-            return View();
+            var project = await _svc.GetAllowProjectAsync(id, User);
+            var model = new ProjectModel
+            {
+                _id = project._id,
+                ProjectName = project.ProjectName,
+                Description = project.Description,
+                StartDate = project.StartDate,
+                FinishDate = project.FinishDate,
+            };
+            return View(model);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Edit(string id, ProjectModel model)
+        {
+            var now = DateTime.UtcNow;
+            if (model.FinishDate.HasValue)
+                if (model.FinishDate < model.StartDate || model.FinishDate < now)
+                {
+                    ModelState.AddModelError(nameof(model.FinishDate), "วันหมดอายุต้องมากกว่าวันเริ่มใช้งาน");
+                }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _svc.UpdateProjectAsync(model, User);
+                    return RedirectToAction(nameof(Detail), new { id });
+                }
+                catch (Exception)
+                {
+                }
+            }
+            return View(model);
         }
 
         public async Task<IActionResult> Delete(string id)

@@ -6,7 +6,6 @@
 
 <div style="margin: 2em 0em">
     <a class="btn btn-lg btn-default" asp-controller="Home" asp-action="Index"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
-
     <h2>@ViewData["Title"]</h2>
     <hr />
     <form asp-action="Create">
@@ -29,6 +28,11 @@
                     <label asp-for="StartDate" class="control-label"></label>
                     <input asp-for="StartDate" type="date" class="form-control">
                     <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FinishDate" class="control-label"></label>
+                    <input asp-for="FinishDate" type="date" class="form-control">
+                    <span asp-validation-for="FinishDate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Create" class="btn btn-primary" />
