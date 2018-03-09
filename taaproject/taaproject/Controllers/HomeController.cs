@@ -51,7 +51,7 @@ namespace taaproject.Controllers
         {
             var model = await _svc.GetAllowProjectAsync(id, User);
             var qry = await _WorkSVC.GetAllAllowWorkAsync(id, User);
-            ViewBag.Works = qry.ToList();
+            model.Work = qry.ToList();
             return View(model);
         }
 

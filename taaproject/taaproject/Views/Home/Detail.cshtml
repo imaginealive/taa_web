@@ -23,7 +23,7 @@
                         <dt>Project Manage</dt>
                         <dd>@Model.ProjectOwner</dd>
                         <dt>Work process</dt>
-                        <dd>@ViewBag.Works.Count</dd>
+                        <dd>@Model.Work.Count</dd>
                         <dt>Work Completed (percent)</dt>
                         <dd>0 (0%)</dd>
                     </dl>
@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    @foreach (var item in ViewBag.Works)
+    @foreach (var item in Model.Work)
     {
         <div class="panel panel-primary">
             <div class="panel-heading">
@@ -63,7 +63,7 @@
                         Feature @(count): @(item.WorkName)
                     </a>
                     <a class="btn btn-sm" asp-controller="Home" asp-action="EditFeature" asp-route-featureid="@item._id"><span class="glyphicon glyphicon-pencil"></span></a>
-                    <label class="pull-right">New</label>
+                    <label class="pull-right">@item.Status</label>
                 </h4>
             </div>
             <div id="@("collapse" + count)" class="panel-collapse collapse">
