@@ -54,25 +54,51 @@
         </div>
     </div>
 
-    @foreach (var item in Model.Work)
+    @foreach (var feature in Model.Work)
     {
+        int countStories = 0;
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordionFeature" href="@("#collapse" + ++count)">
-                        Feature @(count): @(item.WorkName)
+                    <a data-toggle="collapse" data-parent="#accordionFeature" href="@("#collapseFeature" + ++count)">
+                        Feature @(count): @(feature.WorkName)
                     </a>
-                    <a class="btn btn-sm" asp-controller="Home" asp-action="EditFeature" asp-route-featureid="@item._id"><span class="glyphicon glyphicon-pencil"></span></a>
-                    <label class="pull-right">@item.Status</label>
+                    <a class="btn btn-sm" asp-controller="Home" asp-action="EditFeature" asp-route-featureid="@feature._id"><span class="glyphicon glyphicon-pencil"></span></a>
+                    <label class="pull-right">@feature.Status</label>
                 </h4>
             </div>
-            <div id="@("collapse" + count)" class="panel-collapse collapse">
+            <div id="@("collapseFeature" + count)" class="panel-collapse collapse">
                 <div class="panel-body">
                     <p>
-                        @item.Description
+                        @feature.Description
                     </p>
-                    <a class="btn btn-lg btn-success" asp-controller="Home" asp-action="AddNewStory"><span class="glyphicon glyphicon-plus"></span>  New Story</a>
-                    <a class="btn btn-lg btn-danger" asp-controller="Home" asp-action="RemoveFeature" asp-route-projectid="@Model._id" asp-route-featureid="@item._id"><span class="glyphicon glyphicon-remove"></span>  Remove</a>
+
+                    @foreach (var story in feature.StoryList)
+                    {
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordionStory" href="@("#collapseStory" + ++countStories)">
+                                        Story @(countStories): @(story.WorkName)
+                                    </a>
+                                    <a class="btn btn-sm" asp-controller="Home" asp-action="EditStory" asp-route-storyid="@story._id"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    <label class="pull-right">New</label>
+                                </h4>
+                            </div>
+                            <div id="@("collapseStory" + countStories)" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <p>
+                                        @story.Description
+                                    </p>
+                                    <a class="btn btn-lg btn-warning" asp-controller="Home" asp-action="AddNewTask" asp-route-projectid="@Model._id" asp-route-storyid="@story._id"><span class="glyphicon glyphicon-plus"></span>  New Task</a>
+                                    <a class="btn btn-lg btn-danger" asp-controller="Home" asp-action="RemoveStory" asp-route-projectid="@Model._id" asp-route-storyid="@story._id"><span class="glyphicon glyphicon-remove"></span>  Remove</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <a class="btn btn-lg btn-success" asp-controller="Home" asp-action="AddNewStory" asp-route-projectid="@Model._id" asp-route-featureid="@feature._id"><span class="glyphicon glyphicon-plus"></span>  New Story</a>
+                    <a class="btn btn-lg btn-danger" asp-controller="Home" asp-action="RemoveFeature" asp-route-projectid="@Model._id" asp-route-featureid="@feature._id"><span class="glyphicon glyphicon-remove"></span>  Remove</a>
                 </div>
             </div>
         </div>
