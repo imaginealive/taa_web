@@ -42,6 +42,7 @@ namespace taaproject
             services.AddTransient<ProjectService, ProjectService>();
             services.AddTransient<MembershopServices, MembershopServices>();
             services.AddTransient<WorkService, WorkService>();
+            services.AddTransient<IServiceConfigurations>(x => Configuration.GetSection(nameof(ServiceConfigurations)).Get<ServiceConfigurations>());
 
             services.AddMvc();
         }

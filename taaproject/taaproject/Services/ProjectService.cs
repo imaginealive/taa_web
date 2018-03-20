@@ -17,35 +17,32 @@ namespace taaproject.Services
     {
         public IMongoClient client;
         public IMongoDatabase database;
+        public IServiceConfigurations mongoDB;
         SignInManager<IdentityUser> _SignInManager;
         UserManager<IdentityUser> _UserManager;
-        public readonly string projectCollection = "projects";
-        public readonly string membershipCollection = "memberships";
 
         public ProjectService(
             IConfiguration config,
+            IServiceConfigurations mongo,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
         {
-            var mongoCon = config.GetConnectionString("DefaultConnection");
-            client = new MongoClient(mongoCon);
-            database = client.GetDatabase("taa");
+            mongoDB = mongo;
+            client = new MongoClient(mongoDB.DefaultConnection);
+            database = client.GetDatabase(mongoDB.DatabaseName);
             _SignInManager = signInManager;
             _UserManager = userManager;
         }
 
         public async Task CreateProjectAsync(ProjectModel model, ClaimsPrincipal User)
         {
-            await CreateCollectionAsync(projectCollection);
-            await CreateCollectionAsync(membershipCollection);
-
             model._id = Guid.NewGuid().ToString();
             model.CreateDate = DateTime.Now.Date;
 
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
             await project_collection.InsertOneAsync(model);
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var member = new MembershipModel
             {
                 _id = Guid.NewGuid().ToString(),
@@ -59,19 +56,16 @@ namespace taaproject.Services
 
         public async Task<IEnumerable<ProjectViewModel>> GetAllAllowProjectAsync(ClaimsPrincipal User)
         {
-            await CreateCollectionAsync(projectCollection);
-            await CreateCollectionAsync(membershipCollection);
-
             var Username = _UserManager.GetUserName(User);
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username);
             var memberList = beMember.ToList();
             if (memberList == null || memberList.Count == 0) return null;
 
             var admins = await member_collection.FindAsync(it => it.Rank == ProjectMemberRank.Admin);
             var adminList = admins.ToList();
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
             var projects = await project_collection.FindAsync(it => !it.DeletedDate.HasValue);
             return projects.ToList().Where(it => memberList.Any(mb => mb.Project_id == it._id)).Select(pj =>
             {
@@ -88,17 +82,14 @@ namespace taaproject.Services
 
         public async Task<ProjectViewModel> GetAllowProjectAsync(string project_id, ClaimsPrincipal User)
         {
-            await CreateCollectionAsync(projectCollection);
-            await CreateCollectionAsync(membershipCollection);
-
             var Username = _UserManager.GetUserName(User);
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == project_id);
             var member = beMember.FirstOrDefault();
             if (member == null) return null;
             var admin = await member_collection.FindAsync(it => it.Rank == ProjectMemberRank.Admin && it.Project_id == project_id);
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
             var projects = await project_collection.FindAsync(it => !it.DeletedDate.HasValue && it._id == project_id);
             var project = projects.FirstOrDefault();
             if (project == null) return null;
@@ -118,7 +109,7 @@ namespace taaproject.Services
         {
             var Username = _UserManager.GetUserName(User);
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it =>
             it.MemberUserName == Username &&
             it.Project_id == model._id &&
@@ -128,7 +119,7 @@ namespace taaproject.Services
             var canUpdate = beMember.FirstOrDefault();
             if (canUpdate == null) return;
 
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
 
             await project_collection.FindOneAndUpdateAsync(
                 Builders<ProjectModel>.Filter.Eq(it => it._id, model._id),
@@ -145,7 +136,7 @@ namespace taaproject.Services
         {
             var Username = _UserManager.GetUserName(User);
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it =>
             it.MemberUserName == Username &&
             it.Project_id == project_id &&
@@ -154,24 +145,12 @@ namespace taaproject.Services
             var beAdmin = beMember.FirstOrDefault();
             if (beAdmin == null) return;
 
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
 
             await project_collection.FindOneAndUpdateAsync(
                 Builders<ProjectModel>.Filter.Eq(it => it._id, project_id),
                 Builders<ProjectModel>.Update.Set(it => it.DeletedDate, DateTime.Now.Date)
             );
-        }
-
-
-        private async Task CreateCollectionAsync(string collection_name)
-        {
-            try
-            {
-                await database.CreateCollectionAsync(collection_name);
-            }
-            catch (Exception)
-            {
-            }
         }
 
         public class ProjectModel

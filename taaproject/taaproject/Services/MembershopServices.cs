@@ -19,21 +19,19 @@ namespace taaproject.Services
     {
         public IMongoClient client;
         public IMongoDatabase database;
+        public IServiceConfigurations mongoDB;
         SignInManager<IdentityUser> _SignInManager;
         UserManager<IdentityUser> _UserManager;
 
-        public readonly string userCollection = "users";
-        public readonly string projectCollection = "projects";
-        public readonly string membershipCollection = "memberships";
-
         public MembershopServices(
             IConfiguration config,
+            IServiceConfigurations mongo,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
         {
-            var mongoCon = config.GetConnectionString("DefaultConnection");
-            client = new MongoClient(mongoCon);
-            database = client.GetDatabase("taa");
+            mongoDB = mongo;
+            client = new MongoClient(mongoDB.DefaultConnection);
+            database = client.GetDatabase(mongoDB.DatabaseName);
             _SignInManager = signInManager;
             _UserManager = userManager;
         }
@@ -43,19 +41,19 @@ namespace taaproject.Services
             var areDataValidation = !string.IsNullOrEmpty(projectid);
             if (!areDataValidation) return Enumerable.Empty<MembershipInformation>();
 
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
             var project = await project_collection.FindAsync(it => it._id == projectid);
             var selectProject = project.FirstOrDefault();
             var isProjectValid = selectProject != null;
             if (!isProjectValid) return Enumerable.Empty<MembershipInformation>();
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var memberships = await member_collection.FindAsync(it => it.Project_id == selectProject._id);
+            var membershipList = memberships.ToList();
 
-            var user_collection = database.GetCollection<IdentityUser>(userCollection);
+            var user_collection = database.GetCollection<IdentityUser>(mongoDB.UserCollection);
             var users = await user_collection.FindAsync(it => true);
             var usersList = users.ToList();
-            var membershipList = memberships.ToList();
 
             var result = new List<MembershipInformation>();
             foreach (var item in membershipList)
@@ -80,13 +78,13 @@ namespace taaproject.Services
             var areDataValidation = !string.IsNullOrEmpty(projectid) && !string.IsNullOrEmpty(username);
             if (!areDataValidation) return new MembershipModel();
 
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
             var project = await project_collection.FindAsync(it => it._id == projectid);
             var selectProject = project.FirstOrDefault();
             var isProjectValid = selectProject != null;
             if (!isProjectValid) return new MembershipModel();
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var selectMember = await member_collection.FindAsync(it => it.MemberUserName == username && it.Project_id == projectid);
             var result = selectMember.FirstOrDefault();
             return result;
@@ -97,19 +95,19 @@ namespace taaproject.Services
             var areDataValidation = !string.IsNullOrEmpty(projectid) && !string.IsNullOrEmpty(username);
             if (!areDataValidation) return false;
 
-            var user_collection = database.GetCollection<IdentityUser>(userCollection);
+            var user_collection = database.GetCollection<IdentityUser>(mongoDB.UserCollection);
             var user = await user_collection.FindAsync(it => it.Email == username);
             var selectUser = user.FirstOrDefault();
             var isUserValid = selectUser != null;
             if (!isUserValid) return false;
 
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
             var project = await project_collection.FindAsync(it => it._id == projectid);
             var selectProject = project.FirstOrDefault();
             var isProjectValid = selectProject != null;
             if (!isProjectValid) return false;
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var selectMember = await member_collection.FindAsync(it => it.MemberUserName == selectUser.UserName && it.Project_id == projectid);
             var isMemberAlreadyExist = selectMember.FirstOrDefault() != null;
             if (isMemberAlreadyExist) return false;
@@ -131,13 +129,13 @@ namespace taaproject.Services
             var areDataValidation = !string.IsNullOrEmpty(projectid) && !string.IsNullOrEmpty(username);
             if (!areDataValidation) return false;
 
-            var project_collection = database.GetCollection<ProjectModel>(projectCollection);
+            var project_collection = database.GetCollection<ProjectModel>(mongoDB.ProjectCollection);
             var project = await project_collection.FindAsync(it => it._id == projectid);
             var selectProject = project.FirstOrDefault();
             var isProjectValid = selectProject != null;
             if (!isProjectValid) return false;
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var members = await member_collection.FindAsync(it => it.MemberUserName == username && it.Project_id == projectid);
             var selectmember = members.FirstOrDefault();
             if (selectmember == null) return false;
@@ -158,7 +156,7 @@ namespace taaproject.Services
                 && !string.IsNullOrEmpty(request.Rank.ToString());
             if (!areDataValidation) return false;
             
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             await member_collection.ReplaceOneAsync(it => it._id == request._id, request);
             return true;
         }
