@@ -18,22 +18,19 @@ namespace taaproject.Services
     {
         public IMongoClient client;
         public IMongoDatabase database;
+        public IServiceConfigurations mongoDB;
         SignInManager<IdentityUser> _SignInManager;
         UserManager<IdentityUser> _UserManager;
-        public readonly string featureCollection = "features";
-        public readonly string storyCollection = "stories";
-        public readonly string taskCollection = "tasks";
-        public readonly string membershipCollection = "memberships";
 
         public WorkService(
             IConfiguration config,
+            IServiceConfigurations mongo,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
         {
-            var mongoCon = config.GetConnectionString("DefaultConnection");
-            client = new MongoClient(mongoCon);
-            database = client.GetDatabase("taa");
-
+            mongoDB = mongo;
+            client = new MongoClient(mongoDB.DefaultConnection);
+            database = client.GetDatabase(mongoDB.DatabaseName);
             _UserManager = userManager;
             _SignInManager = signInManager;
         }
@@ -42,20 +39,20 @@ namespace taaproject.Services
         {
             var Username = _UserManager.GetUserName(User);
 
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == project_id);
             var member = beMember.FirstOrDefault();
             if (member == null) return null;
 
-            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            var feature_collection = database.GetCollection<FeatureModel>(mongoDB.FeatureCollection);
             var features = await feature_collection.FindAsync(it => it.Project_id == project_id);
             var featuresList = features.ToList();
 
-            var story_collection = database.GetCollection<StoryModel>(storyCollection);
+            var story_collection = database.GetCollection<StoryModel>(mongoDB.StoryCollection);
             var stories = await story_collection.FindAsync(it => it.Project_id == project_id);
             var storyList = stories.ToList();
 
-            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            var task_collection = database.GetCollection<TaskModel>(mongoDB.TaskCollection);
             var tasks = await task_collection.FindAsync(it => it.Project_id == project_id);
             var taskList = tasks.ToList();
 
@@ -122,7 +119,7 @@ namespace taaproject.Services
             var isDataValid = !string.IsNullOrEmpty(featureid);
             if (!isDataValid) return new FeatureModel();
 
-            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            var feature_collection = database.GetCollection<FeatureModel>(mongoDB.FeatureCollection);
             var features = await feature_collection.FindAsync(it => it._id == featureid);
             var result = features.FirstOrDefault();
             return result;
@@ -134,7 +131,7 @@ namespace taaproject.Services
                 && !string.IsNullOrEmpty(request.WorkName);
             if (!isDataValid) return false;
 
-            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            var feature_collection = database.GetCollection<FeatureModel>(mongoDB.FeatureCollection);
             request._id = Guid.NewGuid().ToString();
             request.CreateDate = DateTime.Now;
             await feature_collection.InsertOneAsync(request);
@@ -151,14 +148,14 @@ namespace taaproject.Services
             if (!isDataValid) return false;
 
             var Username = _UserManager.GetUserName(User);
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == request.Project_id);
             var member = beMember.FirstOrDefault();
             if (member == null) return false;
 
             request.AssignBy = member.MemberUserName;
 
-            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            var feature_collection = database.GetCollection<FeatureModel>(mongoDB.FeatureCollection);
             await feature_collection.ReplaceOneAsync(it => it._id == request._id, request);
             return true;
         }
@@ -168,7 +165,7 @@ namespace taaproject.Services
             var isDataValid = !string.IsNullOrEmpty(featureid);
             if (!isDataValid) return false;
 
-            var feature_collection = database.GetCollection<FeatureModel>(featureCollection);
+            var feature_collection = database.GetCollection<FeatureModel>(mongoDB.FeatureCollection);
             var filter = Builders<FeatureModel>.Filter.Eq(it => it._id, featureid);
             await feature_collection.DeleteOneAsync(filter);
             return true;
@@ -183,7 +180,7 @@ namespace taaproject.Services
             var isDataValid = !string.IsNullOrEmpty(storyid);
             if (!isDataValid) return new StoryModel();
 
-            var story_collection = database.GetCollection<StoryModel>(storyCollection);
+            var story_collection = database.GetCollection<StoryModel>(mongoDB.StoryCollection);
             var story = await story_collection.FindAsync(it => it._id == storyid);
             var result = story.FirstOrDefault();
             return result;
@@ -195,7 +192,7 @@ namespace taaproject.Services
                 && !string.IsNullOrEmpty(request.WorkName);
             if (!isDataValid) return false;
 
-            var story_collection = database.GetCollection<StoryModel>(storyCollection);
+            var story_collection = database.GetCollection<StoryModel>(mongoDB.StoryCollection);
             request._id = Guid.NewGuid().ToString();
             request.CreateDate = DateTime.Now;
             await story_collection.InsertOneAsync(request);
@@ -212,14 +209,14 @@ namespace taaproject.Services
             if (!isDataValid) return false;
 
             var Username = _UserManager.GetUserName(User);
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == request.Project_id);
             var member = beMember.FirstOrDefault();
             if (member == null) return false;
 
             request.AssignBy = member.MemberUserName;
 
-            var story_collection = database.GetCollection<StoryModel>(storyCollection);
+            var story_collection = database.GetCollection<StoryModel>(mongoDB.StoryCollection);
             await story_collection.ReplaceOneAsync(it => it._id == request._id, request);
             return true;
         }
@@ -229,7 +226,7 @@ namespace taaproject.Services
             var isDataValid = !string.IsNullOrEmpty(storyid);
             if (!isDataValid) return false;
 
-            var story_collection = database.GetCollection<StoryModel>(storyCollection);
+            var story_collection = database.GetCollection<StoryModel>(mongoDB.StoryCollection);
             var filter = Builders<StoryModel>.Filter.Eq(it => it._id, storyid);
             await story_collection.DeleteOneAsync(filter);
             return true;
@@ -244,7 +241,7 @@ namespace taaproject.Services
             var isDataValid = !string.IsNullOrEmpty(taskid);
             if (!isDataValid) return new TaskModel();
 
-            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            var task_collection = database.GetCollection<TaskModel>(mongoDB.TaskCollection);
             var task = await task_collection.FindAsync(it => it._id == taskid);
             var result = task.FirstOrDefault();
             return result;
@@ -256,7 +253,7 @@ namespace taaproject.Services
                 && !string.IsNullOrEmpty(request.WorkName);
             if (!isDataValid) return false;
 
-            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            var task_collection = database.GetCollection<TaskModel>(mongoDB.TaskCollection);
             request._id = Guid.NewGuid().ToString();
             request.CreateDate = DateTime.Now;
             await task_collection.InsertOneAsync(request);
@@ -273,14 +270,14 @@ namespace taaproject.Services
             if (!isDataValid) return false;
 
             var Username = _UserManager.GetUserName(User);
-            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var member_collection = database.GetCollection<MembershipModel>(mongoDB.MembershipCollection);
             var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == request.Project_id);
             var member = beMember.FirstOrDefault();
             if (member == null) return false;
 
             request.AssignBy = member.MemberUserName;
 
-            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            var task_collection = database.GetCollection<TaskModel>(mongoDB.TaskCollection);
             await task_collection.ReplaceOneAsync(it => it._id == request._id, request);
             return true;
         }
@@ -290,7 +287,7 @@ namespace taaproject.Services
             var isDataValid = !string.IsNullOrEmpty(taskid);
             if (!isDataValid) return false;
 
-            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            var task_collection = database.GetCollection<TaskModel>(mongoDB.TaskCollection);
             var filter = Builders<TaskModel>.Filter.Eq(it => it._id, taskid);
             await task_collection.DeleteOneAsync(filter);
             return true;
