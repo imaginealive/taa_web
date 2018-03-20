@@ -40,10 +40,6 @@ namespace taaproject.Services
 
         public async Task<IEnumerable<FeatureViewModel>> GetAllAllowWorkAsync(string project_id, ClaimsPrincipal User)
         {
-            await CreateCollectionAsync(featureCollection);
-            await CreateCollectionAsync(storyCollection);
-            await CreateCollectionAsync(taskCollection);
-
             var Username = _UserManager.GetUserName(User);
 
             var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
