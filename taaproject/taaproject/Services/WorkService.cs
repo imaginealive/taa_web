@@ -59,57 +59,58 @@ namespace taaproject.Services
             var tasks = await task_collection.FindAsync(it => it.Project_id == project_id);
             var taskList = tasks.ToList();
 
+
             var response = featuresList.Select(ft =>
-            {
-                return new FeatureViewModel
                 {
-                    _id = ft._id,
-                    WorkName = ft.WorkName,
-                    Description = ft.Description,
-                    Status = ft.Status,
-                    CreateDate = ft.CreateDate,
-                    StartDate = ft.StartDate,
-                    CloseDate = ft.CloseDate,
-                    DoneDate = ft.DoneDate,
-                    AssignTo = ft.AssignTo,
-                    AssignBy = ft.AssignBy,
-                    Project_id = ft.Project_id,
-                    StoryList = storyList.Where(st => st.Feature_id == ft._id).Select(st =>
+                    return new FeatureViewModel
                     {
-                        return new StoryViewModel
+                        _id = ft._id,
+                        WorkName = ft.WorkName,
+                        Description = ft.Description,
+                        Status = ft.Status,
+                        CreateDate = ft.CreateDate,
+                        StartDate = ft.StartDate,
+                        CloseDate = ft.CloseDate,
+                        DoneDate = ft.DoneDate,
+                        AssignTo = ft.AssignTo,
+                        AssignBy = ft.AssignBy,
+                        Project_id = ft.Project_id,
+                        StoryList = storyList.Where(st => st.Feature_id == ft._id).Select(st =>
                         {
-                            _id = st._id,
-                            WorkName = st.WorkName,
-                            Description = st.Description,
-                            Status = st.Status,
-                            CreateDate = st.CreateDate,
-                            StartDate = st.StartDate,
-                            CloseDate = st.CloseDate,
-                            DoneDate = st.DoneDate,
-                            AssignTo = st.AssignTo,
-                            AssignBy = st.AssignBy,
-                            Project_id = st.Project_id,
-                            TaskList = taskList.Where(t => t.Story_id == st._id).Select(t =>
+                            return new StoryViewModel
                             {
-                                return new TaskViewModel
+                                _id = st._id,
+                                WorkName = st.WorkName,
+                                Description = st.Description,
+                                Status = st.Status,
+                                CreateDate = st.CreateDate,
+                                StartDate = st.StartDate,
+                                CloseDate = st.CloseDate,
+                                DoneDate = st.DoneDate,
+                                AssignTo = st.AssignTo,
+                                AssignBy = st.AssignBy,
+                                Project_id = st.Project_id,
+                                TaskList = taskList.Where(t => t.Story_id == st._id).Select(t =>
                                 {
-                                    _id = st._id,
-                                    WorkName = st.WorkName,
-                                    Description = st.Description,
-                                    Status = st.Status,
-                                    CreateDate = st.CreateDate,
-                                    StartDate = st.StartDate,
-                                    CloseDate = st.CloseDate,
-                                    DoneDate = st.DoneDate,
-                                    AssignTo = st.AssignTo,
-                                    AssignBy = st.AssignBy,
-                                    Project_id = st.Project_id
-                                };
-                            })
-                        };
-                    }),
-                };
-            });
+                                    return new TaskViewModel
+                                    {
+                                        _id = t._id,
+                                        WorkName = t.WorkName,
+                                        Description = t.Description,
+                                        Status = t.Status,
+                                        CreateDate = t.CreateDate,
+                                        StartDate = t.StartDate,
+                                        CloseDate = t.CloseDate,
+                                        DoneDate = t.DoneDate,
+                                        AssignTo = t.AssignTo,
+                                        AssignBy = t.AssignBy,
+                                        Project_id = t.Project_id
+                                    };
+                                })
+                            };
+                        }),
+                    };
+                }).ToList();
 
             return response;
         }
