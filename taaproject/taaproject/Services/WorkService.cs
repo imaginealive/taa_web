@@ -176,7 +176,7 @@ namespace taaproject.Services
 
         #endregion Features
 
-        #region Story
+        #region Stories
 
         public async Task<StoryModel> GetStory(string storyid)
         {
@@ -195,10 +195,10 @@ namespace taaproject.Services
                 && !string.IsNullOrEmpty(request.WorkName);
             if (!isDataValid) return false;
 
-            var feature_collection = database.GetCollection<StoryModel>(storyCollection);
+            var story_collection = database.GetCollection<StoryModel>(storyCollection);
             request._id = Guid.NewGuid().ToString();
             request.CreateDate = DateTime.Now;
-            await feature_collection.InsertOneAsync(request);
+            await story_collection.InsertOneAsync(request);
 
             return true;
         }
@@ -219,8 +219,8 @@ namespace taaproject.Services
 
             request.AssignBy = member.MemberUserName;
 
-            var feature_collection = database.GetCollection<StoryModel>(storyCollection);
-            await feature_collection.ReplaceOneAsync(it => it._id == request._id, request);
+            var story_collection = database.GetCollection<StoryModel>(storyCollection);
+            await story_collection.ReplaceOneAsync(it => it._id == request._id, request);
             return true;
         }
 
@@ -229,13 +229,74 @@ namespace taaproject.Services
             var isDataValid = !string.IsNullOrEmpty(storyid);
             if (!isDataValid) return false;
 
-            var feature_collection = database.GetCollection<StoryModel>(storyCollection);
+            var story_collection = database.GetCollection<StoryModel>(storyCollection);
             var filter = Builders<StoryModel>.Filter.Eq(it => it._id, storyid);
-            await feature_collection.DeleteOneAsync(filter);
+            await story_collection.DeleteOneAsync(filter);
             return true;
         }
 
-        #endregion Story
+        #endregion Stories
+
+        #region Tasks
+        
+        public async Task<TaskModel> GetTask(string taskid)
+        {
+            var isDataValid = !string.IsNullOrEmpty(taskid);
+            if (!isDataValid) return new TaskModel();
+
+            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            var task = await task_collection.FindAsync(it => it._id == taskid);
+            var result = task.FirstOrDefault();
+            return result;
+        }
+
+        public async Task<bool> CreateTask(TaskModel request)
+        {
+            var isDataValid = request != null
+                && !string.IsNullOrEmpty(request.WorkName);
+            if (!isDataValid) return false;
+
+            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            request._id = Guid.NewGuid().ToString();
+            request.CreateDate = DateTime.Now;
+            await task_collection.InsertOneAsync(request);
+
+            return true;
+        }
+
+        public async Task<bool> UpdateTask(TaskModel request, ClaimsPrincipal User)
+        {
+            var isDataValid = request != null
+                && !string.IsNullOrEmpty(request._id)
+                && !string.IsNullOrEmpty(request.WorkName)
+                && User != null;
+            if (!isDataValid) return false;
+
+            var Username = _UserManager.GetUserName(User);
+            var member_collection = database.GetCollection<MembershipModel>(membershipCollection);
+            var beMember = await member_collection.FindAsync(it => it.MemberUserName == Username && it.Project_id == request.Project_id);
+            var member = beMember.FirstOrDefault();
+            if (member == null) return false;
+
+            request.AssignBy = member.MemberUserName;
+
+            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            await task_collection.ReplaceOneAsync(it => it._id == request._id, request);
+            return true;
+        }
+
+        public async Task<bool> RemoveTask(string taskid)
+        {
+            var isDataValid = !string.IsNullOrEmpty(taskid);
+            if (!isDataValid) return false;
+
+            var task_collection = database.GetCollection<TaskModel>(taskCollection);
+            var filter = Builders<TaskModel>.Filter.Eq(it => it._id, taskid);
+            await task_collection.DeleteOneAsync(filter);
+            return true;
+        }
+
+        #endregion Tasks
 
         private async Task CreateCollectionAsync(string collection_name)
         {

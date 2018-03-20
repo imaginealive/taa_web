@@ -254,7 +254,7 @@ namespace taaproject.Controllers
                 var result = await _WorkSVC.UpdateStory(request, User);
                 if (!result)
                 {
-                    ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานหลักได้ กรุณาตรวจสอบข้อมูล";
+                    ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานรองได้ กรุณาตรวจสอบข้อมูล";
                     var qry = await _membershipSVC.GetMemberships(request.Project_id);
                     ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
                     return View(request);
@@ -263,7 +263,7 @@ namespace taaproject.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานหลักได้ กรุณาตรวจสอบข้อมูล";
+                ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานรองได้ กรุณาตรวจสอบข้อมูล";
                 var qry = await _membershipSVC.GetMemberships(request.Project_id);
                 ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
                 return View(request);
@@ -278,41 +278,79 @@ namespace taaproject.Controllers
 
         #endregion Stories
         
-        public IActionResult AddNewTask()
+        #region Tasks
+
+        public async Task<IActionResult> AddNewTask(string projectid, string storyid)
         {
-            return View();
+            ViewBag.Username = _userManager.GetUserName(User);
+            var qry = await _membershipSVC.GetMemberships(projectid);
+            ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+            return View(new TaskModel { Project_id = projectid, Story_id = storyid });
         }
 
         [HttpPost]
-        public IActionResult AddNewTask(string Name, string Description)
+        public async Task<IActionResult> AddNewTask(TaskModel request)
         {
-            var isValidData = !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Description);
-            if (!isValidData)
+            if (ModelState.IsValid)
             {
-                ViewBag.ErrorMessage = "Name or Description can not be empty";
-                return View();
+                var reulst = await _WorkSVC.CreateTask(request);
+                if (!reulst)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานย่อยได้ กรุณาตรวจสอบข้อมูล";
+                    var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                    ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                    return View(request);
+                }
+                return RedirectToAction(nameof(Detail), new { id = request.Project_id });
             }
-
-            return View(nameof(Detail));
+            else
+            {
+                ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานย่อยได้ กรุณาตรวจสอบข้อมูล";
+                var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                return View(request);
+            }
         }
-        
-        public IActionResult EditTask()
+
+        public async Task<IActionResult> EditTask(string taskid)
         {
-            return View();
+            var model = await _WorkSVC.GetTask(taskid);
+            var qry = await _membershipSVC.GetMemberships(model.Project_id);
+            ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult EditTask(string Description, string AssignmentMember, string inlineRadioOptions)
+        public async Task<IActionResult> EditTask(TaskModel request)
         {
-            var isValidData = !string.IsNullOrEmpty(Description) && !string.IsNullOrEmpty(AssignmentMember) && !string.IsNullOrEmpty(inlineRadioOptions);
-            if (!isValidData)
+            if (ModelState.IsValid)
             {
-                ViewBag.ErrorMessage = "Description or AssignmentMember or InlineRadioOptions can not be empty";
-                return View();
+                var result = await _WorkSVC.UpdateTask(request, User);
+                if (!result)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานย่อยได้ กรุณาตรวจสอบข้อมูล";
+                    var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                    ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                    return View(request);
+                }
+                return RedirectToAction(nameof(Detail), new { id = request.Project_id });
             }
-
-            return View(nameof(Detail));
+            else
+            {
+                ViewBag.ErrorMessage = "ไม่สามารถแก้ไขข้อมูลงานย่อยได้ กรุณาตรวจสอบข้อมูล";
+                var qry = await _membershipSVC.GetMemberships(request.Project_id);
+                ViewBag.AssignmentList = qry.Select(it => it.MemberUserName);
+                return View(request);
+            }
         }
+
+        public async Task<IActionResult> RemoveTask(string projectid, string taskid)
+        {
+            await _WorkSVC.RemoveTask(taskid);
+            return RedirectToAction(nameof(Detail), new { id = projectid });
+        }
+
+        #endregion Tasks
 
         public IActionResult About()
         {
