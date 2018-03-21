@@ -56,10 +56,13 @@ namespace taaproject.Services
             var tasks = await task_collection.FindAsync(it => it.Project_id == project_id);
             var taskList = tasks.ToList();
 
-
-            var response = featuresList.Select(ft =>
+            if (member.Rank == ProjectMemberRank.Developer)
+            {
+                return featuresList.Select(ft =>
                 {
-                    return new FeatureViewModel
+                    var MyFeatureWork = false;
+                    MyFeatureWork = ft.AssignTo == member.MemberUserName;
+                    var feature = new FeatureViewModel
                     {
                         _id = ft._id,
                         WorkName = ft.WorkName,
@@ -74,7 +77,9 @@ namespace taaproject.Services
                         Project_id = ft.Project_id,
                         StoryList = storyList.Where(st => st.Feature_id == ft._id).Select(st =>
                         {
-                            return new StoryViewModel
+                            var MyStoryWork = false;
+                            MyStoryWork = MyFeatureWork || st.AssignTo == member.MemberUserName;
+                            var story = new StoryViewModel
                             {
                                 _id = st._id,
                                 WorkName = st.WorkName,
@@ -89,7 +94,9 @@ namespace taaproject.Services
                                 Project_id = st.Project_id,
                                 TaskList = taskList.Where(t => t.Story_id == st._id).Select(t =>
                                 {
-                                    return new TaskViewModel
+                                    var MyTaskWork = false;
+                                    MyTaskWork = MyFeatureWork || MyStoryWork || t.AssignTo == member.MemberUserName;
+                                    var task = new TaskViewModel
                                     {
                                         _id = t._id,
                                         WorkName = t.WorkName,
@@ -103,13 +110,72 @@ namespace taaproject.Services
                                         AssignBy = t.AssignBy,
                                         Project_id = t.Project_id
                                     };
+                                    if (MyTaskWork) return task;
+                                    else return null;
                                 })
                             };
+                            story.TaskList = story.TaskList.Where(it => it != null);
+                            if (MyStoryWork || story.TaskList.Count() > 0) return story;
+                            else return null;
                         }),
                     };
-                }).ToList();
+                    feature.StoryList = feature.StoryList.Where(it => it != null);
+                    if (MyFeatureWork || feature.StoryList.Count() > 0) return feature;
+                    else return null;
+                }).ToList().Where(it => it != null);
+            }
 
-            return response;
+            return featuresList.Select(ft =>
+                 {
+                     return new FeatureViewModel
+                     {
+                         _id = ft._id,
+                         WorkName = ft.WorkName,
+                         Description = ft.Description,
+                         Status = ft.Status,
+                         CreateDate = ft.CreateDate,
+                         StartDate = ft.StartDate,
+                         CloseDate = ft.CloseDate,
+                         DoneDate = ft.DoneDate,
+                         AssignTo = ft.AssignTo,
+                         AssignBy = ft.AssignBy,
+                         Project_id = ft.Project_id,
+                         StoryList = storyList.Where(st => st.Feature_id == ft._id).Select(st =>
+                         {
+                             return new StoryViewModel
+                             {
+                                 _id = st._id,
+                                 WorkName = st.WorkName,
+                                 Description = st.Description,
+                                 Status = st.Status,
+                                 CreateDate = st.CreateDate,
+                                 StartDate = st.StartDate,
+                                 CloseDate = st.CloseDate,
+                                 DoneDate = st.DoneDate,
+                                 AssignTo = st.AssignTo,
+                                 AssignBy = st.AssignBy,
+                                 Project_id = st.Project_id,
+                                 TaskList = taskList.Where(t => t.Story_id == st._id).Select(t =>
+                                 {
+                                     return new TaskViewModel
+                                     {
+                                         _id = t._id,
+                                         WorkName = t.WorkName,
+                                         Description = t.Description,
+                                         Status = t.Status,
+                                         CreateDate = t.CreateDate,
+                                         StartDate = t.StartDate,
+                                         CloseDate = t.CloseDate,
+                                         DoneDate = t.DoneDate,
+                                         AssignTo = t.AssignTo,
+                                         AssignBy = t.AssignBy,
+                                         Project_id = t.Project_id
+                                     };
+                                 })
+                             };
+                         }),
+                     };
+                 }).ToList();
         }
 
         #region Features
@@ -124,7 +190,7 @@ namespace taaproject.Services
             var result = features.FirstOrDefault();
             return result;
         }
-        
+
         public async Task<bool> CreateFeature(FeatureModel request)
         {
             var isDataValid = request != null
@@ -199,7 +265,7 @@ namespace taaproject.Services
 
             return true;
         }
-        
+
         public async Task<bool> UpdateStory(StoryModel request, ClaimsPrincipal User)
         {
             var isDataValid = request != null
@@ -235,7 +301,7 @@ namespace taaproject.Services
         #endregion Stories
 
         #region Tasks
-        
+
         public async Task<TaskModel> GetTask(string taskid)
         {
             var isDataValid = !string.IsNullOrEmpty(taskid);
