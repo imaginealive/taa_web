@@ -1,0 +1,117 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
+
+<div class="panel panel-primary" style="margin-top: 2em">
+    <div class="panel-heading">โปรเจคตัวอย่าง 1</div>
+    <div class="panel-body">
+        <div class="col-sm-2">
+            <img class="img-responsive" src="https://about.canva.com/wp-content/uploads/sites/3/2016/08/Band-Logo.png" />
+        </div>
+        <div class="col-sm-10">
+            <label>รายละเอียด</label>
+            <p>รายละเอียดของโปรเจคตัวอย่าง 1</p>
+            <label>สมาชิกทั้งหมด</label>
+            <p>2</p>
+            <label>งานทั้งหมด</label>
+            <p>3/10 (33%)</p>
+            <div class="row">
+                <div class="col-sm-4 col-sm-offset-8">
+                    <a asp-controller="Project" asp-action="Detail" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#Features">Feature (1)</a></li>
+    <li><a data-toggle="tab" href="#Stories">Story (1)</a></li>
+    <li><a data-toggle="tab" href="#Tasks">Task (1)</a></li>
+</ul>
+
+<div class="tab-content">
+    <div id="Features" class="tab-pane fade in active">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ลำดับ</th>
+                    <th>ชื่อ</th>
+                    <th>สร้างโดย</th>
+                    <th>มอบหมายโดย</th>
+                    <th>ผู้รับมอบหมาย</th>
+                    <th>สถานะ</th>
+                    <th>ดูรายละเอียด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>ระบบสามารถเข้าสู่ระบบให้แก้ผู้ใช้งานทั่วไปได้</td>
+                    <td>เอิน</td>
+                    <td>เอิน</td>
+                    <td>กัปตัน</td>
+                    <td>กำลังดำเนินการ</td>
+                    <td><a class="btn btn-warning"><span class="glyphicon glyphicon-wrench"></span></a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="Stories" class="tab-pane fade">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ลำดับ</th>
+                    <th>ชื่อ</th>
+                    <th>สร้างโดย</th>
+                    <th>มอบหมายโดย</th>
+                    <th>ผู้รับมอบหมาย</th>
+                    <th>สถานะ</th>
+                    <th>ดูรายละเอียด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>สร้างหน้าเข้าสู่ระบบ</td>
+                    <td>เอิน</td>
+                    <td>เอิน</td>
+                    <td>กัปตัน</td>
+                    <td>กำลังดำเนินการ</td>
+                    <td><a class="btn btn-warning"><span class="glyphicon glyphicon-wrench"></span></a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="Tasks" class="tab-pane fade">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ลำดับ</th>
+                    <th>ชื่อ</th>
+                    <th>สร้างโดย</th>
+                    <th>มอบหมายโดย</th>
+                    <th>ผู้รับมอบหมาย</th>
+                    <th>สถานะ</th>
+                    <th>ดูรายละเอียด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>ออกแบบ Wirefarm</td>
+                    <td>เอิน</td>
+                    <td>เอิน</td>
+                    <td>กัปตัน</td>
+                    <td>เสร็จสิ้น</td>
+                    <td><a class="btn btn-warning"><span class="glyphicon glyphicon-wrench"></span></a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
