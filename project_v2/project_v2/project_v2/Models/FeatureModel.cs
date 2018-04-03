@@ -8,6 +8,5 @@ namespace project_v2.Models
     public class FeatureModel : WorkModel
     {
         public string Project_id { get; set; }
-        public List<StoryModel> Stories { get; set; }
     }
 }
