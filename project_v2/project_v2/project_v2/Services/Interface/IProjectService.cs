@@ -8,8 +8,9 @@ namespace project_v2.Services.Interface
 {
     public interface IProjectService
     {
-        List<ProjectModel> GetProjects();
+        List<ProjectModel> GetProjects(string accountId);
         ProjectModel GetProject(string projectId);
-        void EditProject(string projectid, ProjectModel model);
+        void CreateProject(string accountId, ProjectModel model);
+        void EditProject(ProjectModel model);
     }
 }

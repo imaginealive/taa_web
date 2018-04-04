@@ -15,6 +15,7 @@ namespace project_v2.Models
         public string CreateByMember_id { get; set; }
         public string AssginByMember_id { get; set; }
         public string BeAssignedMember_id { get; set; }
-        public string Status_id { get; set; }
+        public string StatusName { get; set; }
+        public DateTime? WorkDoneDate { get; set; }
     }
 }

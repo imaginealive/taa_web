@@ -10,8 +10,7 @@ namespace project_v2.Services.Interface
     {
         void AddStatus(StatusModel model);
         List<StatusModel> GetAllStatus();
-        StatusModel GetStatus(string statusId);
-        void EditStatus(string statusId, StatusModel model);
+        void EditStatus(StatusModel model);
         void DeleteStatus(string statusId);
     }
 }

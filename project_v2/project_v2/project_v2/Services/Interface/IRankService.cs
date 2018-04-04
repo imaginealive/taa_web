@@ -10,8 +10,7 @@ namespace project_v2.Services.Interface
     {
         void AddRank(ProjectRankModel model);
         List<ProjectRankModel> GetAllRank();
-        ProjectRankModel GetRank(string rankId);
-        void EditRank(string rankId, ProjectRankModel model);
+        void EditRank(ProjectRankModel model);
         void DeleteRank(string rankId);
     }
 }

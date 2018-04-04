@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using project_v2.Services;
+using project_v2.Services.Interface;
 
 namespace project_v2
 {
@@ -21,6 +23,14 @@ namespace project_v2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<IProjectService, ProjectService>();
+            services.AddTransient<IMembershipService, MembershipService>();
+            services.AddTransient<IRankService, RankService>();
+            services.AddTransient<IStatusService, StatusService>();
+            services.AddTransient<IFeatureService, FeatureService>();
+            services.AddTransient<IStoryService, StoryService>();
+            services.AddTransient<ITaskService, TaskService>();
             services.AddTransient<IServiceConfigurations>(x => Configuration.GetSection(nameof(ServiceConfigurations)).Get<ServiceConfigurations>());
 
             services.AddMvc();

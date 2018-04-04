@@ -9,8 +9,7 @@ namespace project_v2.Services.Interface
     public interface IMembershipService
     {
         void AddMember(string accountId, string projectId);
-        ProjectMembershipModel GetAllProjectMember(string projectId);
-        void ChangeMemberRank(string accountId, string projectId, string RankId);
-        void RemoveMember(string accountId, string projectId);
+        List<ProjectMembershipModel> GetAllProjectMember(string projectId);
+        void EditMember(ProjectMembershipModel model);
     }
 }

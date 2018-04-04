@@ -10,8 +10,7 @@ namespace project_v2.Services.Interface
     {
         void CreateStory(StoryModel model);
         List<StoryModel> GetStories(string featureId);
-        StoryModel GetStory(string storyId);
-        void EditStory(string storyId, StoryModel model);
+        void EditStory(StoryModel model);
         void DeleteStory(string storyId);
     }
 }

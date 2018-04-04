@@ -10,8 +10,7 @@ namespace project_v2.Services.Interface
     {
         void CreateTask(TaskModel model);
         List<TaskModel> GetTasks(string storyId);
-        TaskModel GetTask(string taskId);
-        void EditTask(string taskId, TaskModel model);
+        void EditTask(TaskModel model);
         void DeleteTask(string taskId);
     }
 }

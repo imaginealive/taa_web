@@ -17,5 +17,8 @@ namespace project_v2
         string TaskCollection { get; set; }
         string RankCollection { get; set; }
         string StatusCollection { get; set; }
+        string StatusNewId { get; set; }
+        string GuestRankId { get; set; }
+        string MasterRankId { get; set; }
     }
 }

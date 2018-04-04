@@ -10,8 +10,7 @@ namespace project_v2.Services.Interface
     {
         void CreateFeature(FeatureModel model);
         List<FeatureModel> GetFeatures(string projectId);
-        FeatureModel GetFeature(string featureId);
-        void EditFeature(string featureId, FeatureModel model);
+        void EditFeature(FeatureModel model);
         void DeleteFeature(string featureId);
     }
 }

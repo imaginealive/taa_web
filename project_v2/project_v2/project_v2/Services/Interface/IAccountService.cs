@@ -11,6 +11,6 @@ namespace project_v2.Services.Interface
         void CreateAccount(AccountModel model);
         AccountModel Login(string accountName, string password);
         List<AccountModel> GetAllAccount();
-        void EditAccount(string account_id, AccountModel model);
+        void EditAccount(AccountModel model);
     }
 }
