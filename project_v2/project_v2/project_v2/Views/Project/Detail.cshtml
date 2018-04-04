@@ -1,9 +1,9 @@
-﻿
+﻿@model project_v2.Models.ProjectModel
 @{
     ViewData["Title"] = "Detail";
 }
 
-<a asp-controller="Project" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
+<a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model._id" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
 <div class="panel panel-primary" style="margin-top: 2em">
     <div class="panel-heading">รายละเอียดโปรเจค</div>
@@ -15,20 +15,20 @@
                 <img class="img-responsive" src="https://about.canva.com/wp-content/uploads/sites/3/2016/08/Band-Logo.png" />
             </div>
             <div class="col-sm-8">
-                <label>ชื่อโปรเจค</label>
-                <p>ชื่อของโปรเจค</p>
-                <label>รายละเอียด</label>
-                <p>ชื่อของโปรเจค</p>
-                <label>แผนก</label>
-                <p>การบัญชี</p>
+                <label asp-for="ProjectName"></label>
+                <p>@Model.ProjectName</p>
+                <label asp-for="Description"></label>
+                <p>@Model.Description</p>
+                <label asp-for="Department"></label>
+                <p>@Model.Department</p>
                 <label>วันที่สร้างโปรเจค</label>
-                <p>@DateTime.Now.ToShortDateString()</p>
+                <p>@Model.CreateDate.ToShortDateString()</p>
                 <label>วันที่เสร็จสิ้นโปรเจค</label>
-                <p>@DateTime.Now.AddDays(60).ToShortDateString()</p>
+                <p>@Model.ClosingDate.Value.ToShortDateString()</p>
 
                 <div class="row">
                     <div class="col-sm-3 col-sm-offset-9">
-                        <a asp-controller="Project" asp-action="Edit" class="btn btn-block btn-primary">แก้ไข</a>
+                        <a asp-controller="Project" asp-action="Edit" asp-route-projectid="@Model._id" class="btn btn-block btn-primary">แก้ไข</a>
                     </div>
                 </div>
             </div>

@@ -1,27 +1,28 @@
-﻿
+﻿@model project_v2.Models.ProjectModel
 @{
     ViewData["Title"] = "Index";
 }
 
-
 <a asp-controller="Home" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
 <div class="panel panel-primary" style="margin-top: 2em">
-    <div class="panel-heading">โปรเจคตัวอย่าง 1</div>
+    <div class="panel-heading">ข้อมูลเบื้องต้นของโปรเจค</div>
     <div class="panel-body">
         <div class="col-sm-2">
             <img class="img-responsive" src="https://about.canva.com/wp-content/uploads/sites/3/2016/08/Band-Logo.png" />
         </div>
         <div class="col-sm-10">
-            <label>รายละเอียด</label>
-            <p>รายละเอียดของโปรเจคตัวอย่าง 1</p>
+            <label asp-for="ProjectName"></label>
+            <p>@Model.ProjectName</p>
+            <label asp-for="Description">รายละเอียด</label>
+            <p>@Model.Description</p>
             <label>สมาชิกทั้งหมด</label>
             <p>2</p>
             <label>งานทั้งหมด</label>
             <p>3/10 (33%)</p>
             <div class="row">
                 <div class="col-sm-4 col-sm-offset-8">
-                    <a asp-controller="Project" asp-action="Detail" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
+                    <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
                 </div>
             </div>
         </div>
@@ -29,7 +30,19 @@
 
 </div>
 
-<ul class="nav nav-tabs">
+<div class="row">
+    <div class="col-sm-3">
+        <a class="btn btn-block btn-primary"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a>
+    </div>
+    <div class="col-sm-3">
+        <a class="btn btn-block btn-success"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a>
+    </div>
+    <div class="col-sm-3">
+        <a class="btn btn-block btn-warning"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" style="margin-top: 2em">
     <li class="active"><a data-toggle="tab" href="#Features">Feature (1)</a></li>
     <li><a data-toggle="tab" href="#Stories">Story (1)</a></li>
     <li><a data-toggle="tab" href="#Tasks">Task (1)</a></li>

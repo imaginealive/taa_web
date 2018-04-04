@@ -1,5 +1,7 @@
-﻿@{
+﻿@model IEnumerable<project_v2.Models.ProjectModel>
+@{
     ViewData["Title"] = "Home Page";
+    const int minimumProjectCount = 1;
 }
 
 <!-- Admin only -->
@@ -20,47 +22,25 @@
 <div class="row">
 
     <!-- Content -->
-    <div class="col-sm-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading">โปรโมชั่นการตลาด</div>
-            <div class="panel-body">
-                <p>รายละเอียดของโปรเจค</p>
-                <a asp-controller="Project" asp-action="Index" class="btn btn-default btn-block" style="margin-top: 4em">ดูรายละเอียด</a>
+    @if (Model != null && Model.Count() >= minimumProjectCount)
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">@item.ProjectName</div>
+                    <div class="panel-body">
+                        <p>@item.Description</p>
+                        <a asp-controller="Project" asp-action="Index" asp-route-projectid="@item._id" class="btn btn-default btn-block" style="margin-top: 4em">ดูรายละเอียด</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <div class="col-sm-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading">พัฒนาวัตถุดิบ</div>
-            <div class="panel-body">
-                <p>รายละเอียดของโปรเจค</p>
-                <a asp-controller="Project" asp-action="Index" class="btn btn-default btn-block" style="margin-top: 4em">ดูรายละเอียด</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading">โปรเจคตัวอย่าง 1</div>
-            <div class="panel-body">
-                <p>รายละเอียดของโปรเจค</p>
-                <a asp-controller="Project" asp-action="Index" class="btn btn-default btn-block" style="margin-top: 4em">ดูรายละเอียด</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading">โปรเจคตัวอย่าง 2</div>
-            <div class="panel-body">
-                <p>รายละเอียดของโปรเจค</p>
-                <a asp-controller="Project" asp-action="Index" class="btn btn-default btn-block" style="margin-top: 4em">ดูรายละเอียด</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Project not found -->
-    <h1 class="col-sm-12 text-center">ไม่มีรายการโปรเจค</h1>
+        }
+    }
+    else
+    {
+        <!-- Project not found -->
+        <h1 class="col-sm-12 text-center">ไม่มีรายการโปรเจค</h1>
+    }
 
 </div>
