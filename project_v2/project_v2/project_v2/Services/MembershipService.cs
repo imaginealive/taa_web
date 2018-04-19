@@ -15,7 +15,13 @@ namespace project_v2.Services
         public MembershipService(IServiceConfigurations _svcConfig)
         {
             svcConfig = _svcConfig;
-            MongoClient client = new MongoClient(svcConfig.DefaultConnection);
+            var cred = MongoCredential.CreateCredential(svcConfig.DatabaseName, svcConfig.DbUser, svcConfig.DbPassword);
+            var sett = new MongoClientSettings
+            {
+                Server = new MongoServerAddress(svcConfig.ServerAddress, svcConfig.Port),
+                Credentials = new List<MongoCredential> { cred }
+            };
+            MongoClient client = new MongoClient(sett);
             IMongoDatabase database = client.GetDatabase(svcConfig.DatabaseName);
             memberCollection = database.GetCollection<ProjectMembershipModel>(svcConfig.MembershipCollection);
         }

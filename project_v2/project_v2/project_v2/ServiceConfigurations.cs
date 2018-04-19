@@ -7,7 +7,10 @@ namespace project_v2
 {
     public class ServiceConfigurations : IServiceConfigurations
     {
-        public string DefaultConnection { get; set; }
+        public string ServerAddress { get; set; }
+        public int Port { get; set; }
+        public string DbUser { get; set; }
+        public string DbPassword { get; set; }
         public string DatabaseName { get; set; }
         public string ProjectCollection { get; set; }
         public string AccountCollection { get; set; }
@@ -20,5 +23,5 @@ namespace project_v2
         public string StatusNewId { get; set; }
         public string GuestRankId { get; set; }
         public string MasterRankId { get; set; }
-    }
+       }
 }

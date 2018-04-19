@@ -7,7 +7,10 @@ namespace project_v2
 {
     public interface IServiceConfigurations
     {
-        string DefaultConnection { get; set; }
+        string ServerAddress { get; set; }
+        int Port { get; set; }
+        string DbUser { get; set; }
+        string DbPassword { get; set; }
         string DatabaseName { get; set; }
         string ProjectCollection { get; set; }
         string AccountCollection { get; set; }
