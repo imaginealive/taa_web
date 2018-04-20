@@ -22,7 +22,7 @@ namespace project_v2
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        { 
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IProjectService, ProjectService>();
             services.AddTransient<IMembershipService, MembershipService>();
@@ -34,6 +34,14 @@ namespace project_v2
             services.AddTransient<IServiceConfigurations>(x => Configuration.GetSection(nameof(ServiceConfigurations)).Get<ServiceConfigurations>());
 
             services.AddMvc();
+
+            // Adds a default in-memory implementation of IDistributedCache.
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +49,7 @@ namespace project_v2
         {
             if (env.IsDevelopment())
             {
+                app.UseSession();
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
