@@ -3,20 +3,21 @@
     ViewData["Title"] = "AccountManage";
 }
 
-<h2>AccountManage</h2>
+<h2>จัดการสมาชิกทั้งระบบ</h2>
+<hr />
 <table class="table">
     <thead>
         <tr>
-            <th>ชื่อบัญผู้ใช้</th>
+            <th>บัญผู้ใช้</th>
             <th>ชื่อ</th>
             <th>อีเมล์</th>
             <th>ตำแหน่งงาน</th>
             <th>หน่วยงาน</th>
             <th>เบอร์โทรศัพท์</th>
             <th>อายุ</th>
-            <th>สิทธิ์การสร้างโปรเจ็ค</th>
-            <th>สถานะ admin</th>
-            <th>ถูกระงับ</th>
+            <th>สร้างโปรเจค</th>
+            <th>Admin</th>
+            <th>ระงับใช้งาน</th>
             <th></th>
 
         </tr>
@@ -39,9 +40,36 @@
                 {
                     <td>-</td>
                 }
-                <td>@user.ProjectCreatable</td>
-                <td>@user.IsAdmin</td>
-                <td>@user.SuspendDate.HasValue</td>
+                <td class="text-center">
+                    @if (user.ProjectCreatable)
+                    {
+                        <span class="glyphicon glyphicon-ok"></span>
+                    }
+                    else
+                    {
+                        <span class="glyphicon glyphicon-remove"></span>
+                    }
+                </td>
+                <td class="text-center">
+                    @if (user.IsAdmin)
+                    {
+                        <span class="glyphicon glyphicon-ok"></span>
+                    }
+                    else
+                    {
+                        <span class="glyphicon glyphicon-remove"></span>
+                    }
+                </td>
+                <td class="text-center">
+                    @if (user.SuspendDate.HasValue)
+                    {
+                        <span class="glyphicon glyphicon-ok"></span>
+                    }
+                    else
+                    {
+                        <span class="glyphicon glyphicon-remove"></span>
+                    }
+                </td>
                 <td><a asp-action="EditAccount" asp-route-id="@user._id">แก้ไข</a></td>
             </tr>
         }
