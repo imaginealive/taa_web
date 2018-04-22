@@ -34,7 +34,7 @@
                 <ul class="nav navbar-nav navbar-right">
 
                     <!-- TODO: Check user login yet -->
-                    @if (!Context.Session.TryGetValue("LoginData", out byte[] user))
+                    @if (!Context.Session.TryGetValue("LoginData", out byte[] user) || user.Length == 0)
                     {
                         <li><a asp-controller="Account" asp-action="Login">เข้าสู่ระบบ</a></li>
                     }
