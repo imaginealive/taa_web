@@ -32,7 +32,7 @@ namespace project_v2.Models
         /// <summary>
         /// แผนก
         /// </summary>
-        [Display(Name = "แผนก")]
+        [Display(Name = "หน่วยงาน")]
         public string Department { get; set; }
 
         /// <summary>

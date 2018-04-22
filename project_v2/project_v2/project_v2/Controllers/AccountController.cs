@@ -39,6 +39,7 @@ namespace project_v2.Controllers
                 svc.CreateAccount(model as AccountModel);
                 var user = svc.Login(model.AccountName, model.Password);
                 HttpContext.Session.SetString("LoginData", JsonConvert.SerializeObject(user));
+                return RedirectToAction("Index", "Home");
             }
             return View(model);
         }
@@ -53,7 +54,11 @@ namespace project_v2.Controllers
         public IActionResult Login(AccountModel model)
         {
             var user = svc.Login(model.AccountName, model.Password);
-            if (user == null) return View(model);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = "ไม่พบผู้ใช้งาน กรุณาตรวจสอบชื่อผู้ใช้ และรหัสผ่านอีกครั้ง";
+                return View(model);
+            }
 
             HttpContext.Session.SetString("LoginData", JsonConvert.SerializeObject(user));
             return RedirectToAction("Index", "Home");
@@ -62,7 +67,7 @@ namespace project_v2.Controllers
         [HttpGet]
         public IActionResult Logout()
         {
-            HttpContext.Session.SetString("LoginData", null);
+            HttpContext.Session.SetString("LoginData", string.Empty);
             return RedirectToAction("Index", "Home");
         }
     }
