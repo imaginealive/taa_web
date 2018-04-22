@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
@@ -10,8 +11,6 @@ namespace project_v2.Controllers
 {
     public class ProjectController : Controller
     {
-        private const string Username = "demo@gmail.com";
-
         private IProjectService projectSvc;
         public ProjectController(IProjectService projectSvc)
         {
@@ -36,7 +35,14 @@ namespace project_v2.Controllers
         {
             if (ModelState.IsValid)
             {
-                projectSvc.CreateProject(Username, model);
+                HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
+                if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+
+                var json = System.Text.Encoding.UTF8.GetString(isLogin);
+                var user = JsonConvert.DeserializeObject<AccountModel>(json);
+                ViewBag.User = user;
+
+                projectSvc.CreateProject(user._id, model);
                 return RedirectToAction(nameof(Index), "Home");
             }
             return View(model);

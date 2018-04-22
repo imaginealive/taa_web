@@ -20,6 +20,7 @@ namespace project_v2.Models
         /// <summary>
         /// รายละเอียด
         /// </summary>
+        [Required(ErrorMessage = "กรุณากรอกรายละเอียด")]
         [Display(Name = "รายละเอียด")]
         public string Description { get; set; }
 

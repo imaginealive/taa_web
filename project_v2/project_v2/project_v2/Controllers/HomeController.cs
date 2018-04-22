@@ -15,8 +15,6 @@ namespace project_v2.Controllers
     [LoginSession]
     public class HomeController : Controller
     {
-        private const string Username = "demo@gmail.com";
-
         private IProjectService projectSvc;
         public HomeController(IProjectService projectSvc)
         {
@@ -32,7 +30,7 @@ namespace project_v2.Controllers
             var user = JsonConvert.DeserializeObject<AccountModel>(isLogin);
             ViewBag.User = user;
 
-            var model = projectSvc.GetProjects(Username);
+            var model = projectSvc.GetProjects(user._id);
             return View(model);
         }
 
