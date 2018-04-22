@@ -5,9 +5,9 @@
 
 <h2>สร้างโปรเจคใหม่</h2>
 
+<hr />
 <form asp-controller="Project" asp-action="Create" method="post" class="panel panel-primary">
     <div class="panel-body">
-
         <div class="row">
 
             <div class="form-horizontal col-sm-12">
@@ -29,14 +29,14 @@
                 </div>
             </div>
 
-            <div class="form-horizontal col-sm-12">
-                <div class="form-group">
-                    <label class="col-sm-2 control-label" asp-for="LogoUrl"></label>
-                    <div class="col-sm-10">
-                        <input type="file" class="form-control" placeholder="รูปภาพโปรเจค" asp-for="LogoUrl" />
+            @*<div class="form-horizontal col-sm-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="LogoUrl"></label>
+                        <div class="col-sm-10">
+                            <input type="file" class="form-control" placeholder="รูปภาพโปรเจค" asp-for="LogoUrl" />
+                        </div>
                     </div>
-                </div>
-            </div>
+                </div>*@
 
             <div class="form-horizontal col-sm-12">
                 <div class="form-group">
@@ -61,6 +61,7 @@
                     <label class="col-sm-2 control-label" asp-for="ClosingDate"></label>
                     <div class="col-sm-10">
                         <input type="date" class="form-control" value="@DateTime.Now" asp-for="ClosingDate" />
+                        <span asp-validation-for="ClosingDate" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -72,11 +73,19 @@
             </div>
         </div>
         <hr />
-        <div class="row col-sm-12 ">
-            <div class="pull-right">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-default">ยกเลิก</a>
-                <button type="submit" class="btn btn-primary">สร้างโปรเจค</button>
+        <div class="row">
+            <div class="col-sm-offset-8 col-sm-4">
+                <div class="col-sm-6">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-block btn-default">ยกเลิก</a>
+                </div>
+                <div class="col-sm-6">
+                    <button type="submit" class="btn btn-block btn-primary">สร้างโปรเจค</button>
+                </div>
             </div>
         </div>
     </div>
 </form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

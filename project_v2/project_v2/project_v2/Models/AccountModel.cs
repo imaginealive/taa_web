@@ -10,23 +10,23 @@ namespace project_v2.Models
     {
         public string _id { get; set; }
 
-        [Required(ErrorMessage = "ชื่อบัญผู้ใช้ไม่สามารถว่างได้")]
+        [Required(ErrorMessage = "กรุณากรอกชื่อบัญผู้ใช้")]
         [Display(Name = "ชื่อบัญผู้ใช้")]
         public string AccountName { get; set; }
 
-        [Required(ErrorMessage = "รหัสผ่านบัญชีผู้ใช้ไม่สามารถว่างได้")]
+        [Required(ErrorMessage = "กรุณากรอกรหัสผ่านบัญชีผู้ใช้")]
         [Display(Name = "รหัสผ่านบัญชีผู้ใช้")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "ชื่อไม่สามารถว่างได้")]
+        [Required(ErrorMessage = "กรุณากรอกชื่อ")]
         [Display(Name = "ชื่อ")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "นามสกุลไม่สามารถว่างได้")]
+        [Required(ErrorMessage = "กรุณากรอกนามสกุล")]
         [Display(Name = "นามสกุล")]
         public string LastName { get; set; }
 
-        [Required(ErrorMessage = "อีเมล์ไม่สามารถว่างได้")]
+        [Required(ErrorMessage = "กรุณากรอกอีเมล์")]
         [Display(Name = "อีเมล์")]
         public string Email { get; set; }
 

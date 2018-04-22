@@ -9,7 +9,7 @@ namespace project_v2.Models
     public class RegisterModel : AccountModel
     {
         [Compare(nameof(Password), ErrorMessage = "รหัสผ่านบัญชีผู้ใช้ไม่ตรงกัน")]
-        [Required(ErrorMessage = "ยืนยันรหัสผ่านบัญชีผู้ใช้ไม่สามารถว่างได้")]
+        [Required(ErrorMessage = "กรุณากรอกยืนยันรหัสผ่านบัญชีผู้ใช้")]
         [Display(Name = "ยืนยันรหัสผ่านบัญชีผู้ใช้")]
         public string ComfirmPassword { get; set; }
     }

@@ -29,6 +29,9 @@ namespace project_v2.Controllers
             var isLogin = HttpContext.Session.GetString("LoginData");
             if (string.IsNullOrEmpty(isLogin)) return RedirectToAction("Login", "Account");
 
+            var user = JsonConvert.DeserializeObject<AccountModel>(isLogin);
+            ViewBag.User = user;
+
             var model = projectSvc.GetProjects(Username);
             return View(model);
         }

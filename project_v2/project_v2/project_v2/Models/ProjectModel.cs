@@ -13,7 +13,7 @@ namespace project_v2.Models
         /// <summary>
         /// ชื่อโปรเจค
         /// </summary>
-        [Required(ErrorMessage = "ชื่อโปรเจคไม่สามารถว่างได้")]
+        [Required(ErrorMessage = "กรุณากรอกชื่อโปรเจค")]
         [Display(Name = "ชื่อโปรเจค")]
         public string ProjectName { get; set; }
 
@@ -44,7 +44,8 @@ namespace project_v2.Models
         /// <summary>
         /// วันที่เสร็จสิ้นโปรเจค
         /// </summary>
+        [Required(ErrorMessage = "กรุณาระบุวันที่เสร็จสิ้นโปรเจค")]
         [Display(Name = "วันที่เสร็จสิ้นโปรเจค")]
-        public DateTime? ClosingDate { get; set; }
+        public DateTime ClosingDate { get; set; }
     }
 }

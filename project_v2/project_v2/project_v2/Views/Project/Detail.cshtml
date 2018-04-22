@@ -10,27 +10,20 @@
     <div class="panel-body">
 
         <!-- Project detail -->
-        <div class="row">
-            <div class="col-sm-4">
-                <img class="img-responsive" src="https://about.canva.com/wp-content/uploads/sites/3/2016/08/Band-Logo.png" />
-            </div>
-            <div class="col-sm-8">
-                <label asp-for="ProjectName"></label>
-                <p>@Model.ProjectName</p>
-                <label asp-for="Description"></label>
-                <p>@Model.Description</p>
-                <label asp-for="Department"></label>
-                <p>@Model.Department</p>
-                <label>วันที่สร้างโปรเจค</label>
-                <p>@Model.CreateDate.ToShortDateString()</p>
-                <label>วันที่เสร็จสิ้นโปรเจค</label>
-                <p>@Model.ClosingDate.Value.ToShortDateString()</p>
+        <label asp-for="ProjectName"></label>
+        <p>@Model.ProjectName</p>
+        <label asp-for="Description"></label>
+        <p>@Model.Description</p>
+        <label asp-for="Department"></label>
+        <p>@Model.Department</p>
+        <label>วันที่สร้างโปรเจค</label>
+        <p>@Model.CreateDate.ToShortDateString()</p>
+        <label>วันที่เสร็จสิ้นโปรเจค</label>
+        <p>@Model.ClosingDate.ToShortDateString()</p>
 
-                <div class="row">
-                    <div class="col-sm-3 col-sm-offset-9">
-                        <a asp-controller="Project" asp-action="Edit" asp-route-projectid="@Model._id" class="btn btn-block btn-primary">แก้ไข</a>
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-sm-3 col-sm-offset-9">
+                <a asp-controller="Project" asp-action="Edit" asp-route-projectid="@Model._id" class="btn btn-block btn-primary">แก้ไข</a>
             </div>
         </div>
 

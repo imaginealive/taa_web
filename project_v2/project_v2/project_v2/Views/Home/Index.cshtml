@@ -4,20 +4,6 @@
     const int minimumProjectCount = 1;
 }
 
-<!-- Admin only -->
-<div class="row">
-    <div class="col-sm-3">
-        <a asp-controller="Project" asp-action="Create" class="btn btn-block btn-primary"><span class="glyphicon glyphicon-plus"></span> สร้างโปรเจค</a>
-    </div>
-    <div class="col-sm-3">
-        <a class="btn btn-block btn-success"><span class="glyphicon glyphicon-user"></span> จัดการสมาชิกทั้งระบบ</a>
-    </div>
-    <div class="col-sm-3">
-        <a class="btn btn-block btn-warning"><span class="glyphicon glyphicon-th-list"></span> จัดการตำแหน่งทั้งระบบ</a>
-    </div>
-</div>
-<hr class="col-sm-12" />
-
 <!-- Project list -->
 <div class="row">
 
@@ -30,7 +16,15 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">@item.ProjectName</div>
                     <div class="panel-body">
-                        <p>@item.Description</p>
+
+                        @if (item.Description.Count() > 40)
+                        {
+                            <p>@(item.Description.Substring(0, 40) + "...")</p>
+                        }
+                        else
+                        {
+                            <p>@item.Description</p>
+                        }
                         <a asp-controller="Project" asp-action="Index" asp-route-projectid="@item._id" class="btn btn-default btn-block" style="margin-top: 4em">ดูรายละเอียด</a>
                     </div>
                 </div>
@@ -41,6 +35,17 @@
     {
         <!-- Project not found -->
         <h1 class="col-sm-12 text-center">ไม่มีรายการโปรเจค</h1>
+    }
+
+    @if (ViewBag.User.ProjectCreatable)
+    {
+        <div class="col-sm-4">
+            <a id="createProjectBox" asp-controller="Project" asp-action="Create" style="color: gray">
+                <div id="createProjectBorder" class="text-center" style="border: 2px dotted lightgray; height: 183px; margin:auto; padding: 50px 10px;">
+                    <h2 class="glyphicon glyphicon-plus">สร้างโปรเจคใหม่</h2>
+                </div>
+            </a>
+        </div>
     }
 
 </div>
