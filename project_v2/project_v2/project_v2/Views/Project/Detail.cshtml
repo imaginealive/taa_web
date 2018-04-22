@@ -21,11 +21,19 @@
         <label>วันที่เสร็จสิ้นโปรเจค</label>
         <p>@Model.ClosingDate.ToShortDateString()</p>
 
-        <div class="row">
-            <div class="col-sm-3 col-sm-offset-9">
-                <a asp-controller="Project" asp-action="Edit" asp-route-projectid="@Model._id" class="btn btn-block btn-primary">แก้ไข</a>
-            </div>
-        </div>
+        @if (!Context.Session.TryGetValue("LoginData", out byte[] user) || user.Length == 0)
+        {
+            var json = System.Text.Encoding.UTF8.GetString(user);
+            var userdata = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountModel>(json);
+            if (userdata.ProjectCreatable)
+            {
+                <div class="row">
+                    <div class="col-sm-3 col-sm-offset-9">
+                        <a asp-controller="Project" asp-action="Edit" asp-route-projectid="@Model._id" class="btn btn-block btn-primary">แก้ไข</a>
+                    </div>
+                </div>
+            }
+        }
 
         <hr />
 

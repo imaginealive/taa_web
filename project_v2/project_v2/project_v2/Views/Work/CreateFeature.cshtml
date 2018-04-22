@@ -1,0 +1,104 @@
+﻿@model project_v2.Models.FeatureModel
+@{
+    ViewData["Title"] = "CreateFeature";
+}
+
+<h2>สร้างงานหลักใหม่</h2>
+
+<hr />
+<form asp-action="CreateFeature" method="post">
+    @Html.HiddenFor(it => it.Project_id)
+    <div class="panel panel-default">
+        <div class="panel-body bg-info">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>รายละเอียดงาน</h3>
+                </div>
+                <div class="col-md-8">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label class="control-label">โปรเจคที่งานสังกัด</label>
+                        <input class="form-control" value="@ViewBag.ProjectName" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="WorkReport" class="control-label"></label>
+                        <textarea asp-for="WorkReport" class="form-control" rows="6"></textarea>
+                        <span asp-validation-for="WorkReport" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CreateDate" class="control-label"></label>
+                        <input type="text" class="form-control" value="@DateTime.Now.ToShortDateString()" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ClosingDate" class="control-label"></label>
+                        <input asp-for="ClosingDate" type="date" value=@DateTime.Now class="form-control" />
+                        <span asp-validation-for="ClosingDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>การติดตามงาน</h3>
+                </div>
+                <div class="col-md-8">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="CreateByMember_id" class="control-label"></label>
+                        <input class="form-control" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="AssginByMember_id" class="control-label"></label>
+                        <input asp-for="AssginByMember_id" class="form-control" />
+                        <span asp-validation-for="AssginByMember_id" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="BeAssignedMember_id" class="control-label"></label>
+                        <input asp-for="BeAssignedMember_id" class="form-control" />
+                        <span asp-validation-for="BeAssignedMember_id" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StatusName" class="control-label"></label>
+                        <input asp-for="StatusName" class="form-control" />
+                        <span asp-validation-for="StatusName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="WorkDoneDate" class="control-label"></label>
+                        <input asp-for="WorkDoneDate" class="form-control" />
+                        <span asp-validation-for="WorkDoneDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-offset-8">
+            <div class="col-md-6">
+                <a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model.Project_id" class="btn btn-block btn-default">ยกเลิก</a>
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-block btn-primary">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
