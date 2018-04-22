@@ -1,0 +1,105 @@
+﻿@model project_v2.Models.ProjectRankModel
+@{
+    ViewData["Title"] = "CreateRank";
+}
+
+<h2>เพิ่มตำแหน่งงานใหม่</h2>
+<hr />
+
+<form asp-action="CreateRank" method="post">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>ข้อมูลตำแหน่งงาน</h3>
+                </div>
+                <div class="col-md-8">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="RankName" class="control-label"></label>
+                        <input asp-for="RankName" class="form-control" />
+                        <span asp-validation-for="RankName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanEditProject" /> @Html.DisplayNameFor(model => model.CanEditProject)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanSeeAllWork" /> @Html.DisplayNameFor(model => model.CanSeeAllWork)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanEditAllWork" /> @Html.DisplayNameFor(model => model.CanEditAllWork)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanAssign" /> @Html.DisplayNameFor(model => model.CanAssign)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="BeAssigned" /> @Html.DisplayNameFor(model => model.BeAssigned)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanManageMember" /> @Html.DisplayNameFor(model => model.CanManageMember)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanCreateFeature" /> @Html.DisplayNameFor(model => model.CanCreateFeature)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanCreateStoryUnderSelf" /> @Html.DisplayNameFor(model => model.CanCreateStoryUnderSelf)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="CanCreateTaskUnderSelf" /> @Html.DisplayNameFor(model => model.CanCreateTaskUnderSelf)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-offset-8">
+            <div class="col-md-6">
+                <a asp-action="ProjectSystem" class="btn btn-block btn-default">ยกเลิก</a>
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-block btn-primary">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -71,5 +71,45 @@ namespace project_v2.Controllers
             };
             return View(model);
         }
+
+        public IActionResult CreateRank()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateRank(ProjectRankModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ranksvc.AddRank(model);
+                return RedirectToAction(nameof(ProjectSystem));
+            }
+            return View(model);
+        }
+
+        public IActionResult EditRank(string rankid)
+        {
+            var rankList = ranksvc.GetAllRank();
+            var result = rankList.FirstOrDefault(it => it._id == rankid);
+            return View(result);
+        }
+
+        [HttpPost]
+        public IActionResult EditRank(ProjectRankModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ranksvc.EditRank(model);
+                return RedirectToAction(nameof(ProjectSystem));
+            }
+            return View(model);
+        }
+
+        public IActionResult DeleteRank(string rankid)
+        {
+            ranksvc.DeleteRank(rankid);
+            return RedirectToAction(nameof(ProjectSystem));
+        }
     }
 }

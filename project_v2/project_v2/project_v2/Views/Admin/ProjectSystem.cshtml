@@ -3,66 +3,190 @@
     ViewData["Title"] = "ProjectSystem";
 }
 
-<h2>ProjectSystem</h2>
-<h4>Rank <a class="btn">เพิ่ม</a></h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>RankName</th>
-            <th>CanEditProject</th>
-            <th>CanSeeAllWork</th>
-            <th>CanEditAllWork</th>
-            <th>CanAssign</th>
-            <th>BeAssigned</th>
-            <th>CanManageMember</th>
-            <th>CanCreateFeature</th>
-            <th>CanCreateStoryUnderSelf</th>
-            <th>CanCreateTaskUnderSelf</th>
-            <th></th>
+<h2>จัดการตำแหน่งงานทั้งระบบ</h2>
+<hr />
 
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var rank in Model.ranks)
-        {
-        <tr>
-            <th>@rank.RankName</th>
-            <th>@rank.CanEditProject</th>
-            <th>@rank.CanSeeAllWork</th>
-            <th>@rank.CanEditAllWork</th>
-            <th>@rank.CanAssign</th>
-            <th>@rank.BeAssigned</th>
-            <th>@rank.CanManageMember</th>
-            <th>@rank.CanCreateFeature</th>
-            <th>@rank.CanCreateStoryUnderSelf</th>
-            <th>@rank.CanCreateTaskUnderSelf</th>
-            <td><a>แก้ไข</a></td>
-        </tr>
-        }
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-sm-4">
+        <h2>ตำแหน่งงาน</h2>
+    </div>
+    <div class="col-sm-2 col-sm-offset-6">
+        <a class="btn btn-block btn-primary" asp-action="CreateRank"><span class="glyphicon glyphicon-plus"></span> เพิ่มตำแหน่งงาน</a>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="200">ชื่อตำแหน่ง</th>
+                    <th>แก้ไขโปรเจค</th>
+                    <th>เห็นงานทั้งหมด</th>
+                    <th>แก้ไขงานทั้งหมด</th>
+                    <th>มอบหมายงานให้คนอื่น</th>
+                    <th>รับงานจากคนอื่น</th>
+                    <th>จัดการสมาชิก</th>
+                    <th>สร้างงานหลักได้</th>
+                    <th>สร้างงานรองต่อจากงานหลักได้</th>
+                    <th>สร้างงานย่อยต่อจากงานรองได้</th>
+                    <th></th>
 
-<h4>Status <a class="btn">เพิ่ม</a></h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>StatusName</th>
-            <th>IsWorkDone</th>
-            <th>Deletable</th>
-            <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rank in Model.ranks)
+                {
+                    <tr>
+                        <td>@rank.RankName</td>
+                        <td>
+                            @if (rank.CanEditProject)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.CanSeeAllWork)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.CanEditAllWork)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.CanAssign)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.BeAssigned)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.CanManageMember)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.CanCreateFeature)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.CanCreateStoryUnderSelf)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (rank.CanCreateTaskUnderSelf)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td><a asp-action="EditRank" asp-route-rankid="@rank._id">แก้ไข</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var status in Model.status)
-        {
-            <tr>
-                <td>@status.StatusName</td>
-                <td>@status.IsWorkDone</td>
-                <td>@status.Deletable</td>
-                <td><a>แก้ไข</a></td>
-            </tr>
-        }
-    </tbody>
-</table>
+<hr />
 
+<div class="row">
+    <div class="col-sm-4">
+        <h2>สถานะของงาน</h2>
+    </div>
+    <div class="col-sm-2 col-sm-offset-6">
+        <a class="btn btn-block btn-success" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-plus"></span> เพิ่มสถานะของงาน</a>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="200">ชื่อสถานะ</th>
+                    <th>ถือว่างานเสร็จหรือไม่</th>
+                    <th>สามารถลบได้หรือไม่</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var status in Model.status)
+                {
+                    <tr>
+                        <td>@status.StatusName</td>
+                        <td>
+                            @if (status.IsWorkDone)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td>
+                            @if (status.Deletable)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td><a>แก้ไข</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
