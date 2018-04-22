@@ -1,0 +1,50 @@
+﻿@model List<project_v2.Models.AccountModel>
+@{
+    ViewData["Title"] = "AccountManage";
+}
+
+<h2>AccountManage</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ชื่อบัญผู้ใช้</th>
+            <th>ชื่อ</th>
+            <th>อีเมล์</th>
+            <th>ตำแหน่งงาน</th>
+            <th>หน่วยงาน</th>
+            <th>เบอร์โทรศัพท์</th>
+            <th>อายุ</th>
+            <th>สิทธิ์การสร้างโปรเจ็ค</th>
+            <th>สถานะ admin</th>
+            <th>ถูกระงับ</th>
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.AccountName</td>
+                <td>@user.FirstName @user.LastName</td>
+                <td>@user.Email</td>
+                <td>@user.WorkPosition</td>
+                <td>@user.Department</td>
+                <td>@user.Telephone</td>
+                @if (user.BirthDate.HasValue)
+                {
+                    <td>@(DateTime.Now.Year - user.BirthDate.Value.Year)</td>
+                }
+                else
+                {
+                    <td>-</td>
+                }
+                <td>@user.ProjectCreatable</td>
+                <td>@user.IsAdmin</td>
+                <td>@user.SuspendDate.HasValue</td>
+                <td><a asp-action="EditAccount" asp-route-id="@user._id">แก้ไข</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+

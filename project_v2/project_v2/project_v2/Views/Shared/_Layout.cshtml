@@ -44,8 +44,8 @@
                         var userdata = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountModel>(json);
                         if (userdata.IsAdmin)
                         {
-                            <li><a>จัดการสมาชิกทั้งระบบ</a></li>
-                            <li><a>จัดการตำแหน่งทั้งระบบ</a></li>
+                            <li><a asp-controller="Admin" asp-action="AccountManage">จัดการสมาชิกทั้งระบบ</a></li>
+                            <li><a asp-controller="Admin" asp-action="ProjectSystem">จัดการตำแหน่งทั้งระบบ</a></li>
                         }
                         <li><a asp-controller="Account" asp-action="Logout">ออกจากระบบ</a></li>
                     }

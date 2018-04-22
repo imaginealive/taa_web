@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace project_v2.Services.Interface
 {
-    interface IStatusService
+    public interface IStatusService
     {
         void AddStatus(StatusModel model);
         List<StatusModel> GetAllStatus();

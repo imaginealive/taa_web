@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace project_v2.Services.Interface
 {
-    interface IRankService
+    public interface IRankService
     {
         void AddRank(ProjectRankModel model);
         List<ProjectRankModel> GetAllRank();

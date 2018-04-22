@@ -1,0 +1,68 @@
+﻿@model project_v2.Models.ProjectSystemViewModel
+@{
+    ViewData["Title"] = "ProjectSystem";
+}
+
+<h2>ProjectSystem</h2>
+<h4>Rank <a class="btn">เพิ่ม</a></h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>RankName</th>
+            <th>CanEditProject</th>
+            <th>CanSeeAllWork</th>
+            <th>CanEditAllWork</th>
+            <th>CanAssign</th>
+            <th>BeAssigned</th>
+            <th>CanManageMember</th>
+            <th>CanCreateFeature</th>
+            <th>CanCreateStoryUnderSelf</th>
+            <th>CanCreateTaskUnderSelf</th>
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rank in Model.ranks)
+        {
+        <tr>
+            <th>@rank.RankName</th>
+            <th>@rank.CanEditProject</th>
+            <th>@rank.CanSeeAllWork</th>
+            <th>@rank.CanEditAllWork</th>
+            <th>@rank.CanAssign</th>
+            <th>@rank.BeAssigned</th>
+            <th>@rank.CanManageMember</th>
+            <th>@rank.CanCreateFeature</th>
+            <th>@rank.CanCreateStoryUnderSelf</th>
+            <th>@rank.CanCreateTaskUnderSelf</th>
+            <td><a>แก้ไข</a></td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Status <a class="btn">เพิ่ม</a></h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>StatusName</th>
+            <th>IsWorkDone</th>
+            <th>Deletable</th>
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var status in Model.status)
+        {
+            <tr>
+                <td>@status.StatusName</td>
+                <td>@status.IsWorkDone</td>
+                <td>@status.Deletable</td>
+                <td><a>แก้ไข</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
