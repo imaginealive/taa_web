@@ -12,5 +12,8 @@ namespace project_v2.Models
         [Required(ErrorMessage = "กรุณากรอกยืนยันรหัสผ่านบัญชีผู้ใช้")]
         [Display(Name = "ยืนยันรหัสผ่านบัญชีผู้ใช้")]
         public string ComfirmPassword { get; set; }
+
+        [Display(Name = "ระงับใช้งาน")]
+        public bool IsSuspend { get; set; }
     }
 }
