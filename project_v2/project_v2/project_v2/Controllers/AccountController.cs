@@ -36,7 +36,9 @@ namespace project_v2.Controllers
         {
             if (ModelState.IsValid)
             {
-                svc.CreateAccount(model as AccountModel);
+                var json = JsonConvert.SerializeObject(model);
+                var newUser = JsonConvert.DeserializeObject<AccountModel>(json);
+                svc.CreateAccount(newUser);
                 var user = svc.Login(model.AccountName, model.Password);
                 HttpContext.Session.SetString("LoginData", JsonConvert.SerializeObject(user));
                 return RedirectToAction("Index", "Home");
