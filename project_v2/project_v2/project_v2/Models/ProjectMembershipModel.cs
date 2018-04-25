@@ -12,6 +12,6 @@ namespace project_v2.Models
         public string Project_id { get; set; }
         public string ProjectRank_id { get; set; }
         public DateTime CreateDate { get; set; }
-        public DateTime RemoveDate { get; set; }
+        public DateTime? RemoveDate { get; set; }
     }
 }

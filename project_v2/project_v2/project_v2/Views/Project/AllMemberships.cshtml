@@ -1,0 +1,162 @@
+﻿@model project_v2.Models.MembershipManagementModel
+@{
+    ViewData["Title"] = "AllMemberships";
+    string selectedAccountId = string.Empty;
+}
+
+<a asp-action="Detail" asp-route-projectid="@Model.ProjectId" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
+<h2>จัดการสมาชิกภายในโปรเจค</h2>
+<hr />
+
+<div class="row" style="margin-top: 2em">
+    <div class="col-sm-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading"><h4>สมาชิกของโปรเจค</h4></div>
+            <div class="panel-body">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ชื่อ</th>
+                            <th>อีเมล์</th>
+                            <th>ตำแหน่ง</th>
+                            <th width="100">เปลี่ยนตำแหน่ง</th>
+                            <th width="100">ลบออกจากโปรเจค</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Memberships.Any())
+                        {
+                            @foreach (var item in Model.Memberships)
+                            {
+                                <tr>
+                                    <td>@item.AccountName</td>
+                                    <td>@item.Email</td>
+                                    <td>@item.RankName</td>
+                                    <td>
+                                        @if (item.RankName == "Master")
+                                        {
+                                            <a class="text-center btn btn-default disabled"><span class="glyphicon glyphicon-sort"></span></a>
+                                        }
+                                        else
+                                        {
+                                            <a class="text-center btn btn-success" data-toggle="modal" data-target="#ChangeRankModal" onclick="ChangeMembershipRankFunction('@item.AccountName', '@item.Email')"><span class="glyphicon glyphicon-sort"></span></a>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.RankName == "Master")
+                                        {
+                                            <a class="pull-right btn btn-default disabled"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="RemoveMembership" asp-route-projectid="@Model.ProjectId" asp-route-accountid="@item.Account_id" class="pull-right btn btn-danger"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center"><i>ไม่มีรายชื่อเหลืออยู่</i></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-heading"><h4>รายชื่อคนที่ไม่ได้อยู่ในโปรเจค</h4></div>
+            <div class="panel-body">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th width="100">เพิ่มรายชื่อ</th>
+                            <th>ชื่อ</th>
+                            <th>อีเมล์</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.NonMemberships.Any())
+                        {
+                            @foreach (var item in Model.NonMemberships)
+                            {
+                                <tr>
+                                    <td><a asp-action="AddMembership" asp-route-projectid="@Model.ProjectId" asp-route-accountid="@item._id" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span></a></td>
+                                    <td>@item.AccountName</td>
+                                    <td>@item.Email</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center"><i>ไม่มีรายชื่อเหลืออยู่</i></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Rank modal -->
+<div class="modal fade" id="ChangeRankModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" id="myModalLabel">เปลี่ยนตำแหน่งงานให้กับสมาชิก</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-3 col-sm-offset-1">
+                        <label>ชื่อ</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <p id="DisplayName"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 col-sm-offset-1">
+                        <label>อีเมล์</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <p id="DisplayEmail"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <select class="form-control">
+                            @foreach (var item in ViewBag.AllRanks)
+                            {
+                                <option value="@item._id">@item.RankName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                <!-- TODO: Assign AccountId and RankId -->
+                <a class="btn btn-primary" asp-action="ChangeMembershipRank" asp-route-projectid="@Model.ProjectId" asp-route-accountid="" asp-route-rankid="">Save changes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ChangeMembershipRankFunction(name, email) {
+        document.getElementById("DisplayName").innerHTML = name;
+        document.getElementById("DisplayEmail").innerHTML = email;
+    }
+
+</script> 

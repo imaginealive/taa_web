@@ -1,25 +1,26 @@
-﻿@model project_v2.Models.ProjectModel
+﻿@model project_v2.Models.ProjectDetailModel
 @{
     ViewData["Title"] = "Detail";
+    int count = 1;
 }
 
-<a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model._id" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
+<a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model.Project._id" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
 <div class="panel panel-primary" style="margin-top: 2em">
     <div class="panel-heading">รายละเอียดโปรเจค</div>
     <div class="panel-body">
 
         <!-- Project detail -->
-        <label asp-for="ProjectName"></label>
-        <p>@Model.ProjectName</p>
-        <label asp-for="Description"></label>
-        <p>@Model.Description</p>
-        <label asp-for="Department"></label>
-        <p>@Model.Department</p>
+        <label asp-for="Project.ProjectName"></label>
+        <p>@Model.Project.ProjectName</p>
+        <label asp-for="Project.Description"></label>
+        <p>@Model.Project.Description</p>
+        <label asp-for="Project.Department"></label>
+        <p>@Model.Project.Department</p>
         <label>วันที่สร้างโปรเจค</label>
-        <p>@Model.CreateDate.ToShortDateString()</p>
+        <p>@Model.Project.CreateDate.ToShortDateString()</p>
         <label>วันที่เสร็จสิ้นโปรเจค</label>
-        <p>@Model.ClosingDate.ToShortDateString()</p>
+        <p>@Model.Project.ClosingDate.ToShortDateString()</p>
 
         @if (!Context.Session.TryGetValue("LoginData", out byte[] user) || user.Length == 0)
         {
@@ -29,7 +30,7 @@
             {
                 <div class="row">
                     <div class="col-sm-3 col-sm-offset-9">
-                        <a asp-controller="Project" asp-action="Edit" asp-route-projectid="@Model._id" class="btn btn-block btn-primary">แก้ไข</a>
+                        <a asp-action="Edit" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-primary">แก้ไข</a>
                     </div>
                 </div>
             }
@@ -40,13 +41,13 @@
         <!-- Project member -->
         <div class="row">
             <div class="col-sm-2">
-                <h3 style="margin-top: unset">สมาชิก (2)</h3>
+                <h3 style="margin-top: unset">สมาชิก (@Model.Memberships.Count())</h3>
             </div>
             <div class="col-sm-3 col-sm-offset-7">
-                <a class="btn btn-block btn-success"><span class="glyphicon glyphicon-user"></span> จัดการสมาชิกภายในโปรเจค</a>
+                <a asp-action="AllMemberships" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-success"><span class="glyphicon glyphicon-user"></span> จัดการสมาชิกภายในโปรเจค</a>
             </div>
         </div>
-        <table class="table">
+        <table class="table" style="margin-top: 2em">
             <thead>
                 <tr>
                     <th>ลำดับ</th>
@@ -56,18 +57,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>เอิน</td>
-                    <td>earn@gmail.com</td>
-                    <td>ผู้จัดการ</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>กัปตัน</td>
-                    <td>captain@gmail.com</td>
-                    <td>หัวหน้าฝ่ายตลาด</td>
-                </tr>
+                @foreach (var item in Model.Memberships)
+                {
+                    <tr>
+                        <td>@(count++)</td>
+                        <td>@item.AccountName</td>
+                        <td>@item.Email</td>
+                        <td>@item.RankName</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

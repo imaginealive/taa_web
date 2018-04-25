@@ -12,10 +12,18 @@ namespace project_v2.Controllers
     public class ProjectController : Controller
     {
         private IProjectService projectSvc;
-        public ProjectController(IProjectService projectSvc)
+        private IMembershipService membershipSvc;
+        private IAccountService accountSvc;
+        private IRankService rankSvc;
+        public ProjectController(IProjectService projectSvc, IMembershipService membershipSvc, IAccountService accountSvc, IRankService rankSvc)
         {
             this.projectSvc = projectSvc;
+            this.membershipSvc = membershipSvc;
+            this.accountSvc = accountSvc;
+            this.rankSvc = rankSvc;
         }
+
+        #region Projects
 
         public IActionResult Index(string projectid)
         {
@@ -50,9 +58,46 @@ namespace project_v2.Controllers
 
         public IActionResult Detail(string projectid)
         {
-            // TODO: Get membership
-            var model = projectSvc.GetProject(projectid);
-            return View(model);
+            var accountMemberships = new List<AccountModel>();
+            var displayMemberships = new List<DisplayMembership>();
+
+            var project = projectSvc.GetProject(projectid);
+            var memberships = membershipSvc.GetAllProjectMember(projectid);
+            var ranks = rankSvc.GetAllRank();
+            var allAcc = accountSvc.GetAllAccount();
+
+            foreach (var item in allAcc)
+            {
+                if (memberships.FirstOrDefault(it => it.Account_id == item._id && !it.RemoveDate.HasValue) != null)
+                {
+                    accountMemberships.Add(item);
+                }
+            }
+
+            foreach (var item in accountMemberships)
+            {
+                var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
+                var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
+
+                displayMemberships.Add(new DisplayMembership
+                {
+                    _id = item._id,
+                    Account_id = item._id,
+                    CreateDate = membership.CreateDate,
+                    ProjectRank_id = membership.ProjectRank_id,
+                    Project_id = membership.Project_id,
+                    RemoveDate = membership.RemoveDate,
+                    AccountName = item.AccountName,
+                    Email = item.Email,
+                    RankName = rankName
+                });
+            };
+
+            return View(new ProjectDetailModel
+            {
+                Project = project,
+                Memberships = displayMemberships
+            });
         }
 
         public IActionResult Edit(string projectid)
@@ -71,5 +116,94 @@ namespace project_v2.Controllers
             }
             return View(model);
         }
+
+        #endregion Projects
+
+        #region Memberships
+
+        public IActionResult AllMemberships(string projectid)
+        {
+            var nonMemberships = new List<AccountModel>();
+            var accountMemberships = new List<AccountModel>();
+            var displayMemberships = new List<DisplayMembership>();
+
+            var memberships = membershipSvc.GetAllProjectMember(projectid);
+            var allAcc = accountSvc.GetAllAccount();
+            var ranks = rankSvc.GetAllRank();
+
+            foreach (var item in allAcc)
+            {
+                if (memberships.FirstOrDefault(it => it.Account_id == item._id && !it.RemoveDate.HasValue) != null)
+                    accountMemberships.Add(item);
+                else
+                    nonMemberships.Add(item);
+            }
+
+            foreach (var item in accountMemberships)
+            {
+                var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
+                var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
+
+                displayMemberships.Add(new DisplayMembership
+                {
+                    _id = item._id,
+                    Account_id = item._id,
+                    CreateDate = membership.CreateDate,
+                    ProjectRank_id = membership.ProjectRank_id,
+                    Project_id = membership.Project_id,
+                    RemoveDate = membership.RemoveDate,
+                    AccountName = item.AccountName,
+                    Email = item.Email,
+                    RankName = rankName
+                });
+            };
+
+            ViewBag.AllRanks = ranks;
+            return View(new MembershipManagementModel
+            {
+                ProjectId = projectid,
+                Memberships = displayMemberships,
+                NonMemberships = nonMemberships
+            });
+        }
+
+        public IActionResult AddMembership(string projectid, string accountid)
+        {
+            var memberships = membershipSvc.GetAllProjectMember(projectid);
+            var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);
+            if (membership != null && membership.RemoveDate.HasValue)
+            {
+                membership.RemoveDate = null;
+                membershipSvc.EditMember(membership);
+            }
+            else
+            {
+                membershipSvc.AddMember(accountid, projectid);
+            }
+
+            return RedirectToAction(nameof(AllMemberships), new { projectid = projectid });
+        }
+
+        public IActionResult RemoveMembership(string projectid, string accountid)
+        {
+            var memberships = membershipSvc.GetAllProjectMember(projectid);
+            var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);
+            membership.RemoveDate = DateTime.Now;
+
+            membershipSvc.EditMember(membership);
+            return RedirectToAction(nameof(AllMemberships), new { projectid = projectid });
+        }
+
+        public IActionResult ChangeMembershipRank(string projectid, string accountid, string rankid)
+        {
+            var memberships = membershipSvc.GetAllProjectMember(projectid);
+            var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);
+            membership.ProjectRank_id = rankid;
+
+            membershipSvc.EditMember(membership);
+            return RedirectToAction(nameof(AllMemberships), new { projectid = projectid });
+        }
+
+        #endregion Memberships
     }
 }
