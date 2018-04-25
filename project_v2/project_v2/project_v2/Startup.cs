@@ -40,6 +40,7 @@ namespace project_v2
 
             services.AddSession(options =>
             {
+                options.IdleTimeout = TimeSpan.FromMinutes(5);
                 options.Cookie.HttpOnly = true;
             });
         }

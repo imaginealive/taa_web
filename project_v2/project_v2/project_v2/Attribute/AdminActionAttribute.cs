@@ -15,11 +15,14 @@ namespace project_v2.Attribute
             if (!context.HttpContext.Session.TryGetValue("LoginData", out byte[] text) || text.Length == 0)
             {
                 context.Result = new RedirectToActionResult("Login", "Account", null);
+            }
+            else
+            {
                 var json = System.Text.Encoding.UTF8.GetString(text);
                 var userdata = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountModel>(json);
                 if (!userdata.IsAdmin)
                 {
-                    context.Result = new RedirectToActionResult("Login", "Account", null);
+                    context.Result = new RedirectToActionResult("Index", "Home", null);
                 }
             }
         }

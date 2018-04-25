@@ -42,10 +42,13 @@ namespace project_v2.Services
 
         public void DeleteStatus(string statusId)
         {
-            statusCollection.DeleteOne(Builders<StatusModel>.Filter.Eq(it => it._id, statusId));
+            var IsValid = GetAllStatus().FirstOrDefault(it => it._id == statusId).Deletable;
+
+            if (IsValid)
+                statusCollection.DeleteOne(Builders<StatusModel>.Filter.Eq(it => it._id, statusId));
         }
 
-        public void EditStatus( StatusModel model)
+        public void EditStatus(StatusModel model)
         {
             statusCollection.FindOneAndUpdate(
                 Builders<StatusModel>.Filter.Eq(it => it._id, model._id),

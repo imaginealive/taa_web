@@ -1,0 +1,49 @@
+﻿@model project_v2.Models.StatusModel
+@{
+    ViewData["Title"] = "CreateStatus";
+}
+
+<h2>เพิ่มสถานะงานใหม่</h2>
+<hr />
+
+<form asp-action="CreateStatus" method="post">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>ข้อมูลสถานะงาน</h3>
+                </div>
+                <div class="col-md-8">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="StatusName" class="control-label"></label>
+                        <input asp-for="StatusName" class="form-control" />
+                        <span asp-validation-for="StatusName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="IsWorkDone" /> @Html.DisplayNameFor(model => model.IsWorkDone)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-offset-8">
+            <div class="col-md-6">
+                <a asp-action="ProjectSystem" class="btn btn-block btn-default">ยกเลิก</a>
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-block btn-primary">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -111,5 +111,45 @@ namespace project_v2.Controllers
             ranksvc.DeleteRank(rankid);
             return RedirectToAction(nameof(ProjectSystem));
         }
+
+        public IActionResult CreateStatus()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateStatus(StatusModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                statussvc.AddStatus(model);
+                return RedirectToAction(nameof(ProjectSystem));
+            }
+            return View(model);
+        }
+
+        public IActionResult EditStatus(string statusid)
+        {
+            var statusList = statussvc.GetAllStatus();
+            var result = statusList.FirstOrDefault(it => it._id == statusid);
+            return View(result);
+        }
+
+        [HttpPost]
+        public IActionResult EditStatus(StatusModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                statussvc.EditStatus(model);
+                return RedirectToAction(nameof(ProjectSystem));
+            }
+            return View(model);
+        }
+
+        public IActionResult DeleteStatus(string statusid)
+        {
+            statussvc.DeleteStatus(statusid);
+            return RedirectToAction(nameof(ProjectSystem));
+        }
     }
 }

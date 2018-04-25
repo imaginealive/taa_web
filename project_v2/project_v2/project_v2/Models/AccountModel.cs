@@ -39,6 +39,7 @@ namespace project_v2.Models
         [Display(Name = "เบอร์โทรศัพท์")]
         public string Telephone { get; set; }
 
+        [DataType(DataType.Date)]
         [Display(Name = "วันเกิด")]
         public DateTime? BirthDate { get; set; }
 
@@ -51,6 +52,7 @@ namespace project_v2.Models
         [Display(Name = "วันที่สร้าง")]
         public DateTime CreateDate { get; set; }
 
+        [DataType(DataType.Date)]
         [Display(Name = "วันที่ถูกระงับใช้งาน")]
         public DateTime? SuspendDate { get; set; }
     }

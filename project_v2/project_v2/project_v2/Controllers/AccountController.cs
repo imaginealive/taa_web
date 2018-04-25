@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using project_v2.Attribute;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
@@ -71,6 +72,25 @@ namespace project_v2.Controllers
         {
             HttpContext.Session.SetString("LoginData", string.Empty);
             return RedirectToAction("Index", "Home");
+        }
+
+        [LoginSession]
+        public IActionResult EditProfile()
+        {
+            var userdata = JsonConvert.DeserializeObject<AccountModel>(HttpContext.Session.GetString("LoginData"));
+            return View(userdata);
+        }
+
+        [HttpPost]
+        public IActionResult EditProfile(AccountModel body)
+        {
+            if (ModelState.IsValid)
+            {
+                svc.EditAccount(body);
+                HttpContext.Session.SetString("LoginData", JsonConvert.SerializeObject(body));
+                return RedirectToAction("Index", "Home");
+            }
+            return View(body);
         }
     }
 }
