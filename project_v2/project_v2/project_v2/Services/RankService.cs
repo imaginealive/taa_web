@@ -45,7 +45,9 @@ namespace project_v2.Services
         {
             var IsValid = memberCollection
                 .Find(it => it.ProjectRank_id == rankId)
-                .FirstOrDefault() == null;
+                .FirstOrDefault() == null
+                && rankId != svcConfig.GuestRankId
+                && rankId != svcConfig.MasterRankId;
 
             if (IsValid)
             {
@@ -55,20 +57,29 @@ namespace project_v2.Services
 
         public void EditRank(ProjectRankModel model)
         {
-            rankCollection.FindOneAndUpdate(
-                Builders<ProjectRankModel>.Filter.Eq(it => it._id, model._id),
-                Builders<ProjectRankModel>.Update
-                .Set(it => it.RankName, model.RankName)
-                .Set(it => it.CanEditProject, model.CanEditProject)
-                .Set(it => it.CanSeeAllWork, model.CanSeeAllWork)
-                .Set(it => it.CanEditAllWork, model.CanEditAllWork)
-                .Set(it => it.CanAssign, model.CanAssign)
-                .Set(it => it.BeAssigned, model.BeAssigned)
-                .Set(it => it.CanManageMember, model.CanManageMember)
-                .Set(it => it.CanCreateFeature, model.CanCreateFeature)
-                .Set(it => it.CanCreateStoryUnderSelf, model.CanCreateStoryUnderSelf)
-                .Set(it => it.CanCreateTaskUnderSelf, model.CanCreateTaskUnderSelf)
-            );
+            var IsValid = rankCollection
+                   .Find(it => it._id != model._id && it.RankName == model.RankName)
+                   .FirstOrDefault() == null
+                && model._id != svcConfig.GuestRankId
+                && model._id != svcConfig.MasterRankId;
+
+            if (IsValid)
+            {
+                rankCollection.FindOneAndUpdate(
+                    Builders<ProjectRankModel>.Filter.Eq(it => it._id, model._id),
+                    Builders<ProjectRankModel>.Update
+                    .Set(it => it.RankName, model.RankName)
+                    .Set(it => it.CanEditProject, model.CanEditProject)
+                    .Set(it => it.CanSeeAllWork, model.CanSeeAllWork)
+                    .Set(it => it.CanEditAllWork, model.CanEditAllWork)
+                    .Set(it => it.CanAssign, model.CanAssign)
+                    .Set(it => it.BeAssigned, model.BeAssigned)
+                    .Set(it => it.CanManageMember, model.CanManageMember)
+                    .Set(it => it.CanCreateFeature, model.CanCreateFeature)
+                    .Set(it => it.CanCreateStoryUnderSelf, model.CanCreateStoryUnderSelf)
+                    .Set(it => it.CanCreateTaskUnderSelf, model.CanCreateTaskUnderSelf)
+                );
+            }
         }
 
         public List<ProjectRankModel> GetAllRank()

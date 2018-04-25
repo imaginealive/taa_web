@@ -13,6 +13,7 @@
                 <div class="col-md-4">
                     <h3>ข้อมูลตำแหน่งงาน</h3>
                 </div>
+                @Html.HiddenFor(model => model._id)
                 <div class="col-md-8">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
