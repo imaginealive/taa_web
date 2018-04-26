@@ -12,12 +12,24 @@ namespace project_v2.Controllers
     public class ProjectController : Controller
     {
         private IProjectService projectSvc;
+        private IFeatureService featureSvc;
+        private IStoryService storySvc;
+        private ITaskService taskSvc;
         private IMembershipService membershipSvc;
         private IAccountService accountSvc;
         private IRankService rankSvc;
-        public ProjectController(IProjectService projectSvc, IMembershipService membershipSvc, IAccountService accountSvc, IRankService rankSvc)
+        public ProjectController(IProjectService projectSvc,
+            IFeatureService featureSvc,
+            IStoryService storySvc,
+            ITaskService taskSvc,
+            IMembershipService membershipSvc,
+            IAccountService accountSvc,
+            IRankService rankSvc)
         {
             this.projectSvc = projectSvc;
+            this.featureSvc = featureSvc;
+            this.storySvc = storySvc;
+            this.taskSvc = taskSvc;
             this.membershipSvc = membershipSvc;
             this.accountSvc = accountSvc;
             this.rankSvc = rankSvc;

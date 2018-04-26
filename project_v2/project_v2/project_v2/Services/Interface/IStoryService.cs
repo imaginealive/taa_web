@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace project_v2.Services.Interface
 {
-    interface IStoryService
+    public interface IStoryService
     {
         void CreateStory(StoryModel model);
         List<StoryModel> GetStories(string featureId);
