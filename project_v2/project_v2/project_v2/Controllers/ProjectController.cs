@@ -55,6 +55,13 @@ namespace project_v2.Controllers
         {
             if (ModelState.IsValid)
             {
+                if(model.ClosingDate.Date < DateTime.Now.Date)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างโปรเจคได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้";
+                    return View(model);
+                }
+                model.ClosingDate = model.ClosingDate.AddDays(1);
+
                 HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
                 if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
 
@@ -123,6 +130,13 @@ namespace project_v2.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (model.ClosingDate.Date < DateTime.Now.Date)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถแก้ไขโปรเจคได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้";
+                    return View(model);
+                }
+                model.ClosingDate = model.ClosingDate.AddDays(1);
+
                 projectSvc.EditProject(model);
                 return RedirectToAction(nameof(Detail), new { projectid = model._id });
             }
