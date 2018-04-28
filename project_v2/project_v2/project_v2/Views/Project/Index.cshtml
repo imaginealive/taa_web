@@ -1,6 +1,10 @@
-﻿@model project_v2.Models.ProjectModel
+﻿@model project_v2.Models.ProjectDetailModel
 @{
     ViewData["Title"] = "Index";
+
+    int featureCount = 1;
+    var remainingWorks = Model.Features.Where(it => it.StatusName == "Done").Count(); //TODO: Stories and Tasks
+    var totalWorks = Model.Features.Count(); //TODO: Stories and Tasks
 }
 
 <a asp-controller="Home" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
@@ -8,17 +12,17 @@
 <div class="panel panel-primary" style="margin-top: 2em">
     <div class="panel-heading">ข้อมูลเบื้องต้นของโปรเจค</div>
     <div class="panel-body">
-        <label asp-for="ProjectName"></label>
-        <p>@Model.ProjectName</p>
-        <label asp-for="Description">รายละเอียด</label>
-        <p>@Model.Description</p>
+        <label asp-for="Project.ProjectName"></label>
+        <p>@Model.Project.ProjectName</p>
+        <label asp-for="Project.Description">รายละเอียด</label>
+        <p>@Model.Project.Description</p>
         <label>สมาชิกทั้งหมด</label>
-        <p>2</p>
+        <p>@Model.Memberships.Count()</p>
         <label>งานทั้งหมด</label>
-        <p>3/10 (33%)</p>
+        <p>@($"{remainingWorks}/{totalWorks}") (@string.Format("{0:00} %", (remainingWorks / totalWorks) * 100))</p>
         <div class="row">
             <div class="col-sm-4 col-sm-offset-8">
-                <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
+                <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
             </div>
         </div>
     </div>
@@ -28,26 +32,68 @@
 
     <div class="col-sm-2">
         <ul class="nav nav-pills nav-stacked">
-            <li class="active"><a data-toggle="tab" href="#f1">Feature 1</a></li>
-            <li><a data-toggle="tab" href="#f2">Feature 2</a></li>
-            <li><a data-toggle="tab" href="#f3">Feature 3</a></li>
-            <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
+            @foreach (var item in Model.Features)
+            {
+                <li class="active"><a data-toggle="tab" href="#feature@(featureCount)">@item.Name</a></li>
+                featureCount++;
+            }
+            <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model.Project._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
         </ul>
     </div>
     <div class="col-sm-10">
         <div class="panel panel-primary">
             <div class="tab-content panel-body">
-                <div id="f1" class="row tab-pane fade in active">
-                    <div class="row" style="margin: 1em">
-                        <p><b>สร้างโดย: </b>Earn</p>
-                        <p><b>มอบหมายโดย: </b>Earn</p>
-                        <p><b>ผู้รับมอบหมาย: </b>Captain</p>
-                        <p><b>สถานะ: </b>เสร็จสิ้น</p>
-                        <div class="pull-right">
-                            <a class="btn btn-default">ดูรายละเอียด</a>
-                            <a class="btn btn-danger">ลบ</a>
+                <div id="feature1" class="row tab-pane fade in active">
+
+                    @foreach (var item in Model.Features)
+                    {
+                        <div style="margin-bottom: 2em">
+                            <div class="col-sm-3">
+                                <h2>รายละเอียด</h2>
+                            </div>
+                            <div class="col-sm-9">
+                                <p><b>ชื่อ: </b>@item.Name</p>
+                                <p><b>รายละเอียด: </b>@item.Description</p>
+                                <p><b>สร้างโดย: </b>@item.CreateByMember_id </p>
+                                <p><b>มอบหมายโดย: </b>@item.AssginByMember_id</p>
+                                <p><b>ผู้รับมอบหมาย: </b>@item.BeAssignedMember_id</p>
+                            </div>
+                            <div class="row"></div>
+                            <hr class="clearfix" />
+
+                            <div class="col-sm-3">
+                                <h2>สถานะงาน</h2>
+                            </div>
+                            <div class="col-sm-9">
+                                <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@item.ClosingDate.ToShortDateString()</p>
+                                <p>
+                                    <b>วันที่งานเสร็จสิ้นจริง: </b>
+                                    @if (item.WorkDoneDate.HasValue)
+                                    {
+                                        @item.WorkDoneDate.Value.ToShortDateString()
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </p>
+                                <p><b>สถานะ: </b>@item.StatusName</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4 col-sm-offset-8">
+                                    <div class="col-sm-6">
+                                        <a class="btn btn-block btn-default">ดูรายละเอียด</a>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <a class="btn btn-block btn-danger">ลบ</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                        <hr class="clearfix" />
+                    }
+
                     <div class="col-sm-3">
                         <ul class="nav nav-pills nav-stacked">
                             <li class="active"><a data-toggle="tab" href="#s1">Story 1</a></li>
@@ -79,8 +125,14 @@
                                     <div class="col-sm-8">
                                         <div class="tab-content">
                                             <div id="t1" class="tab-pane fade in active">
-                                                <h3>HOME</h3>
-                                                <p>Some content.</p>
+                                                <div class="row" style="margin: 1em">
+                                                    <p><b>สร้างโดย: </b>Earn</p>
+                                                    <p><b>มอบหมายโดย: </b>Earn</p>
+                                                    <p><b>ผู้รับมอบหมาย: </b>Captain</p>
+                                                    <p><b>สถานะ: </b>เสร็จสิ้น</p>
+                                                    <a class="btn btn-default">ดูรายละเอียด</a>
+                                                    <a class="btn btn-danger">ลบ</a>
+                                                </div>
                                             </div>
                                             <div id="t2" class="tab-pane fade">
                                                 <h3>Menu 1</h3>

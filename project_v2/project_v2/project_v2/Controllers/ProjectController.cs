@@ -41,10 +41,24 @@ namespace project_v2.Controllers
 
         public IActionResult Index(string projectid)
         {
-            // TODO: Get membership
-            // TODO: Get Works (Features, Stories and Tasks)
-            var model = projectSvc.GetProject(projectid);
-            return View(model);
+            // TODO: Get Works (Stories and Tasks)
+            var project = projectSvc.GetProject(projectid);
+            var memberships = membershipSvc.GetAllProjectMember(projectid);
+            var features = featureSvc.GetFeatures(projectid);
+
+            var displayMemberships = new List<DisplayMembership>();
+            foreach (var item in memberships)
+            {
+                var model = new DisplayMembership(item);
+                displayMemberships.Add(model);
+            }
+            
+            return View(new ProjectDetailModel
+            {
+                Project = project,
+                Memberships = displayMemberships,
+                Features = features
+            });
         }
 
         public IActionResult Create()
@@ -100,7 +114,7 @@ namespace project_v2.Controllers
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
                 var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
                 var model = new DisplayMembership(membership);
-                model.AccountName = item.AccountName;
+                model.AccountName = $"{item.FirstName} {item.LastName}";
                 model.Email = item.Email;
                 model.RankName = rankName;
 
@@ -165,7 +179,7 @@ namespace project_v2.Controllers
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
                 var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
                 var model = new DisplayMembership(membership);
-                model.AccountName = item.AccountName;
+                model.AccountName = $"{item.FirstName} {item.LastName}";
                 model.Email = item.Email;
                 model.RankName = rankName;
 
