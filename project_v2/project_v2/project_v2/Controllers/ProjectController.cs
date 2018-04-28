@@ -97,19 +97,12 @@ namespace project_v2.Controllers
             {
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
                 var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
+                var model = new DisplayMembership(membership);
+                model.AccountName = item.AccountName;
+                model.Email = item.Email;
+                model.RankName = rankName;
 
-                displayMemberships.Add(new DisplayMembership
-                {
-                    _id = item._id,
-                    Account_id = item._id,
-                    CreateDate = membership.CreateDate,
-                    ProjectRank_id = membership.ProjectRank_id,
-                    Project_id = membership.Project_id,
-                    RemoveDate = membership.RemoveDate,
-                    AccountName = item.AccountName,
-                    Email = item.Email,
-                    RankName = rankName
-                });
+                displayMemberships.Add(model);
             };
 
             return View(new ProjectDetailModel
@@ -169,19 +162,12 @@ namespace project_v2.Controllers
             {
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
                 var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
+                var model = new DisplayMembership(membership);
+                model.AccountName = item.AccountName;
+                model.Email = item.Email;
+                model.RankName = rankName;
 
-                displayMemberships.Add(new DisplayMembership
-                {
-                    _id = item._id,
-                    Account_id = item._id,
-                    CreateDate = membership.CreateDate,
-                    ProjectRank_id = membership.ProjectRank_id,
-                    Project_id = membership.Project_id,
-                    RemoveDate = membership.RemoveDate,
-                    AccountName = item.AccountName,
-                    Email = item.Email,
-                    RankName = rankName
-                });
+                displayMemberships.Add(model);
             };
 
             ViewBag.AllRanks = ranks;

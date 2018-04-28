@@ -17,5 +17,15 @@ namespace project_v2.Models
         public string AccountName { get; set; }
         public string Email { get; set; }
         public string RankName { get; set; }
+        
+        public DisplayMembership(ProjectMembershipModel model)
+        {
+            this._id = model._id;
+            this.Account_id = model.Account_id;
+            this.Project_id = model.Project_id;
+            this.ProjectRank_id = model.ProjectRank_id;
+            this.CreateDate = model.CreateDate;
+            this.RemoveDate = model.RemoveDate;
+        }
     }
 }
