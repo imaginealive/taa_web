@@ -50,12 +50,19 @@ namespace project_v2.Services
 
         public void EditStatus(StatusModel model)
         {
-            statusCollection.FindOneAndUpdate(
-                Builders<StatusModel>.Filter.Eq(it => it._id, model._id),
-                Builders<StatusModel>.Update
-                .Set(it => it.StatusName, model.StatusName)
-                .Set(it => it.IsWorkDone, model.IsWorkDone)
-            );
+            var IsValid = statusCollection
+                .Find(it => it.StatusName == model.StatusName && it._id != model._id)
+                .FirstOrDefault() == null;
+
+            if (IsValid)
+            {
+                statusCollection.FindOneAndUpdate(
+                    Builders<StatusModel>.Filter.Eq(it => it._id, model._id),
+                    Builders<StatusModel>.Update
+                    .Set(it => it.StatusName, model.StatusName)
+                    .Set(it => it.IsWorkDone, model.IsWorkDone)
+                );
+            }
         }
 
         public List<StatusModel> GetAllStatus()
