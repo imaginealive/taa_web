@@ -56,9 +56,6 @@ namespace project_v2.Controllers
                 model.ClosingDate = model.ClosingDate.AddDays(1);
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id)) model.AssginByMember_id = model.CreateByMember_id;
 
-                var status = statusSvc.GetAllStatus().FirstOrDefault(it => it.StatusName.Equals("new", StringComparison.CurrentCultureIgnoreCase));
-                model.StatusName = status._id;
-
                 featureSvc.CreateFeature(model);
                 return RedirectToAction("Index", "Project", new { projectid = model.Project_id });
             }
@@ -74,14 +71,12 @@ namespace project_v2.Controllers
             var createByAccount = allAcc.FirstOrDefault(it => it._id == feature.CreateByMember_id);
             var assginByAccount = allAcc.FirstOrDefault(it => it._id == feature.AssginByMember_id);
             var beassginByAccount = allAcc.FirstOrDefault(it => it._id == feature.BeAssignedMember_id);
-            var status = statusSvc.GetAllStatus().FirstOrDefault(it => it._id == feature.StatusName);
 
             var model = new DisplayFeatureModel(feature)
             {
                 CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
                 AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
                 BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
-                Status = status != null ? status.StatusName : string.Empty
             };
 
             return View(model);

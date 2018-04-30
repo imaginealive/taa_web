@@ -20,15 +20,13 @@ namespace project_v2.Controllers
         private IMembershipService membershipSvc;
         private IAccountService accountSvc;
         private IRankService rankSvc;
-        private IStatusService statusSvc;
         public ProjectController(IProjectService projectSvc,
             IFeatureService featureSvc,
             IStoryService storySvc,
             ITaskService taskSvc,
             IMembershipService membershipSvc,
             IAccountService accountSvc,
-            IRankService rankSvc,
-            IStatusService statusSvc)
+            IRankService rankSvc)
         {
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
@@ -37,7 +35,6 @@ namespace project_v2.Controllers
             this.membershipSvc = membershipSvc;
             this.accountSvc = accountSvc;
             this.rankSvc = rankSvc;
-            this.statusSvc = statusSvc;
         }
 
         #region Projects
@@ -78,14 +75,12 @@ namespace project_v2.Controllers
                 var createByAccount = allAcc.FirstOrDefault(it => it._id == item.CreateByMember_id);
                 var assginByAccount = allAcc.FirstOrDefault(it => it._id == item.AssginByMember_id);
                 var beassginByAccount = allAcc.FirstOrDefault(it => it._id == item.BeAssignedMember_id);
-                var status = statusSvc.GetAllStatus().FirstOrDefault(it => it._id == item.StatusName);
 
                 var model = new DisplayFeatureModel(item)
                 {
                     CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
                     AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
                     BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
-                    Status = status != null ? status.StatusName : string.Empty
                 };
                 displayFeatures.Add(model);
             }

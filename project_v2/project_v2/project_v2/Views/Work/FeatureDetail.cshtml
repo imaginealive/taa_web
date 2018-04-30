@@ -62,9 +62,9 @@
                 </p>
                 <p>
                     <b><label asp-for="StatusName"></label>: </b>
-                    @if (!string.IsNullOrEmpty(Model.Status))
+                    @if (!string.IsNullOrEmpty(Model.StatusName))
                     {
-                        <span>@Model.Status</span>
+                        <span>@Model.StatusName</span>
                     }
                     else
                     {

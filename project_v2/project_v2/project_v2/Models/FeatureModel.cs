@@ -15,7 +15,6 @@ namespace project_v2.Models
         public string CreateByMemberName { get; set; }
         public string AssginByMemberName { get; set; }
         public string BeAssignedMemberName { get; set; }
-        public string Status { get; set; }
 
         public DisplayFeatureModel(FeatureModel model)
         {
