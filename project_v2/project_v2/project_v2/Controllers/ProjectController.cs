@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using project_v2.Attribute;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
 namespace project_v2.Controllers
 {
+    [LoginSession]
     public class ProjectController : Controller
     {
         private IProjectService projectSvc;
@@ -55,7 +57,7 @@ namespace project_v2.Controllers
         {
             if (ModelState.IsValid)
             {
-                if(model.ClosingDate.Date < DateTime.Now.Date)
+                if (model.ClosingDate.Date < DateTime.Now.Date)
                 {
                     ViewBag.ErrorMessage = "ไม่สามารถสร้างโปรเจคได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้";
                     return View(model);
@@ -205,8 +207,26 @@ namespace project_v2.Controllers
             membershipSvc.EditMember(membership);
             return RedirectToAction(nameof(AllMemberships), new { projectid = projectid });
         }
-
+        
         public IActionResult ChangeMembershipRank(string projectid, string accountid, string rankid)
+        {
+            var account = accountSvc.GetAllAccount().First(it => it._id == accountid);
+            var ranks = rankSvc.GetAllRank();
+            var model = new EditRankModel
+            {
+                ProjectId = projectid,
+                AccountId = accountid,
+                Email = account.Email,
+                Name = account.AccountName,
+                RankId = rankid,
+                Ranks = ranks
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult ChangeMembershipRank(string projectid, string accountid, string rankid, EditRankModel body)
         {
             var memberships = membershipSvc.GetAllProjectMember(projectid);
             var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);

@@ -40,7 +40,7 @@
                                         }
                                         else
                                         {
-                                            <a class="text-center btn btn-success" data-toggle="modal" data-target="#ChangeRankModal" onclick="ChangeMembershipRankFunction('@item.AccountName', '@item.Email')"><span class="glyphicon glyphicon-sort"></span></a>
+                                            <a class="text-center btn btn-success" data-toggle="modal" data-target="#ChangeRankModal" onclick="editmodel('@item.Account_id','@item.ProjectRank_id')"><span class="glyphicon glyphicon-sort"></span></a>
                                         }
                                     </td>
                                     <td>
@@ -110,53 +110,12 @@
 <!-- Change Rank modal -->
 <div class="modal fade" id="ChangeRankModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title" id="myModalLabel">เปลี่ยนตำแหน่งงานให้กับสมาชิก</h3>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-3 col-sm-offset-1">
-                        <label>ชื่อ</label>
-                    </div>
-                    <div class="col-sm-8">
-                        <p id="DisplayName"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-3 col-sm-offset-1">
-                        <label>อีเมล์</label>
-                    </div>
-                    <div class="col-sm-8">
-                        <p id="DisplayEmail"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-10 col-sm-offset-1">
-                        <select class="form-control">
-                            @foreach (var item in ViewBag.AllRanks)
-                            {
-                                <option value="@item._id">@item.RankName</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-
-                <!-- TODO: Assign AccountId and RankId -->
-                <a class="btn btn-primary" asp-action="ChangeMembershipRank" asp-route-projectid="@Model.ProjectId" asp-route-accountid="" asp-route-rankid="">Save changes</a>
-            </div>
-        </div>
+        <div id="divRank"></div>
     </div>
 </div>
 
-<script>
-    function ChangeMembershipRankFunction(name, email) {
-        document.getElementById("DisplayName").innerHTML = name;
-        document.getElementById("DisplayEmail").innerHTML = email;
+<script type="text/javascript">
+    function editmodel(accountid, rankid) {
+        $("#divRank").load("/Project/ChangeMembershipRank?projectid=" + '@Model.ProjectId' + "&accountid=" + accountid + "&rankid=" + rankid);
     }
-
-</script> 
+</script>
