@@ -16,6 +16,7 @@ namespace project_v2.Controllers
         private IProjectService projectSvc;
         private IFeatureService featureSvc;
         private IStoryService storySvc;
+        private ITaskService taskSvc;
         private IMembershipService membershipSvc;
         private IAccountService accountSvc;
         private IRankService rankSvc;
@@ -24,6 +25,7 @@ namespace project_v2.Controllers
             IProjectService projectSvc,
             IFeatureService featureSvc,
             IStoryService storySvc,
+            ITaskService taskSvc,
             IMembershipService membershipSvc,
             IAccountService accountSvc,
             IRankService rankSvc,
@@ -32,6 +34,7 @@ namespace project_v2.Controllers
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
             this.storySvc = storySvc;
+            this.taskSvc = taskSvc;
             this.membershipSvc = membershipSvc;
             this.accountSvc = accountSvc;
             this.rankSvc = rankSvc;
@@ -236,7 +239,41 @@ namespace project_v2.Controllers
             return RedirectToAction(nameof(ProjectController.Index), "Project", new { projectid = projectid });
         }
 
-        #endregion Stories
+        #endregion
+
+        #region Tasks
+        
+        public IActionResult CreateTask(string projectid, string featureid, string storyid)
+        {
+            PrepareDataForDisplay(projectid);
+            ViewBag.ProjectId = projectid;
+            ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
+            ViewBag.StoryName = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid).Name;
+            return View(new TaskModel { Story_id = storyid});
+        }
+
+        [HttpPost]
+        public IActionResult CreateTask(string projectid, TaskModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var project = projectSvc.GetProject(projectid);
+                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    PrepareDataForDisplay(projectid);
+                    return View(model);
+                }
+                model.ClosingDate = model.ClosingDate.AddDays(1);
+                if (!string.IsNullOrEmpty(model.BeAssignedMember_id)) model.AssginByMember_id = model.CreateByMember_id;
+
+                taskSvc.CreateTask(model);
+                return RedirectToAction("Index", "Project", new { projectid = projectid });
+            }
+            return View(model);
+        }
+
+        #endregion Tasks
 
         /// <summary>
         /// Prepare for display work information (e.g. CreateByUser, ProjectName, ...)

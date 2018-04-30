@@ -81,15 +81,33 @@ namespace project_v2.Controllers
                 var stories = storySvc.GetStories(feature._id);
                 foreach (var story in stories)
                 {
-                    var story_CreateByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
                     var story_AssginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
                     var story_BeassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
+                    var story_CreateByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
+                    
+                    var displayTasks = new List<DisplayTaskModel>();
+                    var tasks = taskSvc.GetTasks(story._id);
+                    foreach (var task in tasks)
+                    {
+                        var task_AssginByAccount = allAcc.FirstOrDefault(it => it._id == task.AssginByMember_id);
+                        var task_BeassginByAccount = allAcc.FirstOrDefault(it => it._id == task.BeAssignedMember_id);
+                        var task_CreateByAccount = allAcc.FirstOrDefault(it => it._id == task.CreateByMember_id);
+
+                        var model_task = new DisplayTaskModel(task)
+                        {
+                            CreateByMemberName = task_AssginByAccount != null ? $"{task_AssginByAccount.FirstName} {task_AssginByAccount.LastName}" : string.Empty,
+                            AssginByMemberName = task_BeassginByAccount != null ? $"{task_BeassginByAccount.FirstName} {task_BeassginByAccount.LastName}" : string.Empty,
+                            BeAssignedMemberName = task_CreateByAccount != null ? $"{task_CreateByAccount.FirstName} {task_CreateByAccount.LastName}" : string.Empty,
+                        };
+                        displayTasks.Add(model_task);
+                    }
+
                     var model_story = new DisplayStoryModel(story)
                     {
                         CreateByMemberName = story_CreateByAccount != null ? $"{story_CreateByAccount.FirstName} {story_CreateByAccount.LastName}" : string.Empty,
                         AssginByMemberName = story_AssginByAccount != null ? $"{story_AssginByAccount.FirstName} {story_AssginByAccount.LastName}" : string.Empty,
                         BeAssignedMemberName = story_BeassginByAccount != null ? $"{story_BeassginByAccount.FirstName} {story_BeassginByAccount.LastName}" : string.Empty,
-                        Tasks = Enumerable.Empty<DisplayTaskModel>()
+                        Tasks = displayTasks
                     };
                     displayStories.Add(model_story);
                 }
@@ -103,7 +121,7 @@ namespace project_v2.Controllers
                 };
                 displayFeatures.Add(model_feature);
             }
-            
+
             return View(new ProjectDetailModel
             {
                 Project = project,
@@ -276,7 +294,7 @@ namespace project_v2.Controllers
             membershipSvc.EditMember(membership);
             return RedirectToAction(nameof(AllMemberships), new { projectid = projectid });
         }
-        
+
         public IActionResult ChangeMembershipRank(string projectid, string accountid, string rankid)
         {
             var account = accountSvc.GetAllAccount().First(it => it._id == accountid);

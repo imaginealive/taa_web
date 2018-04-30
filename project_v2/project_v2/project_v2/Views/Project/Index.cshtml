@@ -55,7 +55,7 @@
             <div class="panel panel-primary">
                 <div class="tab-content panel-body">
 
-                    @foreach (var feature in Model.Features)
+                    @foreach (var featureContent in Model.Features)
                     {
                         <div id="feature@(featureContentCount)" class="row tab-pane fade in @(featureContentCount == minimumValue ? "active" : string.Empty)">
 
@@ -64,14 +64,14 @@
                                     <h2>รายละเอียด</h2>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p><b>ชื่อ: </b>@feature.Name</p>
-                                    <p><b>รายละเอียด: </b>@feature.Description</p>
-                                    <p><b>สร้างโดย: </b>@feature.CreateByMemberName</p>
+                                    <p><b>ชื่อ: </b>@featureContent.Name</p>
+                                    <p><b>รายละเอียด: </b>@featureContent.Description</p>
+                                    <p><b>สร้างโดย: </b>@featureContent.CreateByMemberName</p>
                                     <p>
                                         <b>มอบหมายโดย: </b>
-                                        @if (!string.IsNullOrEmpty(feature.AssginByMemberName))
+                                        @if (!string.IsNullOrEmpty(featureContent.AssginByMemberName))
                                         {
-                                            <span>@feature.AssginByMemberName</span>
+                                            <span>@featureContent.AssginByMemberName</span>
                                         }
                                         else
                                         {
@@ -80,9 +80,9 @@
                                     </p>
                                     <p>
                                         <b>ผู้รับมอบหมาย: </b>
-                                        @if (!string.IsNullOrEmpty(feature.BeAssignedMemberName))
+                                        @if (!string.IsNullOrEmpty(featureContent.BeAssignedMemberName))
                                         {
-                                            <span>@feature.BeAssignedMemberName</span>
+                                            <span>@featureContent.BeAssignedMemberName</span>
                                         }
                                         else
                                         {
@@ -97,12 +97,12 @@
                                     <h2>สถานะงาน</h2>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@feature.ClosingDate.ToShortDateString()</p>
+                                    <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@featureContent.ClosingDate.ToShortDateString()</p>
                                     <p>
                                         <b>วันที่งานเสร็จสิ้นจริง: </b>
-                                        @if (feature.WorkDoneDate.HasValue)
+                                        @if (featureContent.WorkDoneDate.HasValue)
                                         {
-                                            @feature.WorkDoneDate.Value.ToShortDateString()
+                                            @featureContent.WorkDoneDate.Value.ToShortDateString()
                                         }
                                         else
                                         {
@@ -111,9 +111,9 @@
                                     </p>
                                     <p>
                                         <b>สถานะ: </b>
-                                        @if (!string.IsNullOrEmpty(feature.StatusName))
+                                        @if (!string.IsNullOrEmpty(featureContent.StatusName))
                                         {
-                                            <span>@feature.StatusName</span>
+                                            <span>@featureContent.StatusName</span>
                                         }
                                         else
                                         {
@@ -125,37 +125,37 @@
                                 <div class="row">
                                     <div class="col-sm-4 col-sm-offset-8">
                                         <div class="col-sm-6">
-                                            <a class="btn btn-block btn-default" asp-controller="Work" asp-action="FeatureDetail" asp-route-projectid="@feature.Project_id" asp-route-featureid="@feature._id">ดูรายละเอียด</a>
+                                            <a class="btn btn-block btn-default" asp-controller="Work" asp-action="FeatureDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id">ดูรายละเอียด</a>
                                         </div>
                                         <div class="col-sm-6">
-                                            <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteFeature" asp-route-projectid="@feature.Project_id" asp-route-featureid="@feature._id">ลบ</a>
+                                            <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteFeature" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id">ลบ</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <hr class="clearfix" />
 
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <ul class="nav nav-pills nav-stacked">
-                                    @foreach (var storySideMenu in feature.Stories)
+                                    @foreach (var storySideMenu in featureContent.Stories)
                                     {
                                         <li class="@(storySideMenuCount == minimumValue? "active": string.Empty)"><a data-toggle="tab" href="#story@(storySideMenuCount)">@storySideMenu.Name</a></li>
                                         storySideMenuCount++;
                                     }
-                                    <li><a asp-controller="Work" asp-action="CreateStory" asp-route-projectid="@Model.Project._id" asp-route-featureid="@feature._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
+                                    <li><a asp-controller="Work" asp-action="CreateStory" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
                                 </ul>
                             </div>
-                            <div class="col-sm-9">
 
-                                @if (feature.Stories.Count() >= minimumValue)
+                            <div class="col-sm-10">
+                                @if (featureContent.Stories.Count() >= minimumValue)
                                 {
-                                    @foreach (var storyContent in feature.Stories)
-                                    {
-                                        <div class="panel" style="border: 1px solid #76a771">
-                                            <div class="tab-content panel-body">
+                                    <div class="panel" style="border: 1px solid #76a771">
+                                        <div class="tab-content panel-body">
 
+                                            @foreach (var storyContent in featureContent.Stories)
+                                            {
                                                 <div id="story@(storyContentCount)" class="row tab-pane fade in @(storyContentCount == minimumValue ? "active" : string.Empty)">
-                                                    
+
                                                     <div style="margin-bottom: 2em">
                                                         <div class="col-sm-3">
                                                             <h3>รายละเอียด</h3>
@@ -222,41 +222,41 @@
                                                         <div class="row">
                                                             <div class="col-sm-5 col-sm-offset-7">
                                                                 <div class="col-sm-6">
-                                                                    <a class="btn btn-block btn-default" asp-controller="Work" asp-action="StoryDetail" asp-route-projectid="@feature.Project_id" asp-route-featureid="@feature._id" asp-route-storyid="@storyContent._id">ดูรายละเอียด</a>
+                                                                    <a class="btn btn-block btn-default" asp-controller="Work" asp-action="StoryDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id">ดูรายละเอียด</a>
                                                                 </div>
                                                                 <div class="col-sm-6">
-                                                                    <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteStory" asp-route-projectid="@feature.Project_id" asp-route-storyid="@storyContent._id">ลบ</a>
+                                                                    <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteStory" asp-route-projectid="@featureContent.Project_id" asp-route-storyid="@storyContent._id">ลบ</a>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <hr class="clearfix" />
 
-                                                    <div class="col-sm-4">
+                                                    <div class="col-sm-3">
                                                         <ul class="nav nav-pills nav-stacked">
                                                             @foreach (var taskSideMenu in storyContent.Tasks)
                                                             {
                                                                 <li class="@(taskSideMenuCount == minimumValue? "active": string.Empty)"><a data-toggle="tab" href="#task@(taskSideMenuCount)">@taskSideMenu.Name</a></li>
                                                                 taskSideMenuCount++;
                                                             }
-                                                            <li><a asp-controller="Work" asp-action="CreateTask" asp-route-projectid="@Model.Project._id" asp-route-featureid="@feature._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
+                                                            <li><a asp-controller="Work" asp-action="CreateTask" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
                                                         </ul>
                                                     </div>
 
-                                                    <div class="col-sm-8">
+                                                    <div class="col-sm-9">
 
                                                         @if (storyContent.Tasks.Count() >= minimumValue)
                                                         {
-                                                            @foreach (var taskContent in storyContent.Tasks)
-                                                            {
-                                                                <div class="panel" style="border: 1px solid #5ca9e1">
-                                                                    <div class="tab-content">
-                                                                        <div id="task@(taskContentCount)" class="tab-pane fade in active">
+                                                            <div class="panel" style="border: 1px solid #5ca9e1">
+                                                                <div class="tab-content panel-body">
 
+                                                                    @foreach (var taskContent in storyContent.Tasks)
+                                                                    {
+                                                                        <div id="task@(taskContentCount)" class="row tab-pane fade in @(taskContentCount == minimumValue ? "active" : string.Empty)">
 
                                                                             <div style="margin-bottom: 2em">
                                                                                 <div class="col-sm-3">
-                                                                                    <h2>รายละเอียด</h2>
+                                                                                    <h4>รายละเอียด</h4>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
                                                                                     <p><b>ชื่อ: </b>@taskContent.Name</p>
@@ -289,7 +289,7 @@
                                                                                 <hr class="clearfix" />
 
                                                                                 <div class="col-sm-3">
-                                                                                    <h2>สถานะงาน</h2>
+                                                                                    <h4>สถานะงาน</h4>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
                                                                                     <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@taskContent.ClosingDate.ToShortDateString()</p>
@@ -318,32 +318,32 @@
                                                                                 </div>
 
                                                                                 <div class="row">
-                                                                                    <div class="col-sm-4 col-sm-offset-8">
+                                                                                    <div class="col-sm-6 col-sm-offset-6">
                                                                                         <div class="col-sm-6">
-                                                                                            <a class="btn btn-block btn-default" asp-controller="Work" asp-action="TaskDetail" asp-route-projectid="@feature.Project_id" asp-route-taskid="@storyContent._id">ดูรายละเอียด</a>
+                                                                                            <a class="btn btn-block btn-default" asp-controller="Work" asp-action="TaskDetail" asp-route-projectid="@featureContent.Project_id" asp-route-story="@storyContent._id" asp-route-taskid="@taskContent._id">ดูรายละเอียด</a>
                                                                                         </div>
                                                                                         <div class="col-sm-6">
-                                                                                            <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteTask" asp-route-projectid="@feature.Project_id" asp-route-taskid="@storyContent._id">ลบ</a>
+                                                                                            <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteTask" asp-route-projectid="@featureContent.Project_id" asp-route-taskid="@taskContent._id">ลบ</a>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
 
                                                                         </div>
-                                                                    </div>
+                                                                        taskContentCount++;
+                                                                    }
+
                                                                 </div>
-
-                                                                taskContentCount++;
-                                                            }
+                                                            </div>
                                                         }
-
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        storyContentCount++;
-                                    }
+                                                </div>
+                                                storyContentCount++;
+                                            }
+
+                                        </div>
+                                    </div>
                                 }
                             </div>
                         </div>
