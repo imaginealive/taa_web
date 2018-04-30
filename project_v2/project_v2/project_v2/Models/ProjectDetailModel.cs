@@ -9,6 +9,6 @@ namespace project_v2.Models
     {
         public ProjectModel Project { get; set; }
         public IEnumerable<DisplayMembership> Memberships { get; set; }
-        public IEnumerable<FeatureModel> Features { get; set; }
+        public IEnumerable<DisplayFeatureModel> Features { get; set; }
     }
 }

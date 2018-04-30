@@ -20,13 +20,15 @@ namespace project_v2.Controllers
         private IMembershipService membershipSvc;
         private IAccountService accountSvc;
         private IRankService rankSvc;
+        private IStatusService statusSvc;
         public ProjectController(IProjectService projectSvc,
             IFeatureService featureSvc,
             IStoryService storySvc,
             ITaskService taskSvc,
             IMembershipService membershipSvc,
             IAccountService accountSvc,
-            IRankService rankSvc)
+            IRankService rankSvc,
+            IStatusService statusSvc)
         {
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
@@ -35,6 +37,7 @@ namespace project_v2.Controllers
             this.membershipSvc = membershipSvc;
             this.accountSvc = accountSvc;
             this.rankSvc = rankSvc;
+            this.statusSvc = statusSvc;
         }
 
         #region Projects
@@ -43,21 +46,55 @@ namespace project_v2.Controllers
         {
             // TODO: Get Works (Stories and Tasks)
             var project = projectSvc.GetProject(projectid);
+            var allAcc = accountSvc.GetAllAccount();
             var memberships = membershipSvc.GetAllProjectMember(projectid);
             var features = featureSvc.GetFeatures(projectid);
+            var ranks = rankSvc.GetAllRank();
 
             var displayMemberships = new List<DisplayMembership>();
-            foreach (var item in memberships)
+            foreach (var item in allAcc)
             {
-                var model = new DisplayMembership(item);
-                displayMemberships.Add(model);
+                var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
+                var rankName = string.Empty;
+
+                if (membership != null)
+                {
+                    var rank = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id);
+                    rankName = rank != null ? rank.RankName : string.Empty;
+
+                    var model = new DisplayMembership(membership)
+                    {
+                        AccountName = $"{item.FirstName} {item.LastName}",
+                        Email = item.Email,
+                        RankName = rankName
+                    };
+
+                    displayMemberships.Add(model);
+                }
             }
-            
+            var displayFeatures = new List<DisplayFeatureModel>();
+            foreach (var item in features)
+            {
+                var createByAccount = allAcc.FirstOrDefault(it => it._id == item.CreateByMember_id);
+                var assginByAccount = allAcc.FirstOrDefault(it => it._id == item.AssginByMember_id);
+                var beassginByAccount = allAcc.FirstOrDefault(it => it._id == item.BeAssignedMember_id);
+                var status = statusSvc.GetAllStatus().FirstOrDefault(it => it._id == item.StatusName);
+
+                var model = new DisplayFeatureModel(item)
+                {
+                    CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
+                    AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
+                    BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
+                    Status = status != null ? status.StatusName : string.Empty
+                };
+                displayFeatures.Add(model);
+            }
+
             return View(new ProjectDetailModel
             {
                 Project = project,
                 Memberships = displayMemberships,
-                Features = features
+                Features = displayFeatures
             });
         }
 
@@ -113,10 +150,12 @@ namespace project_v2.Controllers
             {
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
                 var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
-                var model = new DisplayMembership(membership);
-                model.AccountName = $"{item.FirstName} {item.LastName}";
-                model.Email = item.Email;
-                model.RankName = rankName;
+                var model = new DisplayMembership(membership)
+                {
+                    AccountName = $"{item.FirstName} {item.LastName}",
+                    Email = item.Email,
+                    RankName = rankName
+                };
 
                 displayMemberships.Add(model);
             };
@@ -178,10 +217,12 @@ namespace project_v2.Controllers
             {
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
                 var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
-                var model = new DisplayMembership(membership);
-                model.AccountName = $"{item.FirstName} {item.LastName}";
-                model.Email = item.Email;
-                model.RankName = rankName;
+                var model = new DisplayMembership(membership)
+                {
+                    AccountName = $"{item.FirstName} {item.LastName}",
+                    Email = item.Email,
+                    RankName = rankName
+                };
 
                 displayMemberships.Add(model);
             };

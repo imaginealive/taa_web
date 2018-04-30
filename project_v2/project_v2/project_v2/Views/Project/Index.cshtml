@@ -2,7 +2,10 @@
 @{
     ViewData["Title"] = "Index";
 
-    int featureCount = 1;
+    const int minimumValue = 1;
+    int featureSideMenuCount = minimumValue;
+    int featureContentCount = minimumValue;
+
     var remainingWorks = Model.Features.Where(it => it.StatusName == "Done").Count(); //TODO: Stories and Tasks
     var totalWorks = Model.Features.Count(); //TODO: Stories and Tasks
 }
@@ -19,7 +22,7 @@
         <label>สมาชิกทั้งหมด</label>
         <p>@Model.Memberships.Count()</p>
         <label>งานทั้งหมด</label>
-        <p>@($"{remainingWorks}/{totalWorks}") (@string.Format("{0:00} %", (remainingWorks / totalWorks) * 100))</p>
+        <p>@($"{remainingWorks}/{totalWorks}") (@(totalWorks < minimumValue ? "0" : string.Format("{0:00} %", (remainingWorks / totalWorks) * 100)))</p>
         <div class="row">
             <div class="col-sm-4 col-sm-offset-8">
                 <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
@@ -34,138 +37,166 @@
         <ul class="nav nav-pills nav-stacked">
             @foreach (var item in Model.Features)
             {
-                <li class="active"><a data-toggle="tab" href="#feature@(featureCount)">@item.Name</a></li>
-                featureCount++;
+                <li class="@(featureSideMenuCount == 1? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
+                featureSideMenuCount++;
             }
             <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model.Project._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
         </ul>
     </div>
     <div class="col-sm-10">
-        <div class="panel panel-primary">
-            <div class="tab-content panel-body">
-                <div id="feature1" class="row tab-pane fade in active">
+        @if (Model.Features.Count() >= minimumValue)
+        {
+            <div class="panel panel-primary">
+                <div class="tab-content panel-body">
 
                     @foreach (var item in Model.Features)
                     {
-                        <div style="margin-bottom: 2em">
-                            <div class="col-sm-3">
-                                <h2>รายละเอียด</h2>
-                            </div>
-                            <div class="col-sm-9">
-                                <p><b>ชื่อ: </b>@item.Name</p>
-                                <p><b>รายละเอียด: </b>@item.Description</p>
-                                <p><b>สร้างโดย: </b>@item.CreateByMember_id </p>
-                                <p><b>มอบหมายโดย: </b>@item.AssginByMember_id</p>
-                                <p><b>ผู้รับมอบหมาย: </b>@item.BeAssignedMember_id</p>
-                            </div>
-                            <div class="row"></div>
-                            <hr class="clearfix" />
+                        <div id="feature@(featureContentCount)" class="row tab-pane fade in @(featureContentCount == 1 ? "active" : string.Empty)">
 
-                            <div class="col-sm-3">
-                                <h2>สถานะงาน</h2>
-                            </div>
-                            <div class="col-sm-9">
-                                <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@item.ClosingDate.ToShortDateString()</p>
-                                <p>
-                                    <b>วันที่งานเสร็จสิ้นจริง: </b>
-                                    @if (item.WorkDoneDate.HasValue)
-                                    {
-                                        @item.WorkDoneDate.Value.ToShortDateString()
-                                    }
-                                    else
-                                    {
-                                        <span>-</span>
-                                    }
-                                </p>
-                                <p><b>สถานะ: </b>@item.StatusName</p>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-4 col-sm-offset-8">
-                                    <div class="col-sm-6">
-                                        <a class="btn btn-block btn-default">ดูรายละเอียด</a>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <a class="btn btn-block btn-danger">ลบ</a>
-                                    </div>
+                            <div style="margin-bottom: 2em">
+                                <div class="col-sm-3">
+                                    <h2>รายละเอียด</h2>
                                 </div>
-                            </div>
-                        </div>
-                        <hr class="clearfix" />
-                    }
+                                <div class="col-sm-9">
+                                    <p><b>ชื่อ: </b>@item.Name</p>
+                                    <p><b>รายละเอียด: </b>@item.Description</p>
+                                    <p><b>สร้างโดย: </b>@item.CreateByMemberName</p>
+                                    <p>
+                                        <b>มอบหมายโดย: </b>
+                                        @if (!string.IsNullOrEmpty(item.AssginByMemberName))
+                                        {
+                                            <span>@item.AssginByMemberName</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
+                                    <p>
+                                        <b>ผู้รับมอบหมาย: </b>
+                                        @if (!string.IsNullOrEmpty(item.BeAssignedMemberName))
+                                        {
+                                            <span>@item.BeAssignedMemberName</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
+                                </div>
+                                <div class="row"></div>
+                                <hr class="clearfix" />
 
-                    <div class="col-sm-3">
-                        <ul class="nav nav-pills nav-stacked">
-                            <li class="active"><a data-toggle="tab" href="#s1">Story 1</a></li>
-                            <li><a data-toggle="tab" href="#s2">Story 2</a></li>
-                            <li><a data-toggle="tab" href="#s3">Story 3</a></li>
-                            <li><a><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-sm-9">
-                        <div class="panel panel-danger">
-                            <div class="tab-content panel-body">
-                                <div id="s1" class="row tab-pane fade in active">
-                                    <div class="row" style="margin: 1em">
-                                        <p><b>สร้างโดย: </b>Earn</p>
-                                        <p><b>มอบหมายโดย: </b>Earn</p>
-                                        <p><b>ผู้รับมอบหมาย: </b>Captain</p>
-                                        <p><b>สถานะ: </b>เสร็จสิ้น</p>
-                                        <a class="btn btn-default">ดูรายละเอียด</a>
-                                        <a class="btn btn-danger">ลบ</a>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <ul class="nav nav-pills nav-stacked">
-                                            <li class="active"><a data-toggle="tab" href="#t1">Task 1</a></li>
-                                            <li><a data-toggle="tab" href="#t2">Task 2</a></li>
-                                            <li><a data-toggle="tab" href="#t3">Task 3</a></li>
-                                            <li><a><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <div class="tab-content">
-                                            <div id="t1" class="tab-pane fade in active">
-                                                <div class="row" style="margin: 1em">
-                                                    <p><b>สร้างโดย: </b>Earn</p>
-                                                    <p><b>มอบหมายโดย: </b>Earn</p>
-                                                    <p><b>ผู้รับมอบหมาย: </b>Captain</p>
-                                                    <p><b>สถานะ: </b>เสร็จสิ้น</p>
-                                                    <a class="btn btn-default">ดูรายละเอียด</a>
-                                                    <a class="btn btn-danger">ลบ</a>
-                                                </div>
-                                            </div>
-                                            <div id="t2" class="tab-pane fade">
-                                                <h3>Menu 1</h3>
-                                                <p>Some content in menu 1.</p>
-                                            </div>
-                                            <div id="t3" class="tab-pane fade">
-                                                <h3>Menu 2</h3>
-                                                <p>Some content in menu 2.</p>
-                                            </div>
+                                <div class="col-sm-3">
+                                    <h2>สถานะงาน</h2>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@item.ClosingDate.ToShortDateString()</p>
+                                    <p>
+                                        <b>วันที่งานเสร็จสิ้นจริง: </b>
+                                        @if (item.WorkDoneDate.HasValue)
+                                        {
+                                            @item.WorkDoneDate.Value.ToShortDateString()
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
+                                    <p>
+                                        <b>สถานะ: </b>
+                                        @if (!string.IsNullOrEmpty(item.Status))
+                                        {
+                                            <span>@item.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4 col-sm-offset-8">
+                                        <div class="col-sm-6">
+                                            <a class="btn btn-block btn-default" asp-controller="Work" asp-action="FeatureDetail" asp-route-projectid="@item.Project_id" asp-route-featureid="@item._id">ดูรายละเอียด</a>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteFeature" asp-route-projectid="@item.Project_id" asp-route-featureid="@item._id">ลบ</a>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="s2" class="tab-pane fade">
-                                    <h3>Menu 1</h3>
-                                    <p>Some content in menu 1.</p>
-                                </div>
-                                <div id="s3" class="tab-pane fade">
-                                    <h3>Menu 2</h3>
-                                    <p>Some content in menu 2.</p>
+                            </div>
+                            <hr class="clearfix" />
+
+                            <div class="col-sm-3">
+                                <ul class="nav nav-pills nav-stacked">
+                                    <li class="active"><a data-toggle="tab" href="#s1">Story 1</a></li>
+                                    <li><a data-toggle="tab" href="#s2">Story 2</a></li>
+                                    <li><a data-toggle="tab" href="#s3">Story 3</a></li>
+                                    <li><a><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="panel panel-danger">
+                                    <div class="tab-content panel-body">
+                                        <div id="s1" class="row tab-pane fade in active">
+                                            <div class="row" style="margin: 1em">
+                                                <p><b>สร้างโดย: </b>Earn</p>
+                                                <p><b>มอบหมายโดย: </b>Earn</p>
+                                                <p><b>ผู้รับมอบหมาย: </b>Captain</p>
+                                                <p><b>สถานะ: </b>เสร็จสิ้น</p>
+                                                <a class="btn btn-default">ดูรายละเอียด</a>
+                                                <a class="btn btn-danger">ลบ</a>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <ul class="nav nav-pills nav-stacked">
+                                                    <li class="active"><a data-toggle="tab" href="#t1">Task 1</a></li>
+                                                    <li><a data-toggle="tab" href="#t2">Task 2</a></li>
+                                                    <li><a data-toggle="tab" href="#t3">Task 3</a></li>
+                                                    <li><a><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <div class="tab-content">
+                                                    <div id="t1" class="tab-pane fade in active">
+                                                        <div class="row" style="margin: 1em">
+                                                            <p><b>สร้างโดย: </b>Earn</p>
+                                                            <p><b>มอบหมายโดย: </b>Earn</p>
+                                                            <p><b>ผู้รับมอบหมาย: </b>Captain</p>
+                                                            <p><b>สถานะ: </b>เสร็จสิ้น</p>
+                                                            <a class="btn btn-default">ดูรายละเอียด</a>
+                                                            <a class="btn btn-danger">ลบ</a>
+                                                        </div>
+                                                    </div>
+                                                    <div id="t2" class="tab-pane fade">
+                                                        <h3>Menu 1</h3>
+                                                        <p>Some content in menu 1.</p>
+                                                    </div>
+                                                    <div id="t3" class="tab-pane fade">
+                                                        <h3>Menu 2</h3>
+                                                        <p>Some content in menu 2.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="s2" class="tab-pane fade">
+                                            <h3>Menu 1</h3>
+                                            <p>Some content in menu 1.</p>
+                                        </div>
+                                        <div id="s3" class="tab-pane fade">
+                                            <h3>Menu 2</h3>
+                                            <p>Some content in menu 2.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div id="f2" class="tab-pane fade">
-                    <h3>Menu 1</h3>
-                    <p>Some content in menu 1.</p>
-                </div>
-                <div id="f3" class="tab-pane fade">
-                    <h3>Menu 2</h3>
-                    <p>Some content in menu 2.</p>
+                        featureContentCount++;
+                    }
+
                 </div>
             </div>
-        </div>
+        }
     </div>
 </div>
