@@ -69,22 +69,41 @@ namespace project_v2.Controllers
                     displayMemberships.Add(model);
                 }
             }
+
             var displayFeatures = new List<DisplayFeatureModel>();
-            foreach (var item in features)
+            foreach (var feature in features)
             {
-                var createByAccount = allAcc.FirstOrDefault(it => it._id == item.CreateByMember_id);
-                var assginByAccount = allAcc.FirstOrDefault(it => it._id == item.AssginByMember_id);
-                var beassginByAccount = allAcc.FirstOrDefault(it => it._id == item.BeAssignedMember_id);
+                var feature_CreateByAccount = allAcc.FirstOrDefault(it => it._id == feature.CreateByMember_id);
+                var feature_AssginByAccount = allAcc.FirstOrDefault(it => it._id == feature.AssginByMember_id);
+                var feature_BeassginByAccount = allAcc.FirstOrDefault(it => it._id == feature.BeAssignedMember_id);
 
-                var model = new DisplayFeatureModel(item)
+                var displayStories = new List<DisplayStoryModel>();
+                var stories = storySvc.GetStories(feature._id);
+                foreach (var story in stories)
                 {
-                    CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
-                    AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
-                    BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
-                };
-                displayFeatures.Add(model);
-            }
+                    var story_CreateByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
+                    var story_AssginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
+                    var story_BeassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
+                    var model_story = new DisplayStoryModel(story)
+                    {
+                        CreateByMemberName = story_CreateByAccount != null ? $"{story_CreateByAccount.FirstName} {story_CreateByAccount.LastName}" : string.Empty,
+                        AssginByMemberName = story_AssginByAccount != null ? $"{story_AssginByAccount.FirstName} {story_AssginByAccount.LastName}" : string.Empty,
+                        BeAssignedMemberName = story_BeassginByAccount != null ? $"{story_BeassginByAccount.FirstName} {story_BeassginByAccount.LastName}" : string.Empty,
+                        Tasks = Enumerable.Empty<DisplayTaskModel>()
+                    };
+                    displayStories.Add(model_story);
+                }
 
+                var model_feature = new DisplayFeatureModel(feature)
+                {
+                    CreateByMemberName = feature_CreateByAccount != null ? $"{feature_CreateByAccount.FirstName} {feature_CreateByAccount.LastName}" : string.Empty,
+                    AssginByMemberName = feature_AssginByAccount != null ? $"{feature_AssginByAccount.FirstName} {feature_AssginByAccount.LastName}" : string.Empty,
+                    BeAssignedMemberName = feature_BeassginByAccount != null ? $"{feature_BeassginByAccount.FirstName} {feature_BeassginByAccount.LastName}" : string.Empty,
+                    Stories = displayStories
+                };
+                displayFeatures.Add(model_feature);
+            }
+            
             return View(new ProjectDetailModel
             {
                 Project = project,

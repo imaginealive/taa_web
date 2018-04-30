@@ -15,6 +15,7 @@ namespace project_v2.Controllers
     {
         private IProjectService projectSvc;
         private IFeatureService featureSvc;
+        private IStoryService storySvc;
         private IMembershipService membershipSvc;
         private IAccountService accountSvc;
         private IRankService rankSvc;
@@ -22,6 +23,7 @@ namespace project_v2.Controllers
         public WorkController(
             IProjectService projectSvc,
             IFeatureService featureSvc,
+            IStoryService storySvc,
             IMembershipService membershipSvc,
             IAccountService accountSvc,
             IRankService rankSvc,
@@ -29,11 +31,14 @@ namespace project_v2.Controllers
         {
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
+            this.storySvc = storySvc;
             this.membershipSvc = membershipSvc;
             this.accountSvc = accountSvc;
             this.rankSvc = rankSvc;
             this.statusSvc = statusSvc;
         }
+
+        #region Features
 
         public IActionResult CreateFeature(string projectid)
         {
@@ -126,6 +131,112 @@ namespace project_v2.Controllers
             featureSvc.DeleteFeature(featureid);
             return RedirectToAction(nameof(ProjectController.Index), "Project", new { projectid = projectid });
         }
+
+        #endregion Features
+
+        #region Stories
+
+        public IActionResult CreateStory(string projectid, string featureid)
+        {
+            PrepareDataForDisplay(projectid);
+            ViewBag.ProjectId = projectid;
+            ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
+
+            return View(new StoryModel { Feature_id = featureid });
+        }
+
+        [HttpPost]
+        public IActionResult CreateStory(string projectid, StoryModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var project = projectSvc.GetProject(projectid);
+                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    PrepareDataForDisplay(projectid);
+                    return View(model);
+                }
+                model.ClosingDate = model.ClosingDate.AddDays(1);
+                if (!string.IsNullOrEmpty(model.BeAssignedMember_id)) model.AssginByMember_id = model.CreateByMember_id;
+
+                storySvc.CreateStory(model);
+                return RedirectToAction("Index", "Project", new { projectid = projectid });
+            }
+            return View(model);
+        }
+
+        public IActionResult StoryDetail(string projectid, string featureid, string storyid)
+        {
+            PrepareDataForDisplay(projectid);
+            var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
+            var story = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid);
+            var allAcc = accountSvc.GetAllAccount();
+
+            var createByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
+            var assginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
+            var beassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
+
+            ViewBag.ProjectId = projectid;
+            ViewBag.FeatureName = feature.Name;
+            var model = new DisplayStoryModel(story)
+            {
+                CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
+                AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
+                BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
+            };
+            return View(model);
+        }
+
+        public IActionResult EditStory(string projectid, string featureid, string storyid)
+        {
+            PrepareDataForDisplay(projectid);
+            ViewBag.ProjectId = projectid;
+            ViewBag.Feature = featureid;
+            ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
+            var model = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid);
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditStory(string projectid, StoryModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var project = projectSvc.GetProject(projectid);
+                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    PrepareDataForDisplay(projectid);
+                    return View(model);
+                }
+                model.ClosingDate = model.ClosingDate.AddDays(1);
+
+                if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
+                {
+                    HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
+                    if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+
+                    var json = System.Text.Encoding.UTF8.GetString(isLogin);
+                    var user = JsonConvert.DeserializeObject<AccountModel>(json);
+                    ViewBag.User = user;
+
+                    model.AssginByMember_id = user._id;
+                }
+
+                storySvc.EditStory(model);
+                return RedirectToAction(nameof(StoryDetail), new { projectid = projectid, featureid = model.Feature_id, storyid = model._id });
+            }
+            return View(model);
+        }
+
+        public IActionResult DeleteStory(string projectid, string storyid)
+        {
+            storySvc.DeleteStory(storyid);
+            return RedirectToAction(nameof(ProjectController.Index), "Project", new { projectid = projectid });
+        }
+
+        #endregion Stories
 
         /// <summary>
         /// Prepare for display work information (e.g. CreateByUser, ProjectName, ...)

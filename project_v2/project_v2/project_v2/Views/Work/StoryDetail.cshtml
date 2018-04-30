@@ -1,0 +1,100 @@
+﻿@model project_v2.Models.DisplayStoryModel
+@{
+    ViewData["Title"] = "StoryDetail";
+}
+
+<h2>รายละเอียดงานรอง</h2>
+
+<hr />
+<div class="panel panel-default">
+    <div class="panel-body bg-info">
+        <h3>รายละเอียดงาน</h3>
+        <div class="row" style="margin-top: 2em">
+            <div class="col-sm-11 col-sm-offset-1">
+                <p><b>โปรเจคที่งานสังกัด: </b>@ViewBag.ProjectName</p>
+                <p><b>งานหลักที่งานสังกัด: </b>@ViewBag.FeatureName</p>
+                <p><b><label asp-for="Name"></label>: </b> @Model.Name</p>
+                <p><b><label asp-for="Description"></label>: </b> @Model.Description</p>
+                <p>
+                    <b><label asp-for="WorkReport"></label>: </b>
+                    @if (!string.IsNullOrEmpty(Model.WorkReport))
+                    {
+                        <span>@Model.WorkReport</span>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </p>
+                <p><b><label asp-for="CreateDate"></label>: </b> @Model.CreateDate.ToShortDateString()</p>
+                <p><b><label asp-for="ClosingDate"></label>: </b> @Model.ClosingDate.ToShortDateString()</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <h3>การติดตามงาน</h3>
+        <div class="row" style="margin-top: 2em">
+            <div class="col-sm-11 col-sm-offset-1">
+                <p><b><label asp-for="CreateByMember_id"></label>: </b>@Model.CreateByMemberName</p>
+                <p>
+                    <b><label asp-for="AssginByMember_id"></label>: </b>
+                    @if (!string.IsNullOrEmpty(Model.AssginByMember_id))
+                    {
+                        <span>@Model.AssginByMemberName</span>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </p>
+                <p>
+                    <b><label asp-for="BeAssignedMember_id"></label>: </b>
+                    @if (!string.IsNullOrEmpty(Model.BeAssignedMember_id))
+                    {
+                        <span>@Model.BeAssignedMemberName</span>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </p>
+                <p>
+                    <b><label asp-for="StatusName"></label>: </b>
+                    @if (!string.IsNullOrEmpty(Model.StatusName))
+                    {
+                        <span>@Model.StatusName</span>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </p>
+                <p>
+                    <b><label asp-for="WorkDoneDate"></label>: </b>
+                    @if (Model.WorkDoneDate.HasValue)
+                    {
+                        @Model.WorkDoneDate.Value.ToShortDateString()
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-offset-8">
+        <div class="col-md-6">
+            <a asp-controller="Project" asp-action="Index" asp-route-projectid="@ViewBag.ProjectId" class="btn btn-block btn-default">ย้อนกลับ</a>
+        </div>
+        <div class="col-md-6">
+            <a class="btn btn-block btn-primary" asp-action="EditStory" asp-route-projectid="@ViewBag.ProjectId" asp-route-featureid="@Model.Feature_id" asp-route-storyid="@Model._id">แก้ไขรายละเอียด</a>
+        </div>
+    </div>
+</div>
