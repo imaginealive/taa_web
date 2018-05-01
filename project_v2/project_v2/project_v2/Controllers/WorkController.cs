@@ -273,6 +273,80 @@ namespace project_v2.Controllers
             return View(model);
         }
 
+        public IActionResult TaskDetail(string projectid, string featureid, string storyid, string taskid)
+        {
+            PrepareDataForDisplay(projectid);
+            var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
+            var story = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid);
+            var task = taskSvc.GetTasks(storyid).FirstOrDefault(it => it._id == taskid);
+            var allAcc = accountSvc.GetAllAccount();
+
+            var createByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
+            var assginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
+            var beassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
+
+            ViewBag.ProjectId = projectid;
+            ViewBag.FeatureId = feature._id;
+            ViewBag.FeatureName = feature.Name;
+            ViewBag.StoryName = story.Name;
+            var model = new DisplayTaskModel(task)
+            {
+                CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
+                AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
+                BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
+            };
+            return View(model);
+        }
+        
+        public IActionResult EditTask(string projectid, string featureid, string storyid, string taskid)
+        {
+            PrepareDataForDisplay(projectid);
+            ViewBag.ProjectId = projectid;
+            ViewBag.FeatureId = featureid;
+            ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
+            ViewBag.StoryName = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid).Name;
+            var model = taskSvc.GetTasks(storyid).FirstOrDefault(it => it._id == taskid);
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditTask(string projectid, string featureid, TaskModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var project = projectSvc.GetProject(projectid);
+                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                {
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    PrepareDataForDisplay(projectid);
+                    return View(model);
+                }
+                model.ClosingDate = model.ClosingDate.AddDays(1);
+
+                if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
+                {
+                    HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
+                    if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+
+                    var json = System.Text.Encoding.UTF8.GetString(isLogin);
+                    var user = JsonConvert.DeserializeObject<AccountModel>(json);
+                    ViewBag.User = user;
+
+                    model.AssginByMember_id = user._id;
+                }
+
+                taskSvc.EditTask(model);
+                return RedirectToAction(nameof(TaskDetail), new { projectid = projectid, featureid = featureid, storyid = model.Story_id, taskid = model._id });
+            }
+            return View(model);
+        }
+
+        public IActionResult DeleteTask(string projectid, string taskid)
+        {
+            taskSvc.DeleteTask(taskid);
+            return RedirectToAction(nameof(ProjectController.Index), "Project", new { projectid = projectid });
+        }
+
         #endregion Tasks
 
         /// <summary>
