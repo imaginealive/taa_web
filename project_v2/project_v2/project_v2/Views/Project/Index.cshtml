@@ -12,23 +12,87 @@
     int taskSideMenuCount = minimumValue;
     int taskContentCount = minimumValue;
 
-    var remainingWorks = Model.Features.Where(it => it.StatusName == "Done").Count(); //TODO: Stories and Tasks
-    var totalWorks = Model.Features.Count(); //TODO: Stories and Tasks
+    var today = DateTime.Now.Date;
+    var startDate = Model.Project.CreateDate.Date;
+    var lateDate = Model.Project.ClosingDate.Date < today ? Model.Project.ClosingDate.Date : today;
+    var totalWorks = Model.Features.Sum(ft => ft.Stories.Sum(st => st.Tasks.Count())) + Model.Features.Sum(ft => ft.Stories.Count()) + Model.Features.Count();
+    List<double> remaining = new List<double> { };
+    List<double> done = new List<double> { };
 }
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
 
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['วันที่', 'จำนวนงานเสร็จของวัน', 'จำนวนงานที่เหลือ'],
+            @for (var i = startDate; i <= lateDate; i = i.AddDays(1))
+            {
+                var doneToday = Model.Features.Sum(ft => ft.Stories.Sum(st => st.Tasks.Where(t => t.WorkDoneDate.HasValue).Count())) + Model.Features.Sum(ft => ft.Stories.Where(st => st.WorkDoneDate.HasValue).Count()) + Model.Features.Where(ft => ft.WorkDoneDate.HasValue).Count();
+                var remainToday = totalWorks - done.Sum();
+                @Html.Raw($"['{i.ToShortDateString()}', {doneToday}, {remainToday}]");
+                if (i != lateDate) {
+                    @Html.Raw(",");
+                }
+                done.Add(doneToday);
+                remaining.Add(remainToday);
+            }
+        ]);
+
+        var options = {
+            title: 'ความก้าวหน้าของโปรเจ็ค',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+    };
+
+    var chart = new google.visualization.AreaChart(document.getElementById('curve_chart'));
+
+    chart.draw(data, options);
+    }
+</script>
 <a asp-controller="Home" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
 <div class="panel panel-primary" style="margin-top: 2em">
     <div class="panel-heading">ข้อมูลเบื้องต้นของโปรเจค</div>
     <div class="panel-body">
-        <label asp-for="Project.ProjectName"></label>
-        <p>@Model.Project.ProjectName</p>
-        <label asp-for="Project.Description">รายละเอียด</label>
-        <p>@Model.Project.Description</p>
-        <label>สมาชิกทั้งหมด</label>
-        <p>@Model.Memberships.Count()</p>
-        <label>งานทั้งหมด</label>
-        <p>@($"{remainingWorks}/{totalWorks}") (@(totalWorks < minimumValue ? "0" : string.Format("{0:00} %", (remainingWorks / totalWorks) * 100)))</p>
+        <div class="row">
+            <div class="col-lg-12">
+                <dl>
+                    <dt>ชื่อโปรเจค</dt>
+                    <dd>@Model.Project.ProjectName</dd>
+                    <dt>รายละเอียด</dt>
+                    <dd>@Model.Project.Description</dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl>
+                    <dt>สมาชิกทั้งหมด</dt>
+                    <dd>@Model.Memberships.Count()</dd>
+                    @if (Model.Project.ClosingDate.Date > today)
+                    {
+                        <dt>จำนวนวันทำงานเหลือ</dt>
+                        <dd>@((Model.Project.ClosingDate.Date - today).TotalDays + 1) วัน</dd>
+                        <dt>คาดคะเนค่าเฉลี่ยของงานที่ต้องทำต่อวัน</dt>
+                        <dd>@((remaining.LastOrDefault() / ((Model.Project.ClosingDate.Date - today).TotalDays + 1)).ToString("#0.##")) งาน/วัน</dd>
+
+                    }
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl>
+                    <dt>งานทั้งหมด</dt>
+                    <dd>@totalWorks งาน</dd>
+                    <dt>จำนวนงานเสร็จ</dt>
+                    <dd>@(done.Sum()) งาน (@(done.Sum() / totalWorks * 100)%)</dd>
+                    <dt>ค่าเฉลี่ยของงานเสร็จต่อวัน</dt>
+                    <dd>@(done.Sum() / Math.Round((lateDate - startDate).TotalDays + 1)) งาน/วัน</dd>
+                    <dt>จำนวนงานเหลือ</dt>
+                    <dd>@(remaining.LastOrDefault()) งาน (@(remaining.LastOrDefault() / totalWorks * 100)%)</dd>
+                </dl>
+            </div>
+        </div>
+        <div id="curve_chart" style="min-width:100%; padding-bottom: 20px;"></div>
         <div class="row">
             <div class="col-sm-4 col-sm-offset-8">
                 <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
