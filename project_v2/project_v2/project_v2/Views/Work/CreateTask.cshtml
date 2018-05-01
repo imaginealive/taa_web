@@ -6,7 +6,7 @@
 <h2>สร้างงานย่อยใหม่</h2>
 
 <hr />
-<form asp-action="CreateTask" asp-route-projectid="@ViewBag.ProjectId" method="post">
+<form asp-action="CreateTask" asp-route-projectid="@ViewBag.ProjectId" asp-route-featureid="@ViewBag.FeatureId" method="post">
     @Html.HiddenFor(it => it.Story_id)
     <div class="panel panel-default">
         <div class="panel-body bg-info">

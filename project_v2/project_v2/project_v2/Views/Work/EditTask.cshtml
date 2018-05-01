@@ -47,7 +47,7 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="CreateDate" class="control-label"></label>
-                        <input asp-for="CreateDate" type="text" class="form-control" disabled />
+                        <input type="text" class="form-control" value="@(Model.CreateDate.ToShortDateString())" disabled />
                     </div>
                     <div class="form-group">
                         <label asp-for="ClosingDate" class="control-label"></label>

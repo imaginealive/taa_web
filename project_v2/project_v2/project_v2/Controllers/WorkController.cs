@@ -55,9 +55,9 @@ namespace project_v2.Controllers
             if (ModelState.IsValid)
             {
                 var project = projectSvc.GetProject(model.Project_id);
-                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                if (model.ClosingDate.Date > project.ClosingDate.Date || model.ClosingDate.Date < DateTime.Now.Date)
                 {
-                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นงานหลัก ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
                     PrepareDataForDisplay(model.Project_id);
                     return View(model);
                 }
@@ -103,9 +103,9 @@ namespace project_v2.Controllers
             if (ModelState.IsValid)
             {
                 var project = projectSvc.GetProject(model.Project_id);
-                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                if (model.ClosingDate.Date > project.ClosingDate.Date || model.ClosingDate.Date < model.CreateDate.Date)
                 {
-                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นงานหลัก ไม่สามารถน้อยกว่าวันที่สร้าง หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
                     PrepareDataForDisplay(model.Project_id);
                     return View(model);
                 }
@@ -154,10 +154,12 @@ namespace project_v2.Controllers
             if (ModelState.IsValid)
             {
                 var project = projectSvc.GetProject(projectid);
-                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == model.Feature_id);
+                if (model.ClosingDate.Date > project.ClosingDate.Date || model.ClosingDate.Date > feature.ClosingDate.Date || model.ClosingDate.Date < DateTime.Now.Date)
                 {
-                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานรองได้ เนื่องจากวันที่เสร็จสิ้นงานรอง ไม่สามารถน้อยกว่าวันที่ปัจจุบัน ไม่สามารถมากกว่าวันที่เสร็จสิ้นงานหลัก หรือวันที่เสร็จสิ้นโปรเจคได้";
                     PrepareDataForDisplay(projectid);
+                    ViewBag.ProjectId = projectid;
                     return View(model);
                 }
                 model.ClosingDate = model.ClosingDate.AddDays(1);
@@ -166,6 +168,7 @@ namespace project_v2.Controllers
                 storySvc.CreateStory(model);
                 return RedirectToAction("Index", "Project", new { projectid = projectid });
             }
+            ViewBag.ProjectId = projectid;
             return View(model);
         }
 
@@ -207,10 +210,12 @@ namespace project_v2.Controllers
             if (ModelState.IsValid)
             {
                 var project = projectSvc.GetProject(projectid);
-                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == model.Feature_id);
+                if (model.ClosingDate.Date > project.ClosingDate.Date || model.ClosingDate.Date > feature.ClosingDate.Date || model.ClosingDate.Date < model.CreateDate.Date)
                 {
-                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานรองได้ เนื่องจากวันที่เสร็จสิ้นงานรอง ไม่สามารถน้อยกว่าวันที่สร้าง ไม่สามารถมากกว่าวันที่เสร็จสิ้นงานหลัก หรือวันที่เสร็จสิ้นโปรเจคได้";
                     PrepareDataForDisplay(projectid);
+                    ViewBag.ProjectId = projectid;
                     return View(model);
                 }
                 model.ClosingDate = model.ClosingDate.AddDays(1);
@@ -226,10 +231,10 @@ namespace project_v2.Controllers
 
                     model.AssginByMember_id = user._id;
                 }
-
                 storySvc.EditStory(model);
                 return RedirectToAction(nameof(StoryDetail), new { projectid = projectid, featureid = model.Feature_id, storyid = model._id });
             }
+            ViewBag.ProjectId = projectid;
             return View(model);
         }
 
@@ -242,26 +247,33 @@ namespace project_v2.Controllers
         #endregion
 
         #region Tasks
-        
+
         public IActionResult CreateTask(string projectid, string featureid, string storyid)
         {
+            var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
             PrepareDataForDisplay(projectid);
             ViewBag.ProjectId = projectid;
-            ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
+            ViewBag.FeatureId = feature._id;
+            ViewBag.FeatureName = feature.Name;
             ViewBag.StoryName = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid).Name;
-            return View(new TaskModel { Story_id = storyid});
+            return View(new TaskModel { Story_id = storyid });
         }
 
         [HttpPost]
-        public IActionResult CreateTask(string projectid, TaskModel model)
+        public IActionResult CreateTask(string projectid, string featureid, TaskModel model)
         {
+            var project = projectSvc.GetProject(projectid);
+            var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == featureid);
             if (ModelState.IsValid)
             {
-                var project = projectSvc.GetProject(projectid);
-                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                var story = storySvc.GetStories(feature._id).FirstOrDefault(it => it._id == model.Story_id);
+                if (model.ClosingDate.Date > project.ClosingDate.Date || model.ClosingDate.Date > feature.ClosingDate.Date || model.ClosingDate.Date > story.ClosingDate.Date || model.ClosingDate.Date < DateTime.Now.Date)
                 {
-                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานย่อยได้ เนื่องจากวันที่เสร็จสิ้นงานย่อย ไม่สามารถน้อยกว่าวันที่ปัจจุบัน ไม่สามารถมากกว่าวันที่เสร็จสิ้นงานหลัก วันที่เสร็จสิ้นงานรอง หรือวันที่เสร็จสิ้นโปรเจคได้";
                     PrepareDataForDisplay(projectid);
+                    ViewBag.ProjectId = projectid;
+                    ViewBag.FeatureId = feature._id;
+                    ViewBag.FeatureName = feature.Name;
                     return View(model);
                 }
                 model.ClosingDate = model.ClosingDate.AddDays(1);
@@ -270,6 +282,9 @@ namespace project_v2.Controllers
                 taskSvc.CreateTask(model);
                 return RedirectToAction("Index", "Project", new { projectid = projectid });
             }
+            ViewBag.ProjectId = projectid;
+            ViewBag.FeatureId = feature._id;
+            ViewBag.FeatureName = feature.Name;
             return View(model);
         }
 
@@ -297,7 +312,7 @@ namespace project_v2.Controllers
             };
             return View(model);
         }
-        
+
         public IActionResult EditTask(string projectid, string featureid, string storyid, string taskid)
         {
             PrepareDataForDisplay(projectid);
@@ -312,13 +327,18 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult EditTask(string projectid, string featureid, TaskModel model)
         {
+            var project = projectSvc.GetProject(projectid);
+            var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == featureid);
             if (ModelState.IsValid)
             {
-                var project = projectSvc.GetProject(projectid);
-                if (model.ClosingDate.Date > project.ClosingDate || model.ClosingDate.Date < DateTime.Now.Date)
+                var story = storySvc.GetStories(feature._id).FirstOrDefault(it => it._id == model.Story_id);
+                if (model.ClosingDate.Date > project.ClosingDate.Date || model.ClosingDate.Date > feature.ClosingDate.Date || model.ClosingDate.Date > story.ClosingDate.Date || model.ClosingDate.Date < model.CreateDate.Date)
                 {
-                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานหลักได้ เนื่องจากวันที่เสร็จสิ้นโปรเจค ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้ หรือไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
+                    ViewBag.ErrorMessage = "ไม่สามารถสร้างงานย่อยได้ เนื่องจากวันที่เสร็จสิ้นงานย่อย ไม่สามารถน้อยกว่าวันที่สร้าง ไม่สามารถมากกว่าวันที่เสร็จสิ้นงานหลัก วันที่เสร็จสิ้นงานรอง หรือวันที่เสร็จสิ้นโปรเจคได้";
                     PrepareDataForDisplay(projectid);
+                    ViewBag.ProjectId = projectid;
+                    ViewBag.FeatureId = feature._id;
+                    ViewBag.FeatureName = feature.Name;
                     return View(model);
                 }
                 model.ClosingDate = model.ClosingDate.AddDays(1);
@@ -334,10 +354,12 @@ namespace project_v2.Controllers
 
                     model.AssginByMember_id = user._id;
                 }
-
                 taskSvc.EditTask(model);
                 return RedirectToAction(nameof(TaskDetail), new { projectid = projectid, featureid = featureid, storyid = model.Story_id, taskid = model._id });
             }
+            ViewBag.ProjectId = projectid;
+            ViewBag.FeatureId = feature._id;
+            ViewBag.FeatureName = feature.Name;
             return View(model);
         }
 

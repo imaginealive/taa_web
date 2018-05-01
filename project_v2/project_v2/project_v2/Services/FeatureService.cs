@@ -77,6 +77,7 @@ namespace project_v2.Services
                 .Set(it => it.BeAssignedMember_id, model.BeAssignedMember_id)
                 .Set(it => it.StatusName, model.StatusName)
                 .Set(it => it.WorkDoneDate, model.WorkDoneDate)
+                .Set(it => it.ClosingDate, model.ClosingDate)
             );
         }
 
