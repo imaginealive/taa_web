@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Index";
 
+    const int DefaultValue = 0;
     const int minimumValue = 1;
     int featureSideMenuCount = minimumValue;
     int featureContentCount = minimumValue;
@@ -27,7 +28,7 @@
     function drawChart() {
         var data = google.visualization.arrayToDataTable([
             ['วันที่', 'จำนวนงานเสร็จของวัน', 'จำนวนงานที่เหลือ'],
-            @for (var i = startDate; i <= lateDate; i = i.AddDays(1))
+            @for (var i = startDate; i <= lateDate; i = i.AddDays(minimumValue))
             {
                 var doneToday = Model.Features.Sum(ft => ft.Stories.Sum(st => st.Tasks.Where(t => t.WorkDoneDate.HasValue).Count())) + Model.Features.Sum(ft => ft.Stories.Where(st => st.WorkDoneDate.HasValue).Count()) + Model.Features.Where(ft => ft.WorkDoneDate.HasValue).Count();
                 var remainToday = totalWorks - done.Sum();
@@ -54,50 +55,74 @@
 <a asp-controller="Home" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
 <div class="panel panel-primary" style="margin-top: 2em">
-    <div class="panel-heading">ข้อมูลเบื้องต้นของโปรเจค</div>
+    <div class="panel-heading"><h3>ข้อมูลภาพรวมของโปรเจค</h3></div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-lg-12">
-                <dl>
-                    <dt>ชื่อโปรเจค</dt>
-                    <dd>@Model.Project.ProjectName</dd>
-                    <dt>รายละเอียด</dt>
-                    <dd>@Model.Project.Description</dd>
-                </dl>
+            <div class="col-lg-2">
+                <h3>ข้อมูลโปรเจค</h3>
             </div>
-            <div class="col-lg-6">
-                <dl>
-                    <dt>สมาชิกทั้งหมด</dt>
-                    <dd>@Model.Memberships.Count()</dd>
-                    @if (Model.Project.ClosingDate.Date > today)
-                    {
-                        <dt>จำนวนวันทำงานเหลือ</dt>
-                        <dd>@((Model.Project.ClosingDate.Date - today).TotalDays + 1) วัน</dd>
-                        <dt>คาดคะเนค่าเฉลี่ยของงานที่ต้องทำต่อวัน</dt>
-                        <dd>@((remaining.LastOrDefault() / ((Model.Project.ClosingDate.Date - today).TotalDays + 1)).ToString("#0.##")) งาน/วัน</dd>
+            <div class="col-lg-10">
+                <div class="col-lg-6">
+                    <dl>
+                        <dt><label asp-for="Project.ProjectName"></label></dt>
+                        <dd>@Model.Project.ProjectName</dd>
+                        <dt><label asp-for="Project.Description"></label></dt>
+                        <dd>@Model.Project.Description</dd>
 
-                    }
-                </dl>
-            </div>
-            <div class="col-lg-6">
-                <dl>
-                    <dt>งานทั้งหมด</dt>
-                    <dd>@totalWorks งาน</dd>
-                    <dt>จำนวนงานเสร็จ</dt>
-                    <dd>@(done.Sum()) งาน (@(done.Sum() / totalWorks * 100)%)</dd>
-                    <dt>ค่าเฉลี่ยของงานเสร็จต่อวัน</dt>
-                    <dd>@(done.Sum() / Math.Round((lateDate - startDate).TotalDays + 1)) งาน/วัน</dd>
-                    <dt>จำนวนงานเหลือ</dt>
-                    <dd>@(remaining.LastOrDefault()) งาน (@(remaining.LastOrDefault() / totalWorks * 100)%)</dd>
-                </dl>
+                    </dl>
+                </div>
+                <div class="col-lg-6">
+                    <dl>
+                        <dt><label asp-for="Project.CreateDate"></label></dt>
+                        <dd>@Model.Project.CreateDate.ToShortDateString()</dd>
+                        <dt><label asp-for="Project.ClosingDate"></label></dt>
+                        <dd>@Model.Project.ClosingDate.ToShortDateString()</dd>
+                    </dl>
+                </div>
             </div>
         </div>
-        <div id="curve_chart" style="min-width:100%; padding-bottom: 20px;"></div>
+        <hr />
         <div class="row">
-            <div class="col-sm-4 col-sm-offset-8">
+            <div class="col-lg-2">
+                <h3>ภาพรวมของงาน</h3>
+            </div>
+            <div class="col-lg-10">
+                <div class="col-lg-6">
+                    <dl>
+                        <dt>สมาชิกทั้งหมด</dt>
+                        <dd>@Model.Memberships.Count()</dd>
+                        @if (Model.Project.ClosingDate.Date > today)
+                        {
+                            <dt>จำนวนวันทำงานเหลือ</dt>
+                            <dd>@((Model.Project.ClosingDate.Date - today).TotalDays + minimumValue) วัน</dd>
+                            <dt>คาดคะเนค่าเฉลี่ยของงานที่ต้องทำต่อวัน</dt>
+                            <dd>@((remaining.LastOrDefault() / ((Model.Project.ClosingDate.Date - today).TotalDays + minimumValue)).ToString("#0.##")) งาน/วัน</dd>
+
+                        }
+                    </dl>
+                </div>
+                <div class="col-lg-6">
+                    <dl>
+                        <dt>งานทั้งหมด</dt>
+                        <dd>@totalWorks งาน</dd>
+                        <dt>จำนวนงานเสร็จ</dt>
+                        <dd>@(done.Sum()) งาน (@(done.Sum() / totalWorks * 100)%)</dd>
+                        <dt>ค่าเฉลี่ยของงานเสร็จต่อวัน</dt>
+                        <dd>@(done.Sum() / Math.Round((lateDate - startDate).TotalDays + minimumValue)) งาน/วัน</dd>
+                        <dt>จำนวนงานเหลือ</dt>
+                        <dd>@(remaining.LastOrDefault()) งาน (@(remaining.LastOrDefault() / totalWorks * 100)%)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3 col-sm-offset-9">
                 <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
             </div>
         </div>
+        <hr />
+
+        <div id="curve_chart" style="min-width:100%; padding-bottom: 20px;"></div>
     </div>
 </div>
 
@@ -107,7 +132,7 @@
         <ul class="nav nav-pills nav-stacked">
             @foreach (var item in Model.Features)
             {
-                <li class="@(featureSideMenuCount == minimumValue? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
+                <li class="@(Model.Features.FirstOrDefault()._id == item._id? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
                 featureSideMenuCount++;
             }
             <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model.Project._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
@@ -121,7 +146,7 @@
 
                     @foreach (var featureContent in Model.Features)
                     {
-                        <div id="feature@(featureContentCount)" class="row tab-pane fade in @(featureContentCount == minimumValue ? "active" : string.Empty)">
+                        <div id="feature@(featureContentCount)" class="row tab-pane fade in @(Model.Features.FirstOrDefault()._id == featureContent._id? "active" : string.Empty)">
 
                             <div style="margin-bottom: 2em">
                                 <div class="col-sm-3">
@@ -203,7 +228,7 @@
                                 <ul class="nav nav-pills nav-stacked">
                                     @foreach (var storySideMenu in featureContent.Stories)
                                     {
-                                        <li class="@(storySideMenuCount == minimumValue? "active": string.Empty)"><a data-toggle="tab" href="#story@(storySideMenuCount)">@storySideMenu.Name</a></li>
+                                        <li class="@(featureContent.Stories.FirstOrDefault()._id == storySideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#story@(storySideMenuCount)">@storySideMenu.Name</a></li>
                                         storySideMenuCount++;
                                     }
                                     <li><a asp-controller="Work" asp-action="CreateStory" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
@@ -218,7 +243,7 @@
 
                                             @foreach (var storyContent in featureContent.Stories)
                                             {
-                                                <div id="story@(storyContentCount)" class="row tab-pane fade in @(storyContentCount == minimumValue ? "active" : string.Empty)">
+                                                <div id="story@(storyContentCount)" class="row tab-pane fade in @(featureContent.Stories.FirstOrDefault()._id == storyContent._id? "active" : string.Empty)">
 
                                                     <div style="margin-bottom: 2em">
                                                         <div class="col-sm-3">
@@ -300,7 +325,7 @@
                                                         <ul class="nav nav-pills nav-stacked">
                                                             @foreach (var taskSideMenu in storyContent.Tasks)
                                                             {
-                                                                <li class="@(taskSideMenuCount == minimumValue? "active": string.Empty)"><a data-toggle="tab" href="#task@(taskSideMenuCount)">@taskSideMenu.Name</a></li>
+                                                                <li class="@(storyContent.Tasks.FirstOrDefault()._id == taskSideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#task@(taskSideMenuCount)">@taskSideMenu.Name</a></li>
                                                                 taskSideMenuCount++;
                                                             }
                                                             <li><a asp-controller="Work" asp-action="CreateTask" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
@@ -316,7 +341,7 @@
 
                                                                     @foreach (var taskContent in storyContent.Tasks)
                                                                     {
-                                                                        <div id="task@(taskContentCount)" class="row tab-pane fade in @(taskContentCount == minimumValue ? "active" : string.Empty)">
+                                                                        <div id="task@(taskContentCount)" class="row tab-pane fade in @(storyContent.Tasks.FirstOrDefault()._id == taskContent._id? "active" : string.Empty)">
 
                                                                             <div style="margin-bottom: 2em">
                                                                                 <div class="col-sm-3">
@@ -413,7 +438,6 @@
                         </div>
                         featureContentCount++;
                     }
-
                 </div>
             </div>
         }
