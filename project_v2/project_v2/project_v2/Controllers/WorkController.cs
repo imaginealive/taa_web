@@ -461,20 +461,26 @@ namespace project_v2.Controllers
                 return false;
             }
 
-            var isValidClosingDateWithFeature = !isVerifyFeature && value.ClosingDate.Date <= feature.ClosingDate.Date;
-            if (!isValidClosingDateWithFeature)
+            if (isVerifyStory)
             {
-                ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
-                ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} มากกว่าวันที่เสร็จสิ้นของงานหลัก";
-                return false;
+                var isValidClosingDateWithFeature = value.ClosingDate.Date <= feature.ClosingDate.Date;
+                if (!isValidClosingDateWithFeature)
+                {
+                    ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
+                    ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} มากกว่าวันที่เสร็จสิ้นของงานหลัก";
+                    return false;
+                }
             }
 
-            var isValidClosingDateWithStory = !isVerifyFeature && !isVerifyStory && value.ClosingDate.Date <= story.ClosingDate.Date;
-            if (!isValidClosingDateWithStory)
+            if (isVerifyTask)
             {
-                ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
-                ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} มากกว่าวันที่เสร็จสิ้นของงานรอง";
-                return false;
+                var isValidClosingDateWithStory = value.ClosingDate.Date <= story.ClosingDate.Date;
+                if (!isValidClosingDateWithStory)
+                {
+                    ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
+                    ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} มากกว่าวันที่เสร็จสิ้นของงานรอง";
+                    return false;
+                }
             }
             return true;
         }

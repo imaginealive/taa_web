@@ -29,7 +29,6 @@
                     }
                 </p>
                 <p><b><label asp-for="CreateDate"></label>: </b> @Model.CreateDate.ToShortDateString()</p>
-                <p><b><label asp-for="ClosingDate"></label>: </b> @Model.ClosingDate.ToShortDateString()</p>
             </div>
         </div>
     </div>
@@ -74,6 +73,7 @@
                         <span>-</span>
                     }
                 </p>
+                <p><b><label asp-for="ClosingDate"></label>: </b> @Model.ClosingDate.ToShortDateString()</p>
                 <p>
                     <b><label asp-for="WorkDoneDate"></label>: </b>
                     @if (Model.WorkDoneDate.HasValue)
