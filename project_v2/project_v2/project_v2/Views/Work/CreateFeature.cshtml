@@ -72,7 +72,16 @@
                         <input asp-for="ClosingDate" type="date" value=@DateTime.Now class="form-control" />
                         <span asp-validation-for="ClosingDate" class="text-danger"></span>
                     </div>
-                    <p class="text-danger">@ViewBag.ErrorMessage</p>
+
+                    @if (!string.IsNullOrEmpty(ViewBag.ErrorTitle) && !string.IsNullOrEmpty(ViewBag.ErrorMessage))
+                    {
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <h4 class="text-danger">@ViewBag.ErrorTitle</h4>
+                                <p class="text-danger">@ViewBag.ErrorMessage</p>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
