@@ -54,7 +54,8 @@ namespace project_v2.Controllers
         {
             if (ModelState.IsValid)
             {
-                var isValid = ValidateClosingDate(model.Project_id, true, model);
+                var project = projectSvc.GetProject(model.Project_id);
+                var isValid = ValidateClosingDate(true, project, model);
                 if (!isValid)
                 {
                     PrepareDataForDisplay(model.Project_id);
@@ -101,7 +102,8 @@ namespace project_v2.Controllers
         {
             if (ModelState.IsValid)
             {
-                var isValid = ValidateClosingDate(model.Project_id, false, model);
+                var project = projectSvc.GetProject(model.Project_id);
+                var isValid = ValidateClosingDate(false, project, model);
                 if (!isValid)
                 {
                     PrepareDataForDisplay(model.Project_id);
@@ -153,7 +155,7 @@ namespace project_v2.Controllers
             var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == model.Feature_id);
             if (ModelState.IsValid)
             {
-                var isValid = ValidateClosingDate(projectid, true, feature, model);
+                var isValid = ValidateClosingDate(true, project, feature, model);
                 if (!isValid)
                 {
                     PrepareDataForDisplay(projectid);
@@ -211,7 +213,7 @@ namespace project_v2.Controllers
             var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == model.Feature_id);
             if (ModelState.IsValid)
             {
-                var isValid = ValidateClosingDate(projectid, false, feature, model);
+                var isValid = ValidateClosingDate(false, project, feature, model);
                 if (!isValid)
                 {
                     PrepareDataForDisplay(projectid);
@@ -269,7 +271,7 @@ namespace project_v2.Controllers
             var story = storySvc.GetStories(feature._id).FirstOrDefault(it => it._id == model.Story_id);
             if (ModelState.IsValid)
             {
-                var isValid = ValidateClosingDate(projectid, true, feature, story, model);
+                var isValid = ValidateClosingDate(true, project, feature, story, model);
                 if (!isValid)
                 {
                     PrepareDataForDisplay(projectid);
@@ -336,7 +338,7 @@ namespace project_v2.Controllers
             var story = storySvc.GetStories(feature._id).FirstOrDefault(it => it._id == model.Story_id);
             if (ModelState.IsValid)
             {
-                var isValid = ValidateClosingDate(projectid, false, feature, story, model);
+                var isValid = ValidateClosingDate(false, project, feature, story, model);
                 if (!isValid)
                 {
                     PrepareDataForDisplay(projectid);
@@ -419,129 +421,62 @@ namespace project_v2.Controllers
             ViewBag.Statuses = statuses;
         }
 
-        private bool ValidateClosingDate(string projectid, bool isCreate, FeatureModel feature = null, StoryModel story = null, TaskModel task = null)
+        /// <summary>
+        /// Validation ClosingDate each WorkModel
+        /// </summary>
+        /// <param name="isCreateWork">Validate in Create or Edit process</param>
+        /// <param name="project">Project to validate</param>
+        /// <param name="feature">Feature to validate</param>
+        /// <param name="story">Story to validate</param>
+        /// <param name="task">Task to validate</param>
+        /// <returns>Result of validation</returns>
+        private bool ValidateClosingDate(bool isCreateWork, ProjectModel project, FeatureModel feature, StoryModel story = null, TaskModel task = null)
         {
-            var validateProject = !string.IsNullOrEmpty(projectid);
+            var validateProject = project != null;
             if (!validateProject) return false;
 
             var isVerifyFeature = feature != null && story == null && task == null;
             var isVerifyStory = feature != null && story != null && task == null;
             var isVerifyTask = feature != null && story != null && task != null;
-            if (isVerifyFeature)
-            {
-                if (isCreate)
-                {
-                    if (feature.ClosingDate.Date < DateTime.Now.Date)
-                    {
-                        ViewBag.ErrorTitle = "ไม่สามารถสร้างงานหลักได้";
-                        ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานหลัก ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้";
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (feature.ClosingDate.Date < feature.CreateDate.Date)
-                    {
-                        ViewBag.ErrorTitle = "ไม่สามารถแก้ไขงานหลักได้";
-                        ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานหลัก ไม่สามารถน้อยกว่าวันที่สร้างได้";
-                        return false;
-                    }
-                }
 
-                var project = projectSvc.GetProject(projectid);
-                if (feature.ClosingDate.Date > project.ClosingDate.Date)
-                {
-                    var word = isCreate ? "สร้าง" : "แก้ไข";
-                    ViewBag.ErrorTitle = $"ไม่สามารถ{word}งานหลักได้";
-                    ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานหลัก ไม่สามารถมากกว่าวันที่เสร็จสิ้นของโปรเจคได้";
-                    return false;
-                }
-                else return true;
-            }
-            else if (isVerifyStory)
-            {
-                if (isCreate)
-                {
-                    if (story.ClosingDate.Date < DateTime.Now.Date)
-                    {
-                        ViewBag.ErrorTitle = "ไม่สามารถสร้างงานรองได้";
-                        ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานรอง ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้";
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (story.ClosingDate.Date < story.CreateDate.Date)
-                    {
-                        ViewBag.ErrorTitle = "ไม่สามารถแก้ไขงานรองได้";
-                        ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานรอง ไม่สามารถน้อยกว่าวันที่สร้างได้";
-                        return false;
-                    }
-                }
+            var errorTitleCategory = isCreateWork ? "สร้าง" : "แก้ไข";
+            var workCategory = isVerifyFeature ? "งานหลัก" : isVerifyStory ? "งานรอง" : "งานย่อย";
 
-                var project = projectSvc.GetProject(projectid);
-                if (story.ClosingDate.Date > project.ClosingDate.Date)
-                {
-                    var word = isCreate ? "สร้าง" : "แก้ไข";
-                    ViewBag.ErrorTitle = $"ไม่สามารถ{word}งานรองได้";
-                    ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานรอง ไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
-                    return false;
-                }
-                else if (story.ClosingDate.Date > feature.ClosingDate.Date)
-                {
-                    var word = isCreate ? "สร้าง" : "แก้ไข";
-                    ViewBag.ErrorTitle = $"ไม่สามารถ{word}งานรองได้";
-                    ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานรอง ไม่สามารถมากกว่าวันที่เสร็จสิ้นของงานหลักได้";
-                    return false;
-                }
-                else return true;
-            }
-            else if (isVerifyTask)
-            {
-                if (isCreate)
-                {
-                    if (task.ClosingDate.Date < DateTime.Now.Date)
-                    {
-                        ViewBag.ErrorTitle = "ไม่สามารถสร้างงานย่อยได้";
-                        ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานย่อย ไม่สามารถน้อยกว่าวันที่ปัจจุบันได้";
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (task.ClosingDate.Date < task.CreateDate.Date)
-                    {
-                        ViewBag.ErrorTitle = "ไม่สามารถแก้ไขงานย่อยได้";
-                        ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานย่อย ไม่สามารถน้อยกว่าวันที่สร้างได้";
-                        return false;
-                    }
-                }
+            var value = isVerifyFeature ? feature as WorkModel : isVerifyStory ? story as WorkModel : task as WorkModel;
 
-                var project = projectSvc.GetProject(projectid);
-                if (task.ClosingDate.Date > project.ClosingDate.Date)
-                {
-                    var word = isCreate ? "สร้าง" : "แก้ไข";
-                    ViewBag.ErrorTitle = $"ไม่สามารถ{word}งานย่อยได้";
-                    ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานย่อย ไม่สามารถมากกว่าวันที่เสร็จสิ้นโปรเจคได้";
-                    return false;
-                }
-                else if (task.ClosingDate.Date > feature.ClosingDate.Date)
-                {
-                    var word = isCreate ? "สร้าง" : "แก้ไข";
-                    ViewBag.ErrorTitle = $"ไม่สามารถ{word}งานย่อยได้";
-                    ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานย่อย ไม่สามารถมากกว่าวันที่เสร็จสิ้นของงานหลักได้";
-                    return false;
-                }
-                else if (task.ClosingDate.Date > story.ClosingDate.Date)
-                {
-                    var word = isCreate ? "สร้าง" : "แก้ไข";
-                    ViewBag.ErrorTitle = $"ไม่สามารถ{word}งานย่อยได้";
-                    ViewBag.ErrorMessage = "เนื่องจากวันที่เสร็จสิ้นงานย่อย ไม่สามารถมากกว่าวันที่เสร็จสิ้นของงานรองได้";
-                    return false;
-                }
-                else return true;
+            var isValidClosingDate = isCreateWork ? value.ClosingDate.Date >= DateTime.Now.Date : value.ClosingDate.Date >= value.CreateDate.Date;
+            if (!isValidClosingDate)
+            {
+                var postErrorMessage = isCreateWork ? "วันที่ปัจจุบัน" : "วันที่สร้าง";
+                ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
+                ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} น้อยกว่า{postErrorMessage}";
+                return false;
             }
-            return false;
+
+            var isValidClosingDateWithProject = value.ClosingDate.Date <= project.ClosingDate.Date;
+            if (!isValidClosingDateWithProject)
+            {
+                ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
+                ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} มากกว่าวันที่เสร็จสิ้นของโปรเจค";
+                return false;
+            }
+
+            var isValidClosingDateWithFeature = !isVerifyFeature && value.ClosingDate.Date <= feature.ClosingDate.Date;
+            if (!isValidClosingDateWithFeature)
+            {
+                ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
+                ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} มากกว่าวันที่เสร็จสิ้นของงานหลัก";
+                return false;
+            }
+
+            var isValidClosingDateWithStory = !isVerifyFeature && !isVerifyStory && value.ClosingDate.Date <= story.ClosingDate.Date;
+            if (!isValidClosingDateWithStory)
+            {
+                ViewBag.ErrorTitle = $"ไม่สามารถ{errorTitleCategory}{workCategory}ได้";
+                ViewBag.ErrorMessage = $"เนื่องจาก: วันที่คาดการณ์งานต้องเสร็จสิ้นของ{workCategory} มากกว่าวันที่เสร็จสิ้นของงานรอง";
+                return false;
+            }
+            return true;
         }
     }
 }
