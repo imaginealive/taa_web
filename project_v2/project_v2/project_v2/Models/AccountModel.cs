@@ -46,7 +46,7 @@ namespace project_v2.Models
         [Display(Name = "ผู้ใช้งานเป็น Admin ของระบบหรือไม่")]
         public bool IsAdmin { get; set; }
 
-        [Display(Name = "ผู้ใช้งานสามารถโปรเจคในระบบได้หรือไม่")]
+        [Display(Name = "ผู้ใช้งานสามารถสร้างโปรเจคในระบบได้หรือไม่")]
         public bool ProjectCreatable { get; set; }
 
         [Display(Name = "วันที่สร้าง")]
