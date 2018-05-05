@@ -90,7 +90,7 @@
                 <div class="col-lg-6">
                     <dl>
                         <dt>สมาชิกทั้งหมด</dt>
-                        <dd>@Model.Memberships.Count()</dd>
+                        <dd>@Model.Memberships.Where(it=>!it.RemoveDate.HasValue).Count()</dd>
                         @if (Model.Project.ClosingDate.Date > today)
                         {
                             <dt>จำนวนวันทำงานเหลือ</dt>

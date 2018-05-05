@@ -14,7 +14,7 @@ namespace project_v2.Models
         [Display(Name = "ชื่อสถานะ")]
         public string StatusName { get; set; }
         
-        [Display(Name = "สถานะงานเสร็จ")]
+        [Display(Name = "ถือว่างานเสร็จสิ้นหรือไม่")]
         public bool IsWorkDone { get; set; }
         public bool Deletable { get; set; }
     }

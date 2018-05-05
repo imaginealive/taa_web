@@ -20,13 +20,15 @@ namespace project_v2.Controllers
         private IMembershipService membershipSvc;
         private IAccountService accountSvc;
         private IRankService rankSvc;
+        IServiceConfigurations serviceConfig;
         public ProjectController(IProjectService projectSvc,
             IFeatureService featureSvc,
             IStoryService storySvc,
             ITaskService taskSvc,
             IMembershipService membershipSvc,
             IAccountService accountSvc,
-            IRankService rankSvc)
+            IRankService rankSvc,
+            IServiceConfigurations serviceConfig)
         {
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
@@ -35,13 +37,13 @@ namespace project_v2.Controllers
             this.membershipSvc = membershipSvc;
             this.accountSvc = accountSvc;
             this.rankSvc = rankSvc;
+            this.serviceConfig = serviceConfig;
         }
 
         #region Projects
 
         public IActionResult Index(string projectid)
         {
-            // TODO: Get Works (Stories and Tasks)
             var project = projectSvc.GetProject(projectid);
             var allAcc = accountSvc.GetAllAccount();
             var memberships = membershipSvc.GetAllProjectMember(projectid);
@@ -84,7 +86,7 @@ namespace project_v2.Controllers
                     var story_AssginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
                     var story_BeassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
                     var story_CreateByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
-                    
+
                     var displayTasks = new List<DisplayTaskModel>();
                     var tasks = taskSvc.GetTasks(story._id);
                     foreach (var task in tasks)
@@ -192,6 +194,24 @@ namespace project_v2.Controllers
                 displayMemberships.Add(model);
             };
 
+            HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
+            if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+
+            // Check current user permission
+            var json = System.Text.Encoding.UTF8.GetString(isLogin);
+            var user = JsonConvert.DeserializeObject<AccountModel>(json);
+            var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
+            var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
+
+            ViewBag.CanEditProject = member != null ?
+                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditProject ||
+                currentUser.IsAdmin ||
+                currentUser.ProjectCreatable) : false;
+            ViewBag.CanEditMember = member != null ?
+                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanManageMember ||
+                currentUser.IsAdmin ||
+                currentUser.ProjectCreatable) : false;
+
             return View(new ProjectDetailModel
             {
                 Project = project,
@@ -259,7 +279,7 @@ namespace project_v2.Controllers
                 displayMemberships.Add(model);
             };
 
-            ViewBag.AllRanks = ranks;
+            ViewBag.RankMaster = serviceConfig.MasterRankId;
             return View(new MembershipManagementModel
             {
                 ProjectId = projectid,
@@ -298,7 +318,7 @@ namespace project_v2.Controllers
         public IActionResult ChangeMembershipRank(string projectid, string accountid, string rankid)
         {
             var account = accountSvc.GetAllAccount().First(it => it._id == accountid);
-            var ranks = rankSvc.GetAllRank();
+            var ranks = rankSvc.GetAllRank().Where(it => it._id != serviceConfig.MasterRankId).ToList();
             var model = new EditRankModel
             {
                 ProjectId = projectid,

@@ -29,7 +29,7 @@
                     <th>สร้างงานหลักได้</th>
                     <th>สร้างงานรองต่อจากงานหลักได้</th>
                     <th>สร้างงานย่อยต่อจากงานรองได้</th>
-                    <th></th>
+                    <th width="150"></th>
 
                 </tr>
             </thead>
@@ -128,14 +128,14 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                             }
                         </td>
-                        <td>
-                            @if (rank._id != "a0e7f0bd-2bf0-40f2-bd0c-3e3ef75d6472" && rank._id != "87bd4788-4af5-4d42-aa6c-8fbd119fdc92")
+                        <td class="text-right">
+                            @if (rank._id != ViewBag.GuestRankId && rank._id != ViewBag.MasterRankId)
                             {
                                 <a asp-action="EditRank" asp-route-rankid="@rank._id">แก้ไข</a>
                             }
                             else
-                            { 
-                                <span>default</span>
+                            {
+                                <span><i>( ค่าเริ่มต้น )</i></span>
                             }
                         </td>
                     </tr>
@@ -149,7 +149,7 @@
 
 <div class="row">
     <div class="col-sm-4">
-        <h2>สถานะของงาน</h2>
+        <h2>สถานะงาน</h2>
     </div>
     <div class="col-sm-2 col-sm-offset-6">
         <a class="btn btn-block btn-success" asp-action="CreateStatus"><span class="glyphicon glyphicon-plus"></span> เพิ่มสถานะของงาน</a>
@@ -160,9 +160,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th width="150">ชื่อสถานะ</th>
+                    <th width="300">ชื่อสถานะ</th>
                     <th>ถือว่างานเสร็จหรือไม่</th>
-                    <th></th>
+                    <th>สามารถลบสถานะนี้ได้หรือไม่</th>
+                    <th width="150"></th>
                 </tr>
             </thead>
             <tbody>
@@ -180,7 +181,24 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                             }
                         </td>
-                        <td><a asp-action="EditStatus" asp-route-statusid="@status._id">แก้ไข</a></td>
+                        <td>
+                            @if (status.Deletable)
+                            {
+                                <span class="glyphicon glyphicon-ok"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove"></span>
+                            }
+                        </td>
+                        <td class="text-right">
+                            <a asp-action="EditStatus" asp-route-statusid="@status._id">แก้ไข</a>
+                            @if (status._id == ViewBag.NewStatusId)
+                            {
+                                <i>( ค่าเริ่มต้น )</i>
+                            }
+                        </td>
+
                     </tr>
                 }
             </tbody>

@@ -96,13 +96,16 @@
                         </label>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label>
-                            <input asp-for="IsSuspend" /> @Html.DisplayNameFor(model => model.IsSuspend)
-                        </label>
+                @if (!Model.IsAdmin)
+                {
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="IsSuspend" /> @Html.DisplayNameFor(model => model.IsSuspend)
+                            </label>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
         </div>
     </div>

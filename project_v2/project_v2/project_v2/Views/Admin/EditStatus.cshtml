@@ -7,6 +7,8 @@
 <hr />
 
 <form asp-action="EditStatus" method="post">
+    @Html.HiddenFor(it=>it._id)
+
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
@@ -26,14 +28,6 @@
                             <div class="checkbox">
                                 <label>
                                     <input asp-for="IsWorkDone" /> @Html.DisplayNameFor(model => model.IsWorkDone)
-                                </label>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="checkbox">
-                                <label>
-                                    <input asp-for="IsWorkDone" disabled /> @Html.DisplayNameFor(model => model.IsWorkDone)
                                 </label>
                             </div>
                         }

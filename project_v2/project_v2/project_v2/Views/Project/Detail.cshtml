@@ -22,19 +22,14 @@
         <label>วันที่เสร็จสิ้นโปรเจค</label>
         <p>@Model.Project.ClosingDate.ToShortDateString()</p>
 
-        @if (!Context.Session.TryGetValue("LoginData", out byte[] user) || user.Length != 0)
-        {
-            var json = System.Text.Encoding.UTF8.GetString(user);
-            var userdata = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountModel>(json);
-            if (userdata.ProjectCreatable || userdata.IsAdmin)
-            {
-                <div class="row">
-                    <div class="col-sm-3 col-sm-offset-9">
-                        <a asp-action="Edit" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-primary">แก้ไขรายละเอียดโปรเจค</a>
-                    </div>
-                </div>
-            }
-        }
+        <div class="row">
+            <div class="col-sm-3 col-sm-offset-9">
+                @if (ViewBag.CanEditProject)
+                {
+                    <a asp-action="Edit" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-primary">แก้ไขรายละเอียดโปรเจค</a>
+                }
+            </div>
+        </div>
 
         <hr />
 
@@ -44,7 +39,10 @@
                 <h3 style="margin-top: unset">สมาชิก (@Model.Memberships.Count())</h3>
             </div>
             <div class="col-sm-3 col-sm-offset-7">
-                <a asp-action="AllMemberships" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-success"><span class="glyphicon glyphicon-user"></span> จัดการสมาชิกภายในโปรเจค</a>
+                @if (ViewBag.CanEditMember)
+                {
+                    <a asp-action="AllMemberships" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-success"><span class="glyphicon glyphicon-user"></span> จัดการสมาชิกภายในโปรเจค</a>
+                }
             </div>
         </div>
         <table class="table" style="margin-top: 2em">

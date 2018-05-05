@@ -15,16 +15,18 @@ namespace project_v2.Controllers
     {
         private IAccountService accountsvc;
         private IRankService ranksvc;
+        IServiceConfigurations serviceConfig;
         private IStatusService statussvc;
 
         public AdminController(IRankService _ranksvc,
             IStatusService _statussvc,
-            IAccountService _accountsvc)
+            IAccountService _accountsvc,
+            IServiceConfigurations serviceConfig)
         {
             this.accountsvc = _accountsvc;
             this.ranksvc = _ranksvc;
             this.statussvc = _statussvc;
-
+            this.serviceConfig = serviceConfig;
         }
 
         public IActionResult AccountManage()
@@ -64,6 +66,9 @@ namespace project_v2.Controllers
 
         public IActionResult ProjectSystem()
         {
+            ViewBag.GuestRankId = serviceConfig.GuestRankId;
+            ViewBag.MasterRankId = serviceConfig.MasterRankId;
+            ViewBag.NewStatusId = serviceConfig.StatusNewId;
             var model = new ProjectSystemViewModel
             {
                 ranks = ranksvc.GetAllRank(),

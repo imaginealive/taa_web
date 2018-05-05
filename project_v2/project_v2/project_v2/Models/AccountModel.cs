@@ -36,6 +36,7 @@ namespace project_v2.Models
         [Display(Name = "หน่วยงาน")]
         public string Department { get; set; }
 
+        [Required(ErrorMessage = "กรุณากรอกเบอร์โทรศัพท์")]
         [Display(Name = "เบอร์โทรศัพท์")]
         public string Telephone { get; set; }
 

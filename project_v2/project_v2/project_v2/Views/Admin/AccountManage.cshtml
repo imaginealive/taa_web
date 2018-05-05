@@ -18,8 +18,8 @@
                     <th>หน่วยงาน</th>
                     <th>เบอร์โทรศัพท์</th>
                     <th>อายุ</th>
-                    <th>สร้างโปรเจค</th>
-                    <th>Admin</th>
+                    <th>ผู้ดูแลโปรเจค</th>
+                    <th>ผู้ดูแลระบบ</th>
                     <th>ระงับใช้งาน</th>
                     <th></th>
 
@@ -32,8 +32,26 @@
                         <td>@user.AccountName</td>
                         <td>@user.FirstName @user.LastName</td>
                         <td>@user.Email</td>
-                        <td>@user.WorkPosition</td>
-                        <td>@user.Department</td>
+                        <td>
+                            @if (string.IsNullOrEmpty(user.WorkPosition))
+                            {
+                                <span>-</span>
+                            }
+                            else
+                            {
+                                <span>@user.WorkPosition</span>
+                            }
+                        </td>
+                        <td>
+                            @if (string.IsNullOrEmpty(user.Department))
+                            {
+                                <span>-</span>
+                            }
+                            else
+                            {
+                                <span>@user.Department</span>
+                            }
+                        </td>
                         <td>@user.Telephone</td>
                         @if (user.BirthDate.HasValue)
                         {
