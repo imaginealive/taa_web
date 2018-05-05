@@ -75,7 +75,21 @@
                         <span>-</span>
                     }
                 </p>
-                <p><b><label asp-for="ClosingDate"></label>: </b> @Model.ClosingDate.ToShortDateString()</p>
+                <p>
+                    <b><label asp-for="ClosingDate"></label>: </b> @Model.ClosingDate.ToShortDateString()
+                    @if (Model.ClosingDate.Date > DateTime.Now.Date)
+                    {
+                        <span>(เหลือ @((Model.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
+                    }
+                    else if (Model.ClosingDate.Date == DateTime.Now.Date)
+                    {
+                        <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
+                    }
+                    else
+                    {
+                        <span>(หมดเวลาทำงาน)</span>
+                    }
+                </p>
                 <p>
                     <b><label asp-for="WorkDoneDate"></label>: </b>
                     @if (Model.WorkDoneDate.HasValue)

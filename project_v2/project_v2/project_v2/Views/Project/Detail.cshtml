@@ -1,26 +1,67 @@
 ﻿@model project_v2.Models.ProjectDetailModel
 @{
     ViewData["Title"] = "Detail";
+
+    var totalWorkDays = (Model.Project.ClosingDate.Date - Model.Project.CreateDate.Date).Days;
+    var remainingWorkDays = (Model.Project.ClosingDate.Date - DateTime.Now.Date).Days;
     int count = 1;
 }
 
 <a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model.Project._id" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
 <div class="panel panel-primary" style="margin-top: 2em">
-    <div class="panel-heading">รายละเอียดโปรเจค</div>
+    <div class="panel-heading"><h3>รายละเอียดโปรเจค</h3></div>
     <div class="panel-body">
 
         <!-- Project detail -->
-        <label asp-for="Project.ProjectName"></label>
-        <p>@Model.Project.ProjectName</p>
-        <label asp-for="Project.Description"></label>
-        <p>@Model.Project.Description</p>
-        <label asp-for="Project.Department"></label>
-        <p>@Model.Project.Department</p>
-        <label>วันที่สร้างโปรเจค</label>
-        <p>@Model.Project.CreateDate.ToShortDateString()</p>
-        <label>วันที่เสร็จสิ้นโปรเจค</label>
-        <p>@Model.Project.ClosingDate.ToShortDateString()</p>
+        <div class="row">
+            <div class="col-lg-3">
+                <label asp-for="Project.ProjectName"></label>
+            </div>
+            <div class="col-lg-9">
+                <p>@Model.Project.ProjectName</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <label asp-for="Project.Description"></label>
+            </div>
+            <div class="col-lg-9">
+                <p>@Model.Project.Description</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <label asp-for="Project.CreateDate"></label>
+            </div>
+            <div class="col-lg-9">
+                <p>@Model.Project.CreateDate.ToShortDateString()</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <label asp-for="Project.ClosingDate"></label>
+            </div>
+            <div class="col-lg-9">
+                <p>@Model.Project.ClosingDate.ToShortDateString()</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <label>จำนวนวันทั้งหมดที่มีทั้งหมด</label>
+            </div>
+            <div class="col-lg-9">
+                <p>@totalWorkDays วัน</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <label>จำนวนวันทำงานที่เหลือ</label>
+            </div>
+            <div class="col-lg-9">
+                <p>@remainingWorkDays วัน</p>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-sm-3 col-sm-offset-9">

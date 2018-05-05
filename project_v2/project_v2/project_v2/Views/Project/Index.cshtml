@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "Index";
 
-    const int DefaultValue = 0;
     const int minimumValue = 1;
     int featureSideMenuCount = minimumValue;
     int featureContentCount = minimumValue;
@@ -12,6 +11,9 @@
 
     int taskSideMenuCount = minimumValue;
     int taskContentCount = minimumValue;
+
+    var totalWorkDays = (Model.Project.ClosingDate.Date - Model.Project.CreateDate.Date).Days;
+    var remainingWorkDays = (Model.Project.ClosingDate.Date - DateTime.Now.Date).Days;
 
     var today = DateTime.Now.Date;
     var startDate = Model.Project.CreateDate.Date;
@@ -55,69 +57,138 @@
 <a asp-controller="Home" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
 <div class="panel panel-primary" style="margin-top: 2em">
-    <div class="panel-heading"><h3>ข้อมูลภาพรวมของโปรเจค</h3></div>
+    <div class="panel-heading"><h3>ภาพรวมของโปรเจค</h3></div>
     <div class="panel-body">
+
+        <!-- Project information-->
         <div class="row">
             <div class="col-lg-2">
                 <h3>ข้อมูลโปรเจค</h3>
             </div>
             <div class="col-lg-10">
-                <div class="col-lg-6">
-                    <dl>
-                        <dt><label asp-for="Project.ProjectName"></label></dt>
-                        <dd>@Model.Project.ProjectName</dd>
-                        <dt><label asp-for="Project.Description"></label></dt>
-                        <dd>@Model.Project.Description</dd>
-
-                    </dl>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label asp-for="Project.ProjectName"></label>
+                    </div>
+                    <div class="col-lg-9">
+                        <p>@Model.Project.ProjectName</p>
+                    </div>
                 </div>
-                <div class="col-lg-6">
-                    <dl>
-                        <dt><label asp-for="Project.CreateDate"></label></dt>
-                        <dd>@Model.Project.CreateDate.ToShortDateString()</dd>
-                        <dt><label asp-for="Project.ClosingDate"></label></dt>
-                        <dd>@Model.Project.ClosingDate.ToShortDateString()</dd>
-                    </dl>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label asp-for="Project.Description"></label>
+                    </div>
+                    <div class="col-lg-9">
+                        <p>@Model.Project.Description</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label asp-for="Project.CreateDate"></label>
+                    </div>
+                    <div class="col-lg-9">
+                        <p>@Model.Project.CreateDate.ToShortDateString()</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label asp-for="Project.ClosingDate"></label>
+                    </div>
+                    <div class="col-lg-9">
+                        <p>@Model.Project.ClosingDate.ToShortDateString()</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>จำนวนวันทั้งหมดที่มีทั้งหมด</label>
+                    </div>
+                    <div class="col-lg-9">
+                        <p>@totalWorkDays วัน</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>จำนวนวันทำงานที่เหลือ</label>
+                    </div>
+                    <div class="col-lg-9">
+                        <p>@remainingWorkDays วัน</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>สมาชิกทั้งหมด</label>
+                    </div>
+                    <div class="col-lg-9">
+                        <p>@Model.Memberships.Where(it => !it.RemoveDate.HasValue).Count() คน</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2em">
+                <div class="col-sm-3 col-sm-offset-9">
+                    <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
                 </div>
             </div>
         </div>
+
         <hr />
+        <!-- Overall works-->
         <div class="row">
             <div class="col-lg-2">
                 <h3>ภาพรวมของงาน</h3>
             </div>
             <div class="col-lg-10">
-                <div class="col-lg-6">
-                    <dl>
-                        <dt>สมาชิกทั้งหมด</dt>
-                        <dd>@Model.Memberships.Where(it=>!it.RemoveDate.HasValue).Count()</dd>
-                        @if (Model.Project.ClosingDate.Date > today)
-                        {
-                            <dt>จำนวนวันทำงานเหลือ</dt>
-                            <dd>@((Model.Project.ClosingDate.Date - today).TotalDays + minimumValue) วัน</dd>
-                            <dt>คาดคะเนค่าเฉลี่ยของงานที่ต้องทำต่อวัน</dt>
-                            <dd>@((remaining.LastOrDefault() / ((Model.Project.ClosingDate.Date - today).TotalDays + minimumValue)).ToString("#0.##")) งาน/วัน</dd>
 
-                        }
-                    </dl>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>งานทั้งหมด</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>@totalWorks งาน</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>จำนวนงานเสร็จ</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>@(done.Sum()) งาน (@(done.Sum() / totalWorks * 100)%)</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>จำนวนงานเหลือ</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>@(remaining.LastOrDefault()) งาน (@(remaining.LastOrDefault() / totalWorks * 100)%)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>คาดคะเนค่าเฉลี่ยของงานที่ต้องทำต่อวัน</label>
+                            </div>
+                            <div class="col-lg-6">
+                                @if (Model.Project.ClosingDate.Date > today)
+                                {
+                                    <p>@((remaining.LastOrDefault() / ((Model.Project.ClosingDate.Date - today).TotalDays + minimumValue)).ToString("#0.##")) งาน/วัน</p>
+                                }
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>ค่าเฉลี่ยของงานเสร็จต่อวัน</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>@(done.Sum() / Math.Round((lateDate - startDate).TotalDays + minimumValue)) งาน/วัน</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-6">
-                    <dl>
-                        <dt>งานทั้งหมด</dt>
-                        <dd>@totalWorks งาน</dd>
-                        <dt>จำนวนงานเสร็จ</dt>
-                        <dd>@(done.Sum()) งาน (@(done.Sum() / totalWorks * 100)%)</dd>
-                        <dt>ค่าเฉลี่ยของงานเสร็จต่อวัน</dt>
-                        <dd>@(done.Sum() / Math.Round((lateDate - startDate).TotalDays + minimumValue)) งาน/วัน</dd>
-                        <dt>จำนวนงานเหลือ</dt>
-                        <dd>@(remaining.LastOrDefault()) งาน (@(remaining.LastOrDefault() / totalWorks * 100)%)</dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-3 col-sm-offset-9">
-                <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
             </div>
         </div>
         <hr />
@@ -186,7 +257,21 @@
                                     <h2>สถานะงาน</h2>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@featureContent.ClosingDate.ToShortDateString()</p>
+                                    <p>
+                                        <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@featureContent.ClosingDate.ToShortDateString()
+                                        @if (featureContent.ClosingDate.Date > DateTime.Now.Date)
+                                        {
+                                            <span>(เหลือ @((featureContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
+                                        }
+                                        else if (featureContent.ClosingDate.Date == DateTime.Now.Date)
+                                        {
+                                            <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
+                                        }
+                                        else
+                                        {
+                                            <span>(หมดเวลาทำงาน)</span>
+                                        }
+                                    </p>
                                     <p>
                                         <b>วันที่งานเสร็จสิ้นจริง: </b>
                                         @if (featureContent.WorkDoneDate.HasValue)
@@ -283,7 +368,21 @@
                                                             <h3>สถานะงาน</h3>
                                                         </div>
                                                         <div class="col-sm-9">
-                                                            <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@storyContent.ClosingDate.ToShortDateString()</p>
+                                                            <p>
+                                                                <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@storyContent.ClosingDate.ToShortDateString()
+                                                                @if (storyContent.ClosingDate.Date > DateTime.Now.Date)
+                                                                {
+                                                                    <span>(เหลือ @((storyContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
+                                                                }
+                                                                else if (storyContent.ClosingDate.Date == DateTime.Now.Date)
+                                                                {
+                                                                    <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>(หมดเวลาทำงาน)</span>
+                                                                }
+                                                            </p>
                                                             <p>
                                                                 <b>วันที่งานเสร็จสิ้นจริง: </b>
                                                                 @if (storyContent.WorkDoneDate.HasValue)
@@ -381,7 +480,21 @@
                                                                                     <h4>สถานะงาน</h4>
                                                                                 </div>
                                                                                 <div class="col-sm-9">
-                                                                                    <p><b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@taskContent.ClosingDate.ToShortDateString()</p>
+                                                                                    <p>
+                                                                                        <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@taskContent.ClosingDate.ToShortDateString()
+                                                                                        @if (taskContent.ClosingDate.Date > DateTime.Now.Date)
+                                                                                        {
+                                                                                            <span>(เหลือ @((taskContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
+                                                                                        }
+                                                                                        else if (taskContent.ClosingDate.Date == DateTime.Now.Date)
+                                                                                        {
+                                                                                            <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <span>(หมดเวลาทำงาน)</span>
+                                                                                        }
+                                                                                    </p>
                                                                                     <p>
                                                                                         <b>วันที่งานเสร็จสิ้นจริง: </b>
                                                                                         @if (taskContent.WorkDoneDate.HasValue)

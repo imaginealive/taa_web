@@ -45,8 +45,8 @@ namespace project_v2.Models
         /// <summary>
         /// วันที่เสร็จสิ้นโปรเจค
         /// </summary>
-        [Required(ErrorMessage = "กรุณาระบุวันที่เสร็จสิ้นโปรเจค")]
-        [Display(Name = "วันที่เสร็จสิ้นโปรเจค")]
+        [Required(ErrorMessage = "กรุณาระบุคาดการณ์วันที่งานต้องเสร็จสิ้น")]
+        [Display(Name = "คาดการณ์วันที่งานต้องเสร็จสิ้น")]
         public DateTime ClosingDate { get; set; }
     }
 }
