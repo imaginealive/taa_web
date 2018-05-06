@@ -124,6 +124,34 @@ namespace project_v2.Controllers
                 displayFeatures.Add(model_feature);
             }
 
+            HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
+            if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+
+            // Check current user permission
+            var json = System.Text.Encoding.UTF8.GetString(isLogin);
+            var user = JsonConvert.DeserializeObject<AccountModel>(json);
+            var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
+            var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
+
+            ViewBag.CanCreateFeature = member != null ?
+                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateFeature ||
+                currentUser.IsAdmin ||
+                currentUser.ProjectCreatable) : false;
+            ViewBag.CanCreateStory = member != null ?
+                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateStoryUnderSelf ||
+                currentUser.IsAdmin ||
+                currentUser.ProjectCreatable) : false;
+            ViewBag.CanCreateTask = member != null ?
+                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateTaskUnderSelf ||
+                currentUser.IsAdmin ||
+                currentUser.ProjectCreatable) : false;
+
+            // TODO: Can see all work view
+            ViewBag.CanSeeAllWork = member != null ?
+                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanSeeAllWork ||
+                currentUser.IsAdmin ||
+                currentUser.ProjectCreatable) : false;
+
             return View(new ProjectDetailModel
             {
                 Project = project,

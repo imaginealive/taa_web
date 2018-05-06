@@ -56,6 +56,7 @@
 </script>
 <a asp-controller="Home" asp-action="Index" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
 
+<!-- Heading -->
 <div class="panel panel-primary" style="margin-top: 2em">
     <div class="panel-heading"><h3>ภาพรวมของโปรเจค</h3></div>
     <div class="panel-body">
@@ -197,6 +198,7 @@
     </div>
 </div>
 
+<!-- Works -->
 <div class="row" style="margin-top: 2em">
 
     <div class="col-sm-2">
@@ -206,7 +208,10 @@
                 <li class="@(Model.Features.FirstOrDefault()._id == item._id? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
                 featureSideMenuCount++;
             }
-            <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model.Project._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
+            @if (ViewBag.CanCreateFeature)
+            {
+                <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model.Project._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
+            }
         </ul>
     </div>
     <div class="col-sm-10">
@@ -316,7 +321,10 @@
                                         <li class="@(featureContent.Stories.FirstOrDefault()._id == storySideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#story@(storySideMenuCount)">@storySideMenu.Name</a></li>
                                         storySideMenuCount++;
                                     }
-                                    <li><a asp-controller="Work" asp-action="CreateStory" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
+                                    @if (ViewBag.CanCreateStory)
+                                    {
+                                        <li><a asp-controller="Work" asp-action="CreateStory" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
+                                    }
                                 </ul>
                             </div>
 
@@ -427,7 +435,10 @@
                                                                 <li class="@(storyContent.Tasks.FirstOrDefault()._id == taskSideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#task@(taskSideMenuCount)">@taskSideMenu.Name</a></li>
                                                                 taskSideMenuCount++;
                                                             }
-                                                            <li><a asp-controller="Work" asp-action="CreateTask" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
+                                                            @if (ViewBag.CanCreateTask)
+                                                            {
+                                                                <li><a asp-controller="Work" asp-action="CreateTask" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
+                                                            }
                                                         </ul>
                                                     </div>
 
