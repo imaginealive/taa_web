@@ -423,10 +423,9 @@ namespace project_v2.Controllers
 
             HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
             var json = System.Text.Encoding.UTF8.GetString(isLogin);
-            var user = JsonConvert.DeserializeObject<AccountModel>(json);
+            var currentUser = JsonConvert.DeserializeObject<AccountModel>(json);
 
             // Check current user permission
-            var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 
             if (work != null)
@@ -437,14 +436,18 @@ namespace project_v2.Controllers
                 var assignedByAccount = allAcc.FirstOrDefault(it => it._id == work.BeAssignedMember_id);
                 ViewBag.BeAssignedMemberName = $"{assignedByAccount.FirstName} {assignedByAccount.LastName}";
 
-                ViewBag.CanEditThisWork = member != null ?
+                ViewBag.CanEditOrUpdateThisWork = member != null ?
                     work.CreateByMember_id == currentUser._id ||
                     work.BeAssignedMember_id == currentUser._id ||
                     (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork ||
                     currentUser.IsAdmin ||
                     currentUser.ProjectCreatable) : false;
 
-                ViewBag.IsCreator = member != null ? work.CreateByMember_id == currentUser._id : false;
+                ViewBag.CanEditWorkInformation = member != null ?
+                    work.CreateByMember_id == currentUser._id ||
+                    (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork ||
+                    currentUser.IsAdmin ||
+                    currentUser.ProjectCreatable) : false;
             }
 
             ViewBag.CanAssign = member != null ?
