@@ -10,6 +10,17 @@
     @Html.HiddenFor(it => it.Project_id)
     @Html.HiddenFor(it => it._id)
     @Html.HiddenFor(it => it.CreateDate)
+    @Html.HiddenFor(it => it.CreateByMember_id)
+    @Html.HiddenFor(it => it.AssginByMember_id)
+
+    @if (!ViewBag.CanAssign)
+    {
+        @Html.HiddenFor(it => it.Name)
+        @Html.HiddenFor(it => it.Description)
+        @Html.HiddenFor(it => it.BeAssignedMember_id)
+        @Html.HiddenFor(it => it.ClosingDate)
+        @Html.HiddenFor(it=>it.WorkDoneDate)
+    }
 
     <div class="panel panel-default">
         <div class="panel-body bg-info">
@@ -25,12 +36,26 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="Name" class="control-label"></label>
-                        <input asp-for="Name" class="form-control" />
+                        @if (ViewBag.CanAssign)
+                        {
+                            <input asp-for="Name" class="form-control" />
+                        }
+                        else
+                        {
+                            <input asp-for="Name" class="form-control" disabled />
+                        }
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Description" class="control-label"></label>
-                        <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+                        @if (ViewBag.CanAssign)
+                        {
+                            <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+                        }
+                        else
+                        {
+                            <textarea asp-for="Description" class="form-control" rows="6" disabled></textarea>
+                        }
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -58,17 +83,23 @@
                     <div class="form-group">
                         <label asp-for="CreateByMember_id" class="control-label"></label>
                         <input class="form-control" value="@(ViewBag.CreateByUser.AccountName)" disabled />
-                        <input class="form-control" value="@ViewBag.CreateByUser.Account_id" asp-for="CreateByMember_id" style="display:none" />
                     </div>
                     <div class="form-group">
                         <label asp-for="BeAssignedMember_id" class="control-label"></label>
-                        <select asp-for="BeAssignedMember_id" class="form-control">
-                            <option value="@(null)">ยังไม่ระบุ</option>
-                            @foreach (var item in ViewBag.Memberships)
-                            {
-                                <option value="@item.Account_id">@item.AccountName (@item.RankName)</option>
-                            }
-                        </select>
+                        @if (ViewBag.CanAssign)
+                        {
+                            <select asp-for="BeAssignedMember_id" class="form-control">
+                                <option value="@(null)">ยังไม่ระบุ</option>
+                                @foreach (var item in ViewBag.Memberships)
+                                {
+                                    <option value="@item.Account_id">@item.AccountName (@item.RankName)</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <input class="form-control" value="@ViewBag.BeAssignedMemberName" disabled />
+                        }
                     </div>
                     <div class="form-group">
                         <label asp-for="StatusName" class="control-label"></label>
@@ -81,14 +112,23 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="ClosingDate" class="control-label"></label>
-                        <input asp-for="ClosingDate" type="date" class="form-control" />
+                        @if (ViewBag.CanAssign)
+                        {
+                            <input asp-for="ClosingDate" type="date" class="form-control" />
+                        }
+                        else
+                        {
+                            <input asp-for="ClosingDate" type="date" class="form-control" disabled />
+                        }
                         <span asp-validation-for="ClosingDate" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="WorkDoneDate" class="control-label"></label>
-                        <input asp-for="WorkDoneDate" class="form-control" />
-                        <span asp-validation-for="WorkDoneDate" class="text-danger"></span>
-                    </div>
+                    @if (Model.WorkDoneDate.HasValue)
+                    {
+                        <div class="form-group">
+                            <label asp-for="WorkDoneDate" class="control-label"></label>
+                            <input class="form-control" value="@Model.WorkDoneDate.Value.ToShortDateString()" disabled />
+                        </div>
+                    }
 
                     @if (!string.IsNullOrEmpty(ViewBag.ErrorTitle) && !string.IsNullOrEmpty(ViewBag.ErrorMessage))
                     {

@@ -72,7 +72,6 @@ namespace project_v2.Controllers
 
         public IActionResult FeatureDetail(string projectid, string featureid)
         {
-            PrepareDataForDisplay(projectid);
             var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
             var allAcc = accountSvc.GetAllAccount();
 
@@ -86,14 +85,14 @@ namespace project_v2.Controllers
                 AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
                 BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
             };
-
+            PrepareDataForDisplay(projectid, feature);
             return View(model);
         }
 
         public IActionResult EditFeature(string projectid, string featureid)
         {
-            PrepareDataForDisplay(projectid);
             var model = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
+            PrepareDataForDisplay(projectid, model);
             return View(model);
         }
 
@@ -106,10 +105,9 @@ namespace project_v2.Controllers
                 var isValid = ValidateClosingDate(false, project, model);
                 if (!isValid)
                 {
-                    PrepareDataForDisplay(model.Project_id);
+                    PrepareDataForDisplay(model.Project_id, model);
                     return View(model);
                 }
-                model.ClosingDate = model.ClosingDate.AddDays(1);
 
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
                 {
@@ -118,14 +116,22 @@ namespace project_v2.Controllers
 
                     var json = System.Text.Encoding.UTF8.GetString(isLogin);
                     var user = JsonConvert.DeserializeObject<AccountModel>(json);
-                    ViewBag.User = user;
 
-                    model.AssginByMember_id = user._id;
+                    var memberships = membershipSvc.GetAllProjectMember(model.Project_id);
+                    var ranks = rankSvc.GetAllRank();
+                    var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
+                    var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
+                    if (userRank.CanAssign || user.IsAdmin)
+                    {
+                        model.ClosingDate = model.ClosingDate.AddDays(1);
+                        model.AssginByMember_id = user._id;
+                    }
                 }
 
                 featureSvc.EditFeature(model);
                 return RedirectToAction(nameof(FeatureDetail), new { projectid = model.Project_id, featureid = model._id });
             }
+            PrepareDataForDisplay(model.Project_id, model);
             return View(model);
         }
 
@@ -383,7 +389,7 @@ namespace project_v2.Controllers
         /// Prepare for display work information (e.g. CreateByUser, ProjectName, ...)
         /// </summary>
         /// <param name="projectid"></param>
-        private void PrepareDataForDisplay(string projectid)
+        private void PrepareDataForDisplay(string projectid, WorkModel work = null)
         {
             var accountMemberships = new List<AccountModel>();
             var displayMemberships = new List<DisplayMembership>();
@@ -402,20 +408,47 @@ namespace project_v2.Controllers
             foreach (var item in accountMemberships)
             {
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
-                var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
-                var modelMembership = new DisplayMembership(membership);
-                modelMembership.AccountName = $"{item.FirstName} {item.LastName}";
-                modelMembership.Email = item.Email;
-                modelMembership.RankName = rankName;
+                var CanBeAssign = membership != null ? ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).BeAssigned : false;
+                if (CanBeAssign)
+                {
+                    var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
+                    var modelMembership = new DisplayMembership(membership);
+                    modelMembership.AccountName = $"{item.FirstName} {item.LastName}";
+                    modelMembership.Email = item.Email;
+                    modelMembership.RankName = rankName;
 
-                displayMemberships.Add(modelMembership);
+                    displayMemberships.Add(modelMembership);
+                }
             };
 
             HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
             var json = System.Text.Encoding.UTF8.GetString(isLogin);
             var user = JsonConvert.DeserializeObject<AccountModel>(json);
 
-            ViewBag.CreateByUser = new DisplayMembership { Account_id = user._id, AccountName = $"{user.FirstName} {user.LastName}" };
+            // Check current user permission
+            var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
+            var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
+
+            if (work != null)
+            {
+                var createByAccount = allAcc.FirstOrDefault(it => it._id == work.CreateByMember_id);
+                ViewBag.CreateByUser = new DisplayMembership { Account_id = createByAccount._id, AccountName = $"{createByAccount.FirstName} {createByAccount.LastName}" };
+
+                var assignedByAccount = allAcc.FirstOrDefault(it => it._id == work.BeAssignedMember_id);
+                ViewBag.BeAssignedMemberName = $"{assignedByAccount.FirstName} {assignedByAccount.LastName}";
+
+                ViewBag.CanEditThisWork = member != null ?
+                    work.CreateByMember_id == currentUser._id ||
+                    work.BeAssignedMember_id == currentUser._id ||
+                    (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork ||
+                    currentUser.IsAdmin ||
+                    currentUser.ProjectCreatable) : false;
+            }
+
+            ViewBag.CanAssign = member != null ?
+                    (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanAssign ||
+                    currentUser.IsAdmin ||
+                    currentUser.ProjectCreatable) : false;
             ViewBag.ProjectName = projectInfo.ProjectName;
             ViewBag.Memberships = displayMemberships;
             ViewBag.Statuses = statuses;

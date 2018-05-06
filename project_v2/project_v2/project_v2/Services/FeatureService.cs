@@ -63,7 +63,7 @@ namespace project_v2.Services
         {
             var status = statusCollection.Find(it => it.StatusName == model.StatusName).FirstOrDefault();
             if (status != null && status.IsWorkDone)
-                model.WorkDoneDate = DateTime.Now;
+                model.WorkDoneDate = DateTime.Now.AddDays(1);
             else
                 model.WorkDoneDate = null;
 

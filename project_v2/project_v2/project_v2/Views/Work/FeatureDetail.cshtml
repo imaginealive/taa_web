@@ -106,11 +106,14 @@
 
 <div class="row">
     <div class="col-md-offset-8">
-        <div class="col-md-6">
+        <div class="@(ViewBag.CanEditThisWork? "col-md-6": "col-md-6 col-md-offset-6")">
             <a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model.Project_id" class="btn btn-block btn-default">ย้อนกลับ</a>
         </div>
-        <div class="col-md-6">
-            <a class="btn btn-block btn-primary" asp-action="EditFeature" asp-route-projectid="@Model.Project_id" asp-route-featureid="@Model._id">แก้ไขรายละเอียด</a>
-        </div>
+        @if (ViewBag.CanEditThisWork)
+        {
+            <div class="col-md-6">
+                <a class="btn btn-block btn-primary" asp-action="EditFeature" asp-route-projectid="@Model.Project_id" asp-route-featureid="@Model._id">แก้ไขรายละเอียด</a>
+            </div>
+        }
     </div>
 </div>
