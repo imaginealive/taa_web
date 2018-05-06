@@ -443,6 +443,8 @@ namespace project_v2.Controllers
                     (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork ||
                     currentUser.IsAdmin ||
                     currentUser.ProjectCreatable) : false;
+
+                ViewBag.IsCreator = member != null ? work.CreateByMember_id == currentUser._id : false;
             }
 
             ViewBag.CanAssign = member != null ?
