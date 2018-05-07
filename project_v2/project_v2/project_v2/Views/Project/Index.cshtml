@@ -185,7 +185,7 @@
                                 <label>ค่าเฉลี่ยของงานเสร็จต่อวัน</label>
                             </div>
                             <div class="col-lg-6">
-                                <p>@(done.Sum() / Math.Round((lateDate - startDate).TotalDays + minimumValue)) งาน/วัน</p>
+                                <p>@((done.Sum() / Math.Round((lateDate - startDate).TotalDays + minimumValue)).ToString("#0.##")) งาน/วัน</p>
                             </div>
                         </div>
                     </div>
