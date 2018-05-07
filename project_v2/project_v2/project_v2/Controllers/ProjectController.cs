@@ -97,9 +97,9 @@ namespace project_v2.Controllers
 
                         var model_task = new DisplayTaskModel(task)
                         {
-                            CreateByMemberName = task_AssginByAccount != null ? $"{task_AssginByAccount.FirstName} {task_AssginByAccount.LastName}" : string.Empty,
-                            AssginByMemberName = task_BeassginByAccount != null ? $"{task_BeassginByAccount.FirstName} {task_BeassginByAccount.LastName}" : string.Empty,
-                            BeAssignedMemberName = task_CreateByAccount != null ? $"{task_CreateByAccount.FirstName} {task_CreateByAccount.LastName}" : string.Empty,
+                            CreateByMemberName = task_CreateByAccount != null ? $"{task_CreateByAccount.FirstName} {task_CreateByAccount.LastName}" : string.Empty,
+                            AssginByMemberName = task_AssginByAccount != null ? $"{task_AssginByAccount.FirstName} {task_AssginByAccount.LastName}" : string.Empty,
+                            BeAssignedMemberName = task_BeassginByAccount != null ? $"{task_BeassginByAccount.FirstName} {task_BeassginByAccount.LastName}" : string.Empty,
                         };
                         displayTasks.Add(model_task);
                     }
