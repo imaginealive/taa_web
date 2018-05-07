@@ -133,24 +133,12 @@ namespace project_v2.Controllers
             var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 
-            ViewBag.CanCreateFeature = member != null ?
-                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateFeature ||
-                currentUser.IsAdmin ||
-                currentUser.ProjectCreatable) : false;
-            ViewBag.CanCreateStory = member != null ?
-                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateStoryUnderSelf ||
-                currentUser.IsAdmin ||
-                currentUser.ProjectCreatable) : false;
-            ViewBag.CanCreateTask = member != null ?
-                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateTaskUnderSelf ||
-                currentUser.IsAdmin ||
-                currentUser.ProjectCreatable) : false;
-
-            // TODO: Can see all work view
-            ViewBag.CanSeeAllWork = member != null ?
-                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanSeeAllWork ||
-                currentUser.IsAdmin ||
-                currentUser.ProjectCreatable) : false;
+            ViewBag.CurrentUser = currentUser;
+            ViewBag.CanCreateFeature = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateFeature) : false;
+            ViewBag.CanCreateStory = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateStoryUnderSelf) : false;
+            ViewBag.CanCreateTask = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateTaskUnderSelf) : false;
+            ViewBag.CanEditAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) : false;
+            ViewBag.CanSeeAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanSeeAllWork) : false;
 
             return View(new ProjectDetailModel
             {
@@ -231,14 +219,8 @@ namespace project_v2.Controllers
             var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 
-            ViewBag.CanEditProject = member != null ?
-                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditProject ||
-                currentUser.IsAdmin ||
-                currentUser.ProjectCreatable) : false;
-            ViewBag.CanEditMember = member != null ?
-                (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanManageMember ||
-                currentUser.IsAdmin ||
-                currentUser.ProjectCreatable) : false;
+            ViewBag.CanEditProject = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditProject) : false;
+            ViewBag.CanEditMember = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanManageMember) : false;
 
             return View(new ProjectDetailModel
             {
