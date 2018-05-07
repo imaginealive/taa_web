@@ -32,13 +32,13 @@
             ['วันที่', 'จำนวนงานเสร็จของวัน', 'จำนวนงานที่เหลือ'],
             @for (var i = startDate; i <= lateDate; i = i.AddDays(minimumValue))
             {
-                var doneToday = Model.Features.Sum(ft => ft.Stories.Sum(st => st.Tasks.Where(t => t.WorkDoneDate.HasValue).Count())) + Model.Features.Sum(ft => ft.Stories.Where(st => st.WorkDoneDate.HasValue).Count()) + Model.Features.Where(ft => ft.WorkDoneDate.HasValue).Count();
+                var doneToday = Model.Features.Sum(ft => ft.Stories.Sum(st => st.Tasks.Where(t => t.WorkDoneDate.HasValue && t.WorkDoneDate.Value.Date == i.Date).Count())) + Model.Features.Sum(ft => ft.Stories.Where(st => st.WorkDoneDate.HasValue && st.WorkDoneDate.Value.Date == i.Date).Count()) + Model.Features.Where(ft => ft.WorkDoneDate.HasValue && ft.WorkDoneDate.Value.Date == i.Date).Count();
+                done.Add(doneToday);
                 var remainToday = totalWorks - done.Sum();
                 @Html.Raw($"['{i.ToShortDateString()}', {doneToday}, {remainToday}]");
                 if (i != lateDate) {
                     @Html.Raw(",");
                 }
-                done.Add(doneToday);
                 remaining.Add(remainToday);
             }
         ]);
