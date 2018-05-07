@@ -288,6 +288,14 @@ namespace project_v2.Controllers
 
                 displayMemberships.Add(model);
             };
+            
+            HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
+            if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+
+            // Check current user permission
+            var json = System.Text.Encoding.UTF8.GetString(isLogin);
+            var user = JsonConvert.DeserializeObject<AccountModel>(json);
+            ViewBag.CurrentUser = user;
 
             ViewBag.RankMaster = serviceConfig.MasterRankId;
             return View(new MembershipManagementModel

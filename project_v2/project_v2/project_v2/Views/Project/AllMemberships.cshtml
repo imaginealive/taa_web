@@ -34,7 +34,7 @@
                                     <td>@item.Email</td>
                                     <td>@item.RankName</td>
                                     <td>
-                                        @if (item.ProjectRank_id == ViewBag.RankMaster)
+                                        @if (item.ProjectRank_id == ViewBag.RankMaster || item.Account_id == ViewBag.CurrentUser._id)
                                         {
                                             <a class="text-center btn btn-default disabled"><span class="glyphicon glyphicon-sort"></span></a>
                                         }
