@@ -43,6 +43,7 @@ namespace project_v2.Services
                 model._id = Guid.NewGuid().ToString();
                 model.CreateDate = DateTime.Now;
                 model.WorkDoneDate = null;
+                model.ClosingDate = DateTime.SpecifyKind(model.ClosingDate, DateTimeKind.Local);
                 model.StatusName = statusCollection.Find(it => it._id == svcConfig.StatusNewId).FirstOrDefault()?.StatusName;
                 featureCollection.InsertOne(model);
             }
@@ -63,7 +64,7 @@ namespace project_v2.Services
         {
             var status = statusCollection.Find(it => it.StatusName == model.StatusName).FirstOrDefault();
             if (status != null && status.IsWorkDone)
-                model.WorkDoneDate = DateTime.Now.AddDays(1);
+                model.WorkDoneDate = DateTime.Now;
             else
                 model.WorkDoneDate = null;
 
@@ -77,7 +78,7 @@ namespace project_v2.Services
                 .Set(it => it.BeAssignedMember_id, model.BeAssignedMember_id)
                 .Set(it => it.StatusName, model.StatusName)
                 .Set(it => it.WorkDoneDate, model.WorkDoneDate)
-                .Set(it => it.ClosingDate, model.ClosingDate)
+                .Set(it => it.ClosingDate, DateTime.SpecifyKind(model.ClosingDate, DateTimeKind.Local))
             );
         }
 

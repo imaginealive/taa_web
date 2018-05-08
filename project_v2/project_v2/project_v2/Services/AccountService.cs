@@ -38,18 +38,28 @@ namespace project_v2.Services
                 model.CreateDate = DateTime.Now;
                 model.IsAdmin = false;
                 model.ProjectCreatable = false;
+                if (model.BirthDate.HasValue)
+                    model.BirthDate = DateTime.SpecifyKind(model.BirthDate.Value.Date, DateTimeKind.Local);
+                else
+                    model.BirthDate = null;
                 accountCollection.InsertOne(model);
             }
         }
 
         public void EditAccount(AccountModel model)
         {
+            if (model.BirthDate.HasValue)
+                model.BirthDate = DateTime.SpecifyKind(model.BirthDate.Value.Date, DateTimeKind.Local);
+            else
+                model.BirthDate = null;
+
             accountCollection.FindOneAndUpdate(
                 Builders<AccountModel>.Filter.Eq(it => it._id, model._id),
                 Builders<AccountModel>.Update
                 .Set(it => it.Password, model.Password)
                 .Set(it => it.FirstName, model.FirstName)
                 .Set(it => it.LastName, model.LastName)
+                .Set(it => it.BirthDate, model.BirthDate)
                 .Set(it => it.WorkPosition, model.WorkPosition)
                 .Set(it => it.Department, model.Department)
                 .Set(it => it.Email, model.Email)

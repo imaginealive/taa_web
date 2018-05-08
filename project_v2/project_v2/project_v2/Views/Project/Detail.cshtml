@@ -54,15 +54,28 @@
                 <p>@totalWorkDays วัน</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-3">
-                <label>จำนวนวันทำงานที่เหลือ</label>
+        @if (!(Model.Project.ClosingDate.Date < DateTime.Now))
+        {
+            <div class="row">
+                <div class="col-lg-3">
+                    <label>จำนวนวันทำงานที่เหลือ</label>
+                </div>
+                <div class="col-lg-9">
+                    <p>@remainingWorkDays วัน</p>
+                </div>
             </div>
-            <div class="col-lg-9">
-                <p>@remainingWorkDays วัน</p>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-lg-3">
+                    <label>จำนวนวันทำงานที่เหลือ</label>
+                </div>
+                <div class="col-lg-9">
+                    <p>หมดเวลาทำงาน</p>
+                </div>
             </div>
-        </div>
-
+        }
         <div class="row">
             <div class="col-sm-3 col-sm-offset-9">
                 @if (ViewBag.CanEditProject)

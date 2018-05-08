@@ -38,6 +38,7 @@ namespace project_v2.Services
             {
                 model._id = Guid.NewGuid().ToString();
                 model.CreateDate = DateTime.Now;
+                model.ClosingDate = DateTime.SpecifyKind(model.ClosingDate, DateTimeKind.Local);
                 projectCollection.InsertOne(model);
 
                 var member = new ProjectMembershipModel
@@ -46,8 +47,8 @@ namespace project_v2.Services
                     Account_id = accountId,
                     Project_id = model._id,
                     ProjectRank_id = svcConfig.MasterRankId,
-                    CreateDate = DateTime.Now
-                };
+                    CreateDate = DateTime.Now,
+            };
                 memberCollection.InsertOne(member);
             }
         }
@@ -61,7 +62,7 @@ namespace project_v2.Services
                 .Set(it => it.Description, model.Description)
                 .Set(it => it.Department, model.Department)
                 .Set(it => it.LogoUrl, model.LogoUrl)
-                .Set(it => it.ClosingDate, model.ClosingDate)
+                .Set(it => it.ClosingDate, DateTime.SpecifyKind(model.ClosingDate, DateTimeKind.Local))
             );
         }
 
