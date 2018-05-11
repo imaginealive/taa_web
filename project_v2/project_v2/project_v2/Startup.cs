@@ -33,16 +33,13 @@ namespace project_v2
             services.AddTransient<ITaskService, TaskService>();
             services.AddTransient<IServiceConfigurations>(x => Configuration.GetSection(nameof(ServiceConfigurations)).Get<ServiceConfigurations>());
 
+            services.AddAuthentication("FiverSecurityScheme")
+                    .AddCookie("FiverSecurityScheme", options =>
+                    {
+                        options.AccessDeniedPath = "/Account/Login";
+                        options.LoginPath = "/Account/Login";
+                    });
             services.AddMvc();
-
-            // Adds a default in-memory implementation of IDistributedCache.
-            services.AddDistributedMemoryCache();
-
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(5);
-                options.Cookie.HttpOnly = true;
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,7 +47,7 @@ namespace project_v2
         {
             if (env.IsDevelopment())
             {
-                app.UseSession();
+                app.UseAuthentication();
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }

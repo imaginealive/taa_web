@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using project_v2.Attribute;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
 namespace project_v2.Controllers
 {
-    [LoginSession]
+    [Authorize]
     public class WorkController : Controller
     {
         private IProjectService projectSvc;
@@ -111,11 +112,12 @@ namespace project_v2.Controllers
 
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
                 {
-                    HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
-                    if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+                    var isLogin = HttpContext.User.Identity.IsAuthenticated;
+                    if (!isLogin) return RedirectToAction("Login", "Account");
 
-                    var json = System.Text.Encoding.UTF8.GetString(isLogin);
-                    var user = JsonConvert.DeserializeObject<AccountModel>(json);
+                    // Check current user permission
+                    var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+                    var user = JsonConvert.DeserializeObject<AccountModel>(userString);
 
                     var memberships = membershipSvc.GetAllProjectMember(model.Project_id);
                     var ranks = rankSvc.GetAllRank();
@@ -231,11 +233,12 @@ namespace project_v2.Controllers
 
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
                 {
-                    HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
-                    if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+                    var isLogin = HttpContext.User.Identity.IsAuthenticated;
+                    if (!isLogin) return RedirectToAction("Login", "Account");
 
-                    var json = System.Text.Encoding.UTF8.GetString(isLogin);
-                    var user = JsonConvert.DeserializeObject<AccountModel>(json);
+                    // Check current user permission
+                    var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+                    var user = JsonConvert.DeserializeObject<AccountModel>(userString);
 
                     var memberships = membershipSvc.GetAllProjectMember(projectid);
                     var ranks = rankSvc.GetAllRank();
@@ -366,11 +369,12 @@ namespace project_v2.Controllers
 
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
                 {
-                    HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
-                    if (isLogin.Length == 0) return RedirectToAction("Login", "Account");
+                    var isLogin = HttpContext.User.Identity.IsAuthenticated;
+                    if (!isLogin) return RedirectToAction("Login", "Account");
 
-                    var json = System.Text.Encoding.UTF8.GetString(isLogin);
-                    var user = JsonConvert.DeserializeObject<AccountModel>(json);
+                    // Check current user permission
+                    var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+                    var user = JsonConvert.DeserializeObject<AccountModel>(userString);
 
                     var memberships = membershipSvc.GetAllProjectMember(projectid);
                     var ranks = rankSvc.GetAllRank();
@@ -437,10 +441,9 @@ namespace project_v2.Controllers
                     displayMemberships.Add(modelMembership);
                 }
             };
-
-            HttpContext.Session.TryGetValue("LoginData", out byte[] isLogin);
-            var json = System.Text.Encoding.UTF8.GetString(isLogin);
-            var currentUser = JsonConvert.DeserializeObject<AccountModel>(json);
+            
+            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+            var currentUser = JsonConvert.DeserializeObject<AccountModel>(userString);
 
             // Check current user permission
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;

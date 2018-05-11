@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using project_v2.Attribute;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
@@ -33,7 +34,7 @@ namespace project_v2.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterModel model)
+        public async Task<IActionResult> Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
@@ -41,7 +42,23 @@ namespace project_v2.Controllers
                 var newUser = JsonConvert.DeserializeObject<AccountModel>(json);
                 svc.CreateAccount(newUser);
                 var user = svc.Login(model.AccountName, model.Password);
-                HttpContext.Session.SetString("LoginData", JsonConvert.SerializeObject(user));
+
+
+                // create claims
+                List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, JsonConvert.SerializeObject(user)),
+                new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
+            };
+
+                // create identity
+                ClaimsIdentity identity = new ClaimsIdentity(claims, "cookie");
+
+                // create principal
+                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+                // sign-in
+                await HttpContext.SignInAsync(scheme: "FiverSecurityScheme", principal: principal);
                 return RedirectToAction("Index", "Home");
             }
             return View(model);
@@ -54,7 +71,7 @@ namespace project_v2.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(AccountModel model)
+        public async Task<IActionResult> Login(AccountModel model)
         {
             var user = svc.Login(model.AccountName, model.Password);
             if (user == null)
@@ -63,31 +80,62 @@ namespace project_v2.Controllers
                 return View(model);
             }
 
-            HttpContext.Session.SetString("LoginData", JsonConvert.SerializeObject(user));
+            // create claims
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, JsonConvert.SerializeObject(user)),
+                new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
+            };
+
+            // create identity
+            ClaimsIdentity identity = new ClaimsIdentity(claims, "cookie");
+
+            // create principal
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+            // sign-in
+            await HttpContext.SignInAsync(scheme: "FiverSecurityScheme", principal: principal);
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
-        public IActionResult Logout()
+        [Authorize]
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.SetString("LoginData", string.Empty);
+            await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
-        [LoginSession]
+        [Authorize]
         public IActionResult EditProfile()
         {
-            var userdata = JsonConvert.DeserializeObject<AccountModel>(HttpContext.Session.GetString("LoginData"));
+
+            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+            var userdata = JsonConvert.DeserializeObject<AccountModel>(userString);
             return View(userdata);
         }
 
+        [Authorize]
         [HttpPost]
-        public IActionResult EditProfile(AccountModel body)
+        public async Task<IActionResult> EditProfile(AccountModel body)
         {
             if (ModelState.IsValid)
             {
                 svc.EditAccount(body);
-                HttpContext.Session.SetString("LoginData", JsonConvert.SerializeObject(body));
+                // create claims
+                List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, JsonConvert.SerializeObject(body)),
+                new Claim(ClaimTypes.Role, body.IsAdmin ? "Admin" : "User")
+            };
+
+                // create identity
+                ClaimsIdentity identity = new ClaimsIdentity(claims, "cookie");
+
+                // create principal
+                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+                // sign-in
+                await HttpContext.SignInAsync(scheme: "FiverSecurityScheme", principal: principal);
                 return RedirectToAction("Index", "Home");
             }
             return View(body);

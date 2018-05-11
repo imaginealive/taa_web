@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using project_v2.Attribute;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
 namespace project_v2.Controllers
 {
-    [LoginSession]
+    [Authorize]
     public class HomeController : Controller
     {
         private IProjectService projectSvc;
@@ -24,10 +25,10 @@ namespace project_v2.Controllers
         public IActionResult Index()
         {
             //Check, Did user login?
-            var isLogin = HttpContext.Session.GetString("LoginData");
-            if (string.IsNullOrEmpty(isLogin)) return RedirectToAction("Login", "Account");
-
-            var user = JsonConvert.DeserializeObject<AccountModel>(isLogin);
+            var isLogin = HttpContext.User.Identity.IsAuthenticated;
+            if (!isLogin) return RedirectToAction("Login", "Account");
+            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+            var user = JsonConvert.DeserializeObject<AccountModel>(userString);
             ViewBag.User = user;
 
             var model = projectSvc.GetProjects(user._id);
