@@ -3,6 +3,51 @@
     ViewData["Title"] = "Home Page";
     const int minimumProjectCount = 1;
 }
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load("current", { packages: ["corechart"] });
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Project', 'งานเสร็จ', 'งานเหลือ'],
+
+            @foreach (var item in ViewBag.Data as List<project_v2.Models.ProjectGraphModel>)
+            {
+                @Html.Raw($"['{item.ProjectName}', {item.WorkDone}, {item.WorkProcess}]");
+
+                if (item.ProjectId != (ViewBag.Data as List<project_v2.Models.ProjectGraphModel>).Last().ProjectId) {
+                    @Html.Raw(",");
+                }
+             }
+        ]);
+
+        var view = new google.visualization.DataView(data);
+                    view.setColumns([0, 1,
+            {
+                calc: "stringify",
+                sourceColumn: 1,
+                type: "string",
+                role: "annotation"
+            },
+            2]);
+
+        var options = {
+            bar: { groupWidth: "40%" },
+            legend: { position: 'bottom', maxLines: 3 },
+            isStacked: true
+        };
+
+        var chart = new google.visualization.BarChart(document.getElementById("barchart_values"));
+        chart.draw(view, options);
+    }
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading">ความก้าวหน้าของโปรเจคทั้งหมด</div>
+    <div class="panel-body">
+        <div id="barchart_values" style="min-width:100%; padding-bottom: 20px;"></div>
+    </div>
+</div>
 
 <!-- Project list -->
 <div class="row">

@@ -186,7 +186,7 @@
                             <div class="col-lg-6">
                                 @if (totalWorks > 0)
                                 {
-                                <p>@(remaining.LastOrDefault()) งาน (@((remaining.LastOrDefault() / totalWorks * 100).ToString("#0.#"))%)</p>
+                                    <p>@(remaining.LastOrDefault()) งาน (@((remaining.LastOrDefault() / totalWorks * 100).ToString("#0.#"))%)</p>
                                 }
                                 else
                                 {
@@ -196,18 +196,18 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label>คาดคะเนค่าเฉลี่ยของงานที่ต้องทำต่อวัน</label>
-                            </div>
-                            <div class="col-lg-6">
-                                @if (Model.Project.ClosingDate.Date > today)
-                                {
+                        @if (Model.Project.ClosingDate.Date > today)
+                        {
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label>คาดคะเนค่าเฉลี่ยของงานที่ต้องทำต่อวัน</label>
+                                </div>
+                                <div class="col-lg-6">
                                     <p>@((remaining.LastOrDefault() / ((Model.Project.ClosingDate.Date - today).TotalDays + minimumValue)).ToString("#0.##")) งาน/วัน</p>
-                                }
+
+                                </div>
                             </div>
-                        </div>
+                        }
                         <div class="row">
                             <div class="col-lg-6">
                                 <label>ค่าเฉลี่ยของงานเสร็จต่อวัน</label>
@@ -223,394 +223,401 @@
         <hr />
 
         <div id="curve_chart" style="min-width:100%; padding-bottom: 20px;"></div>
+        <div style="margin-top: 2em">
+            <div class="col-sm-3 col-sm-offset-9">
+                <a asp-action="report" asp-route-id="@Model.Project._id" class="btn btn-block btn-primary">
+                    ดูรายงานความก้าวหน้า
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Works -->
 <div class="row" style="margin-top: 2em">
 
-        <div class="col-sm-2">
-            <ul class="nav nav-pills nav-stacked">
-                @foreach (var item in ViewBag.displayFeatures)
-                {
-                    <li class="@((ViewBag.displayFeatures as List<DisplayFeatureModel>).FirstOrDefault()._id == item._id? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
-                    featureSideMenuCount++;
-                }
-                @if (ViewBag.CanCreateFeature)
-                {
-                    <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model.Project._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
-                }
-            </ul>
-        </div>
-        <div class="col-sm-10">
-            @if (Model.Features.Count() >= minimumValue)
+    <div class="col-sm-2">
+        <ul class="nav nav-pills nav-stacked">
+            @foreach (var item in ViewBag.displayFeatures)
             {
-                <div class="panel panel-primary">
-                    <div class="tab-content panel-body">
+                <li class="@((ViewBag.displayFeatures as List<DisplayFeatureModel>).FirstOrDefault()._id == item._id? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
+                featureSideMenuCount++;
+            }
+            @if (ViewBag.CanCreateFeature)
+            {
+                <li><a asp-controller="Work" asp-action="CreateFeature" asp-route-projectid="@Model.Project._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานหลัก</a></li>
+            }
+        </ul>
+    </div>
+    <div class="col-sm-10">
+        @if (Model.Features.Count() >= minimumValue)
+        {
+            <div class="panel panel-primary">
+                <div class="tab-content panel-body">
 
-                        @foreach (var featureContent in ViewBag.displayFeatures as List<DisplayFeatureModel>)
-                        {
-                            <div id="feature@(featureContentCount)" class="row tab-pane fade in @((ViewBag.displayFeatures as List<DisplayFeatureModel>).FirstOrDefault()._id == featureContent._id ? "active" : string.Empty)">
+                    @foreach (var featureContent in ViewBag.displayFeatures as List<DisplayFeatureModel>)
+                    {
+                        <div id="feature@(featureContentCount)" class="row tab-pane fade in @((ViewBag.displayFeatures as List<DisplayFeatureModel>).FirstOrDefault()._id == featureContent._id ? "active" : string.Empty)">
 
-                                <div style="margin-bottom: 2em">
-                                    <div class="col-sm-3">
-                                        <h2>รายละเอียด</h2>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <p><b>ชื่อ: </b>@featureContent.Name</p>
-                                        <p><b>รายละเอียด: </b>@featureContent.Description</p>
-                                        <p><b>สร้างโดย: </b>@featureContent.CreateByMemberName</p>
-                                        <p>
-                                            <b>มอบหมายโดย: </b>
-                                            @if (!string.IsNullOrEmpty(featureContent.AssginByMemberName))
-                                            {
-                                                <span>@featureContent.AssginByMemberName</span>
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </p>
-                                        <p>
-                                            <b>ผู้รับมอบหมาย: </b>
-                                            @if (!string.IsNullOrEmpty(featureContent.BeAssignedMemberName))
-                                            {
-                                                <span>@featureContent.BeAssignedMemberName</span>
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </p>
-                                    </div>
-                                    <div class="row"></div>
-                                    <hr class="clearfix" />
-
-                                    <div class="col-sm-3">
-                                        <h2>สถานะงาน</h2>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <p>
-                                            <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@featureContent.ClosingDate.ToShortDateString()
-                                            @if (featureContent.ClosingDate.Date > DateTime.Now.Date)
-                                            {
-                                                <span>(เหลือ @((featureContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
-                                            }
-                                            else if (featureContent.ClosingDate.Date == DateTime.Now.Date)
-                                            {
-                                                <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
-                                            }
-                                            else
-                                            {
-                                                <span>(หมดเวลาทำงาน)</span>
-                                            }
-                                        </p>
-                                        <p>
-                                            <b>วันที่งานเสร็จสิ้นจริง: </b>
-                                            @if (featureContent.WorkDoneDate.HasValue)
-                                            {
-                                                @featureContent.WorkDoneDate.Value.ToShortDateString()
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </p>
-                                        <p>
-                                            <b>สถานะ: </b>
-                                            @if (!string.IsNullOrEmpty(featureContent.StatusName))
-                                            {
-                                                <span>@featureContent.StatusName</span>
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </p>
-                                    </div>
-
-                                    @{
-                                        var canDeleteFeature = featureContent.CreateDate.Date == DateTime.Now.Date && (featureContent.CreateByMember_id == ViewBag.CurrentUser._id && ViewBag.CanEditAllWork);
-                                        <div class="row">
-                                            <div class="col-sm-4 col-sm-offset-8">
-                                                <div class="@(canDeleteFeature? "col-sm-6": "col-sm-6 col-sm-offset-6" )">
-                                                    <a class="btn btn-block btn-default" asp-controller="Work" asp-action="FeatureDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id">ดูรายละเอียด</a>
-                                                </div>
-                                                @if (canDeleteFeature)
-                                                {
-                                                    <div class="col-sm-6">
-                                                        <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteFeature" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id">ลบ</a>
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
-                                    }
+                            <div style="margin-bottom: 2em">
+                                <div class="col-sm-3">
+                                    <h2>รายละเอียด</h2>
                                 </div>
+                                <div class="col-sm-9">
+                                    <p><b>ชื่อ: </b>@featureContent.Name</p>
+                                    <p><b>รายละเอียด: </b>@featureContent.Description</p>
+                                    <p><b>สร้างโดย: </b>@featureContent.CreateByMemberName</p>
+                                    <p>
+                                        <b>มอบหมายโดย: </b>
+                                        @if (!string.IsNullOrEmpty(featureContent.AssginByMemberName))
+                                        {
+                                            <span>@featureContent.AssginByMemberName</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
+                                    <p>
+                                        <b>ผู้รับมอบหมาย: </b>
+                                        @if (!string.IsNullOrEmpty(featureContent.BeAssignedMemberName))
+                                        {
+                                            <span>@featureContent.BeAssignedMemberName</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
+                                </div>
+                                <div class="row"></div>
                                 <hr class="clearfix" />
 
-                                <div class="col-sm-2">
-                                    <ul class="nav nav-pills nav-stacked">
-                                        @foreach (var storySideMenu in featureContent.Stories)
+                                <div class="col-sm-3">
+                                    <h2>สถานะงาน</h2>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p>
+                                        <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@featureContent.ClosingDate.ToShortDateString()
+                                        @if (featureContent.ClosingDate.Date > DateTime.Now.Date)
                                         {
-                                            <li class="@(featureContent.Stories.FirstOrDefault()._id == storySideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#story@(storySideMenuCount)">@storySideMenu.Name</a></li>
-                                            storySideMenuCount++;
+                                            <span>(เหลือ @((featureContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
                                         }
-                                        @if (ViewBag.CanCreateStory)
+                                        else if (featureContent.ClosingDate.Date == DateTime.Now.Date)
                                         {
-                                            <li><a asp-controller="Work" asp-action="CreateStory" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
+                                            <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
                                         }
-                                    </ul>
+                                        else
+                                        {
+                                            <span>(หมดเวลาทำงาน)</span>
+                                        }
+                                    </p>
+                                    <p>
+                                        <b>วันที่งานเสร็จสิ้นจริง: </b>
+                                        @if (featureContent.WorkDoneDate.HasValue)
+                                        {
+                                            @featureContent.WorkDoneDate.Value.ToShortDateString()
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
+                                    <p>
+                                        <b>สถานะ: </b>
+                                        @if (!string.IsNullOrEmpty(featureContent.StatusName))
+                                        {
+                                            <span>@featureContent.StatusName</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </p>
                                 </div>
 
-                                <div class="col-sm-10">
-                                    @if (featureContent.Stories.Count() >= minimumValue)
+                                @{
+                                    var canDeleteFeature = featureContent.CreateDate.Date == DateTime.Now.Date && (featureContent.CreateByMember_id == ViewBag.CurrentUser._id && ViewBag.CanEditAllWork);
+                                    <div class="row">
+                                        <div class="col-sm-4 col-sm-offset-8">
+                                            <div class="@(canDeleteFeature? "col-sm-6": "col-sm-6 col-sm-offset-6" )">
+                                                <a class="btn btn-block btn-default" asp-controller="Work" asp-action="FeatureDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id">ดูรายละเอียด</a>
+                                            </div>
+                                            @if (canDeleteFeature)
+                                            {
+                                                <div class="col-sm-6">
+                                                    <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteFeature" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id">ลบ</a>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <hr class="clearfix" />
+
+                            <div class="col-sm-2">
+                                <ul class="nav nav-pills nav-stacked">
+                                    @foreach (var storySideMenu in featureContent.Stories)
                                     {
-                                        <div class="panel" style="border: 1px solid #76a771">
-                                            <div class="tab-content panel-body">
+                                        <li class="@(featureContent.Stories.FirstOrDefault()._id == storySideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#story@(storySideMenuCount)">@storySideMenu.Name</a></li>
+                                        storySideMenuCount++;
+                                    }
+                                    @if (ViewBag.CanCreateStory)
+                                    {
+                                        <li><a asp-controller="Work" asp-action="CreateStory" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานรอง</a></li>
+                                    }
+                                </ul>
+                            </div>
 
-                                                @foreach (var storyContent in featureContent.Stories)
-                                                {
-                                                    <div id="story@(storyContentCount)" class="row tab-pane fade in @(featureContent.Stories.FirstOrDefault()._id == storyContent._id? "active" : string.Empty)">
+                            <div class="col-sm-10">
+                                @if (featureContent.Stories.Count() >= minimumValue)
+                                {
+                                    <div class="panel" style="border: 1px solid #76a771">
+                                        <div class="tab-content panel-body">
 
-                                                        <div style="margin-bottom: 2em">
-                                                            <div class="col-sm-3">
-                                                                <h3>รายละเอียด</h3>
-                                                            </div>
-                                                            <div class="col-sm-9">
-                                                                <p><b>ชื่อ: </b>@storyContent.Name</p>
-                                                                <p><b>รายละเอียด: </b>@storyContent.Description</p>
-                                                                <p><b>สร้างโดย: </b>@storyContent.CreateByMemberName</p>
-                                                                <p>
-                                                                    <b>มอบหมายโดย: </b>
-                                                                    @if (!string.IsNullOrEmpty(storyContent.AssginByMemberName))
-                                                                    {
-                                                                        <span>@storyContent.AssginByMemberName</span>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <span>-</span>
-                                                                    }
-                                                                </p>
-                                                                <p>
-                                                                    <b>ผู้รับมอบหมาย: </b>
-                                                                    @if (!string.IsNullOrEmpty(storyContent.BeAssignedMemberName))
-                                                                    {
-                                                                        <span>@storyContent.BeAssignedMemberName</span>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <span>-</span>
-                                                                    }
-                                                                </p>
-                                                            </div>
-                                                            <div class="row"></div>
-                                                            <hr class="clearfix" />
+                                            @foreach (var storyContent in featureContent.Stories)
+                                            {
+                                                <div id="story@(storyContentCount)" class="row tab-pane fade in @(featureContent.Stories.FirstOrDefault()._id == storyContent._id? "active" : string.Empty)">
 
-                                                            <div class="col-sm-3">
-                                                                <h3>สถานะงาน</h3>
-                                                            </div>
-                                                            <div class="col-sm-9">
-                                                                <p>
-                                                                    <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@storyContent.ClosingDate.ToShortDateString()
-                                                                    @if (storyContent.ClosingDate.Date > DateTime.Now.Date)
-                                                                    {
-                                                                        <span>(เหลือ @((storyContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
-                                                                    }
-                                                                    else if (storyContent.ClosingDate.Date == DateTime.Now.Date)
-                                                                    {
-                                                                        <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <span>(หมดเวลาทำงาน)</span>
-                                                                    }
-                                                                </p>
-                                                                <p>
-                                                                    <b>วันที่งานเสร็จสิ้นจริง: </b>
-                                                                    @if (storyContent.WorkDoneDate.HasValue)
-                                                                    {
-                                                                        @storyContent.WorkDoneDate.Value.ToShortDateString()
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <span>-</span>
-                                                                    }
-                                                                </p>
-                                                                <p>
-                                                                    <b>สถานะ: </b>
-                                                                    @if (!string.IsNullOrEmpty(storyContent.StatusName))
-                                                                    {
-                                                                        <span>@storyContent.StatusName</span>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <span>-</span>
-                                                                    }
-                                                                </p>
-                                                            </div>
-
-                                                            @{
-                                                                var canDeleteStory = storyContent.CreateDate.Date == DateTime.Now.Date && (storyContent.CreateByMember_id == ViewBag.CurrentUser._id && ViewBag.CanEditAllWork);
-                                                                <div class="row">
-                                                                    <div class="col-sm-5 col-sm-offset-7">
-                                                                        <div class="@(canDeleteStory? "col-sm-6": "col-sm-6 col-sm-offset-6" )">
-                                                                            <a class="btn btn-block btn-default" asp-controller="Work" asp-action="StoryDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id">ดูรายละเอียด</a>
-                                                                        </div>
-                                                                        @if (canDeleteStory)
-                                                                        {
-                                                                            <div class="col-sm-6">
-                                                                                <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteStory" asp-route-projectid="@featureContent.Project_id" asp-route-storyid="@storyContent._id">ลบ</a>
-                                                                            </div>
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                            }
+                                                    <div style="margin-bottom: 2em">
+                                                        <div class="col-sm-3">
+                                                            <h3>รายละเอียด</h3>
                                                         </div>
+                                                        <div class="col-sm-9">
+                                                            <p><b>ชื่อ: </b>@storyContent.Name</p>
+                                                            <p><b>รายละเอียด: </b>@storyContent.Description</p>
+                                                            <p><b>สร้างโดย: </b>@storyContent.CreateByMemberName</p>
+                                                            <p>
+                                                                <b>มอบหมายโดย: </b>
+                                                                @if (!string.IsNullOrEmpty(storyContent.AssginByMemberName))
+                                                                {
+                                                                    <span>@storyContent.AssginByMemberName</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </p>
+                                                            <p>
+                                                                <b>ผู้รับมอบหมาย: </b>
+                                                                @if (!string.IsNullOrEmpty(storyContent.BeAssignedMemberName))
+                                                                {
+                                                                    <span>@storyContent.BeAssignedMemberName</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                        <div class="row"></div>
                                                         <hr class="clearfix" />
 
                                                         <div class="col-sm-3">
-                                                            <ul class="nav nav-pills nav-stacked">
-                                                                @foreach (var taskSideMenu in storyContent.Tasks)
+                                                            <h3>สถานะงาน</h3>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <p>
+                                                                <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@storyContent.ClosingDate.ToShortDateString()
+                                                                @if (storyContent.ClosingDate.Date > DateTime.Now.Date)
                                                                 {
-                                                                    <li class="@(storyContent.Tasks.FirstOrDefault()._id == taskSideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#task@(taskSideMenuCount)">@taskSideMenu.Name</a></li>
-                                                                    taskSideMenuCount++;
+                                                                    <span>(เหลือ @((storyContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
                                                                 }
-                                                                @if (ViewBag.CanCreateTask)
+                                                                else if (storyContent.ClosingDate.Date == DateTime.Now.Date)
                                                                 {
-                                                                    <li><a asp-controller="Work" asp-action="CreateTask" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
+                                                                    <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
                                                                 }
-                                                            </ul>
+                                                                else
+                                                                {
+                                                                    <span>(หมดเวลาทำงาน)</span>
+                                                                }
+                                                            </p>
+                                                            <p>
+                                                                <b>วันที่งานเสร็จสิ้นจริง: </b>
+                                                                @if (storyContent.WorkDoneDate.HasValue)
+                                                                {
+                                                                    @storyContent.WorkDoneDate.Value.ToShortDateString()
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </p>
+                                                            <p>
+                                                                <b>สถานะ: </b>
+                                                                @if (!string.IsNullOrEmpty(storyContent.StatusName))
+                                                                {
+                                                                    <span>@storyContent.StatusName</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>-</span>
+                                                                }
+                                                            </p>
                                                         </div>
 
-                                                        <div class="col-sm-9">
+                                                        @{
+                                                            var canDeleteStory = storyContent.CreateDate.Date == DateTime.Now.Date && (storyContent.CreateByMember_id == ViewBag.CurrentUser._id && ViewBag.CanEditAllWork);
+                                                            <div class="row">
+                                                                <div class="col-sm-5 col-sm-offset-7">
+                                                                    <div class="@(canDeleteStory? "col-sm-6": "col-sm-6 col-sm-offset-6" )">
+                                                                        <a class="btn btn-block btn-default" asp-controller="Work" asp-action="StoryDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id">ดูรายละเอียด</a>
+                                                                    </div>
+                                                                    @if (canDeleteStory)
+                                                                    {
+                                                                        <div class="col-sm-6">
+                                                                            <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteStory" asp-route-projectid="@featureContent.Project_id" asp-route-storyid="@storyContent._id">ลบ</a>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                    <hr class="clearfix" />
 
-                                                            @if (storyContent.Tasks.Count() >= minimumValue)
+                                                    <div class="col-sm-3">
+                                                        <ul class="nav nav-pills nav-stacked">
+                                                            @foreach (var taskSideMenu in storyContent.Tasks)
                                                             {
-                                                                <div class="panel" style="border: 1px solid #5ca9e1">
-                                                                    <div class="tab-content panel-body">
+                                                                <li class="@(storyContent.Tasks.FirstOrDefault()._id == taskSideMenu._id? "active": string.Empty)"><a data-toggle="tab" href="#task@(taskSideMenuCount)">@taskSideMenu.Name</a></li>
+                                                                taskSideMenuCount++;
+                                                            }
+                                                            @if (ViewBag.CanCreateTask)
+                                                            {
+                                                                <li><a asp-controller="Work" asp-action="CreateTask" asp-route-projectid="@Model.Project._id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id"><span class="glyphicon glyphicon-plus"></span> สร้างงานย่อย</a></li>
+                                                            }
+                                                        </ul>
+                                                    </div>
 
-                                                                        @foreach (var taskContent in storyContent.Tasks)
-                                                                        {
-                                                                            <div id="task@(taskContentCount)" class="row tab-pane fade in @(storyContent.Tasks.FirstOrDefault()._id == taskContent._id? "active" : string.Empty)">
+                                                    <div class="col-sm-9">
 
-                                                                                <div style="margin-bottom: 2em">
-                                                                                    <div class="col-sm-3">
-                                                                                        <h4>รายละเอียด</h4>
-                                                                                    </div>
-                                                                                    <div class="col-sm-9">
-                                                                                        <p><b>ชื่อ: </b>@taskContent.Name</p>
-                                                                                        <p><b>รายละเอียด: </b>@taskContent.Description</p>
-                                                                                        <p><b>สร้างโดย: </b>@taskContent.CreateByMemberName</p>
-                                                                                        <p>
-                                                                                            <b>มอบหมายโดย: </b>
-                                                                                            @if (!string.IsNullOrEmpty(taskContent.AssginByMemberName))
-                                                                                            {
-                                                                                                <span>@taskContent.AssginByMemberName</span>
-                                                                                            }
-                                                                                            else
-                                                                                            {
-                                                                                                <span>-</span>
-                                                                                            }
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            <b>ผู้รับมอบหมาย: </b>
-                                                                                            @if (!string.IsNullOrEmpty(taskContent.BeAssignedMemberName))
-                                                                                            {
-                                                                                                <span>@taskContent.BeAssignedMemberName</span>
-                                                                                            }
-                                                                                            else
-                                                                                            {
-                                                                                                <span>-</span>
-                                                                                            }
-                                                                                        </p>
-                                                                                    </div>
-                                                                                    <div class="row"></div>
-                                                                                    <hr class="clearfix" />
+                                                        @if (storyContent.Tasks.Count() >= minimumValue)
+                                                        {
+                                                            <div class="panel" style="border: 1px solid #5ca9e1">
+                                                                <div class="tab-content panel-body">
 
-                                                                                    <div class="col-sm-3">
-                                                                                        <h4>สถานะงาน</h4>
-                                                                                    </div>
-                                                                                    <div class="col-sm-9">
-                                                                                        <p>
-                                                                                            <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@taskContent.ClosingDate.ToShortDateString()
-                                                                                            @if (taskContent.ClosingDate.Date > DateTime.Now.Date)
-                                                                                            {
-                                                                                                <span>(เหลือ @((taskContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
-                                                                                            }
-                                                                                            else if (taskContent.ClosingDate.Date == DateTime.Now.Date)
-                                                                                            {
-                                                                                                <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
-                                                                                            }
-                                                                                            else
-                                                                                            {
-                                                                                                <span>(หมดเวลาทำงาน)</span>
-                                                                                            }
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            <b>วันที่งานเสร็จสิ้นจริง: </b>
-                                                                                            @if (taskContent.WorkDoneDate.HasValue)
-                                                                                            {
-                                                                                                @taskContent.WorkDoneDate.Value.ToShortDateString()
-                                                                                            }
-                                                                                            else
-                                                                                            {
-                                                                                                <span>-</span>
-                                                                                            }
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            <b>สถานะ: </b>
-                                                                                            @if (!string.IsNullOrEmpty(taskContent.StatusName))
-                                                                                            {
-                                                                                                <span>@taskContent.StatusName</span>
-                                                                                            }
-                                                                                            else
-                                                                                            {
-                                                                                                <span>-</span>
-                                                                                            }
-                                                                                        </p>
-                                                                                    </div>
+                                                                    @foreach (var taskContent in storyContent.Tasks)
+                                                                    {
+                                                                        <div id="task@(taskContentCount)" class="row tab-pane fade in @(storyContent.Tasks.FirstOrDefault()._id == taskContent._id? "active" : string.Empty)">
 
-                                                                                    @{
-                                                                                        var canDeleteTask = taskContent.CreateDate.Date == DateTime.Now.Date && (taskContent.CreateByMember_id == ViewBag.CurrentUser._id && ViewBag.CanEditAllWork);
-                                                                                        <div class="row">
-                                                                                            <div class="col-sm-6 col-sm-offset-6">
-                                                                                                <div class="@(canDeleteTask? "col-sm-6": "col-sm-6 col-sm-offset-6" )">
-                                                                                                    <a class="btn btn-block btn-default" asp-controller="Work" asp-action="TaskDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id" asp-route-taskid="@taskContent._id">ดูรายละเอียด</a>
-                                                                                                </div>
-                                                                                                @if (canDeleteTask)
-                                                                                                {
-                                                                                                    <div class="col-sm-6">
-                                                                                                        <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteTask" asp-route-projectid="@featureContent.Project_id" asp-route-taskid="@taskContent._id">ลบ</a>
-                                                                                                    </div>
-                                                                                                }
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    }
+                                                                            <div style="margin-bottom: 2em">
+                                                                                <div class="col-sm-3">
+                                                                                    <h4>รายละเอียด</h4>
+                                                                                </div>
+                                                                                <div class="col-sm-9">
+                                                                                    <p><b>ชื่อ: </b>@taskContent.Name</p>
+                                                                                    <p><b>รายละเอียด: </b>@taskContent.Description</p>
+                                                                                    <p><b>สร้างโดย: </b>@taskContent.CreateByMemberName</p>
+                                                                                    <p>
+                                                                                        <b>มอบหมายโดย: </b>
+                                                                                        @if (!string.IsNullOrEmpty(taskContent.AssginByMemberName))
+                                                                                        {
+                                                                                            <span>@taskContent.AssginByMemberName</span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <span>-</span>
+                                                                                        }
+                                                                                    </p>
+                                                                                    <p>
+                                                                                        <b>ผู้รับมอบหมาย: </b>
+                                                                                        @if (!string.IsNullOrEmpty(taskContent.BeAssignedMemberName))
+                                                                                        {
+                                                                                            <span>@taskContent.BeAssignedMemberName</span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <span>-</span>
+                                                                                        }
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="row"></div>
+                                                                                <hr class="clearfix" />
+
+                                                                                <div class="col-sm-3">
+                                                                                    <h4>สถานะงาน</h4>
+                                                                                </div>
+                                                                                <div class="col-sm-9">
+                                                                                    <p>
+                                                                                        <b>คาดการณ์วันที่งานต้องเสร็จสิ้น: </b>@taskContent.ClosingDate.ToShortDateString()
+                                                                                        @if (taskContent.ClosingDate.Date > DateTime.Now.Date)
+                                                                                        {
+                                                                                            <span>(เหลือ @((taskContent.ClosingDate.Date - DateTime.Now.Date).Days) วัน)</span>
+                                                                                        }
+                                                                                        else if (taskContent.ClosingDate.Date == DateTime.Now.Date)
+                                                                                        {
+                                                                                            <span class="text-danger">(งานต้องเสร็จภายในวันนี้)</span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <span>(หมดเวลาทำงาน)</span>
+                                                                                        }
+                                                                                    </p>
+                                                                                    <p>
+                                                                                        <b>วันที่งานเสร็จสิ้นจริง: </b>
+                                                                                        @if (taskContent.WorkDoneDate.HasValue)
+                                                                                        {
+                                                                                            @taskContent.WorkDoneDate.Value.ToShortDateString()
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <span>-</span>
+                                                                                        }
+                                                                                    </p>
+                                                                                    <p>
+                                                                                        <b>สถานะ: </b>
+                                                                                        @if (!string.IsNullOrEmpty(taskContent.StatusName))
+                                                                                        {
+                                                                                            <span>@taskContent.StatusName</span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <span>-</span>
+                                                                                        }
+                                                                                    </p>
                                                                                 </div>
 
+                                                                                @{
+                                                                                    var canDeleteTask = taskContent.CreateDate.Date == DateTime.Now.Date && (taskContent.CreateByMember_id == ViewBag.CurrentUser._id && ViewBag.CanEditAllWork);
+                                                                                    <div class="row">
+                                                                                        <div class="col-sm-6 col-sm-offset-6">
+                                                                                            <div class="@(canDeleteTask? "col-sm-6": "col-sm-6 col-sm-offset-6" )">
+                                                                                                <a class="btn btn-block btn-default" asp-controller="Work" asp-action="TaskDetail" asp-route-projectid="@featureContent.Project_id" asp-route-featureid="@featureContent._id" asp-route-storyid="@storyContent._id" asp-route-taskid="@taskContent._id">ดูรายละเอียด</a>
+                                                                                            </div>
+                                                                                            @if (canDeleteTask)
+                                                                                            {
+                                                                                                <div class="col-sm-6">
+                                                                                                    <a class="btn btn-block btn-danger" asp-controller="Work" asp-action="DeleteTask" asp-route-projectid="@featureContent.Project_id" asp-route-taskid="@taskContent._id">ลบ</a>
+                                                                                                </div>
+                                                                                            }
+                                                                                        </div>
+                                                                                    </div>
+                                                                                }
                                                                             </div>
-                                                                            taskContentCount++;
-                                                                        }
 
-                                                                    </div>
+                                                                        </div>
+                                                                        taskContentCount++;
+                                                                    }
+
                                                                 </div>
-                                                            }
-                                                        </div>
-
+                                                            </div>
+                                                        }
                                                     </div>
-                                                    storyContentCount++;
-                                                }
 
-                                            </div>
+                                                </div>
+                                                storyContentCount++;
+                                            }
+
                                         </div>
-                                    }
-                                </div>
+                                    </div>
+                                }
                             </div>
-                            featureContentCount++;
-                        }
-                    </div>
+                        </div>
+                        featureContentCount++;
+                    }
                 </div>
-            }
-        </div>
+            </div>
+        }
+    </div>
 
 </div>

@@ -1,0 +1,164 @@
+﻿@model List<project_v2.Models.DisplayFeatureModel>
+@{
+    ViewData["Title"] = "Report";
+    var storyCount = 0;
+    var WorkingCount = Model.Where(it => !it.WorkDoneDate.HasValue).Count() + Model.Sum(it => it.Stories.Where(story => !story.WorkDoneDate.HasValue).Count()) + Model.Sum(it => it.Stories.Sum(story => story.Tasks.Where(task => !task.WorkDoneDate.HasValue).Count()));
+}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load("current", { packages: ["timeline"] });
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var container = document.getElementById('example4.2');
+        var chart = new google.visualization.Timeline(container);
+        var dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn({ type: 'string', id: 'Role' });
+        dataTable.addColumn({ type: 'string', id: 'Name' });
+        dataTable.addColumn({ type: 'date', id: 'Start' });
+        dataTable.addColumn({ type: 'date', id: 'End' });
+        dataTable.addRows([
+            @foreach (var feature in Model)
+            {
+                storyCount = storyCount + feature.Stories.Count();
+                var FeatureStatus = feature.WorkDoneDate.HasValue ? feature.WorkDoneDate.Value.Date > feature.ClosingDate.Date ? "งานเสร็จ (ล่าช้า)" : "งานเสร็จ" : feature.ClosingDate.Date > DateTime.Now.Date ? "กำลังดำเนินงาน" : "งานล่าช้า";
+                var FeatureEndDate = feature.WorkDoneDate.HasValue && feature.WorkDoneDate.Value.Date > feature.ClosingDate ? feature.WorkDoneDate.Value : feature.ClosingDate;
+                @Html.Raw($"['งานหลัก {feature.Name}', '{FeatureStatus}', new Date({feature.CreateDate.Year}, {feature.CreateDate.Month}, {feature.CreateDate.Day}), new Date({FeatureEndDate.Year}, {FeatureEndDate.Month}, {FeatureEndDate.Day})]");
+
+                if (feature._id != Model.Last()._id || feature.Stories.Count() != 0)
+                {
+                    @Html.Raw($",");
+                }
+                @foreach (var story in feature.Stories)
+                {
+                    var StoryStatus = story.WorkDoneDate.HasValue ? story.WorkDoneDate.Value.Date > story.ClosingDate.Date ? "งานเสร็จ (ล่าช้า)" : "งานเสร็จ" : story.ClosingDate.Date > DateTime.Now.Date ? "กำลังดำเนินงาน" : "งานล่าช้า";
+                    var endDate = story.WorkDoneDate.HasValue ? story.WorkDoneDate.Value : story.ClosingDate;
+                    @Html.Raw($"['งานรอง {story.Name}', '{StoryStatus}', new Date({story.CreateDate.Year}, {story.CreateDate.Month}, {story.CreateDate.Day}), new Date({endDate.Year}, {endDate.Month}, {endDate.Day})]");
+
+                    if (story._id != feature.Stories.Last()._id || feature._id != Model.Last()._id)
+                    {
+                        @Html.Raw($",");
+                    }
+                }
+            }
+        ]);
+
+        var options = {
+            timeline: { groupByRowLabel: false },
+
+        };
+
+        chart.draw(dataTable, options);
+    }
+</script>
+<a asp-controller="Project" asp-action="Index" asp-route-projectid="@ViewBag.projectId" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ</a>
+
+<h2>Report</h2>
+@{ var graphHeight = "200px";
+    if (Model.Count + storyCount > 3)
+    {
+        graphHeight = (200 + (Model.Count() + storyCount - 3) * 40).ToString() + "px";
+    }
+}
+<div id="example4.2" style="min-width:100%; height:@graphHeight; padding-bottom: 20px;"></div>
+
+<h4>รายการงานที่ยังเหลืออยู่ (@WorkingCount)</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ชื่องาน</th>
+            <th>ประเภทงาน</th>
+            <th>วันปิดงาน</th>
+            <th>จำนวนวันที่เหลือ</th>
+            <th>มอบหมาย</th>
+            <th>สถานะงาน</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var feature in Model)
+        {
+            if (!feature.WorkDoneDate.HasValue)
+            {
+                if (feature.ClosingDate.Date <= DateTime.Now.Date && !feature.WorkDoneDate.HasValue)
+                {
+                    <tr class="danger">
+                        <td>@feature.Name</td>
+                        <td>งานหลัก</td>
+                        <td>@feature.ClosingDate.ToShortDateString()</td>
+                        <td>@((feature.ClosingDate.Date - DateTime.Now.Date).Days) วัน</td>
+                        <td>@feature.BeAssignedMemberName</td>
+                        <td>@feature.StatusName</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@feature.Name</td>
+                        <td>งานหลัก</td>
+                        <td>@feature.ClosingDate.ToShortDateString()</td>
+                        <td>@((feature.ClosingDate.Date - DateTime.Now.Date).Days) วัน</td>
+                        <td>@feature.BeAssignedMemberName</td>
+                        <td>@feature.StatusName</td>
+                    </tr>
+                }
+            }
+            foreach (var story in feature.Stories)
+            {
+                if (!story.WorkDoneDate.HasValue)
+                {
+                    if (story.ClosingDate.Date <= DateTime.Now.Date && !story.WorkDoneDate.HasValue)
+                    {
+                        <tr class="danger">
+                            <td>@story.Name</td>
+                            <td>งานรอง</td>
+                            <td>@story.ClosingDate.ToShortDateString()</td>
+                            <td>@((story.ClosingDate.Date - DateTime.Now.Date).Days) วัน</td>
+                            <td>@story.BeAssignedMemberName</td>
+                            <td>@story.StatusName</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>@story.Name</td>
+                            <td>งานรอง</td>
+                            <td>@story.ClosingDate.ToShortDateString()</td>
+                            <td>@((story.ClosingDate.Date - DateTime.Now.Date).Days) วัน</td>
+                            <td>@story.BeAssignedMemberName</td>
+                            <td>@story.StatusName</td>
+                        </tr>
+                    }
+                }
+
+                foreach (var task in story.Tasks)
+                {
+                    if (!task.WorkDoneDate.HasValue)
+                    {
+                        if (task.ClosingDate.Date <= DateTime.Now.Date && !task.WorkDoneDate.HasValue)
+                        {
+                            <tr class="danger">
+                                <td>@task.Name</td>
+                                <td>งานย่อย</td>
+                                <td>@task.ClosingDate.ToShortDateString()</td>
+                                <td>@((task.ClosingDate.Date - DateTime.Now.Date).Days) วัน</td>
+                                <td>@task.BeAssignedMemberName</td>
+                                <td>@task.StatusName</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>@task.Name</td>
+                                <td>งานย่อย</td>
+                                <td>@task.ClosingDate.ToShortDateString()</td>
+                                <td>@((task.ClosingDate.Date - DateTime.Now.Date).Days) วัน</td>
+                                <td>@task.BeAssignedMemberName</td>
+                                <td>@task.StatusName</td>
+                            </tr>
+                        }
+                    }
+                }
+            }
+        }
+    </tbody>
+</table>

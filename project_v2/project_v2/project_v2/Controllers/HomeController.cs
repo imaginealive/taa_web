@@ -17,9 +17,18 @@ namespace project_v2.Controllers
     public class HomeController : Controller
     {
         private IProjectService projectSvc;
-        public HomeController(IProjectService projectSvc)
+        private IFeatureService featureSvc;
+        private IStoryService storySvc;
+        private ITaskService taskSvc;
+        public HomeController(IProjectService projectSvc,
+            IFeatureService featureSvc,
+            IStoryService storySvc,
+            ITaskService taskSvc)
         {
             this.projectSvc = projectSvc;
+            this.featureSvc = featureSvc;
+            this.storySvc = storySvc;
+            this.taskSvc = taskSvc;
         }
 
         public IActionResult Index()
@@ -32,6 +41,44 @@ namespace project_v2.Controllers
             ViewBag.User = user;
 
             var model = projectSvc.GetProjects(user._id);
+            
+            var GraphData = new List<ProjectGraphModel>() { };
+            foreach (var project in model)
+            {
+                var data = new ProjectGraphModel()
+                {
+                    ProjectId = project._id,
+                    ProjectName = project.ProjectName
+                };
+                var features = featureSvc.GetFeatures(project._id);
+                var AllWork = 0;
+                var WorkDone = 0;
+                foreach (var feature in features)
+                {
+                    var stories = storySvc.GetStories(feature._id);
+                    foreach (var story in stories)
+                    {
+                        var tasks = taskSvc.GetTasks(story._id);
+                        AllWork = AllWork + tasks.Count();
+                        WorkDone = WorkDone + tasks.Where(it => it.WorkDoneDate.HasValue).Count();
+
+                        if (story.WorkDoneDate.HasValue)
+                        {
+                            WorkDone++;
+                        }
+                        AllWork++;
+                    }
+                    if (feature.WorkDoneDate.HasValue)
+                    {
+                        WorkDone++;
+                    }
+                    AllWork++;
+                }
+                data.WorkDone = WorkDone;
+                data.WorkProcess = AllWork - WorkDone;
+                GraphData.Add(data);
+            }
+            ViewBag.Data = GraphData;
             return View(model);
         }
 
