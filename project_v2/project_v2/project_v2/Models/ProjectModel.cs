@@ -48,5 +48,11 @@ namespace project_v2.Models
         [Required(ErrorMessage = "กรุณาระบุคาดการณ์วันที่งานต้องเสร็จสิ้น")]
         [Display(Name = "คาดการณ์วันที่งานต้องเสร็จสิ้น")]
         public DateTime ClosingDate { get; set; }
+
+        /// <summary>
+        /// วันที่งานเสร็จสิ้นจริง
+        /// </summary>
+        [Display(Name = "วันที่งานเสร็จสิ้นจริง")]
+        public DateTime? WorkDoneDate { get; set; }
     }
 }

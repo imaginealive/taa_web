@@ -58,8 +58,8 @@
         @foreach (var item in Model)
         {
             <div class="col-sm-4">
-                <a asp-controller="Project" asp-action="Index" asp-route-projectid="@item._id" style="text-decoration: none">
-                    <div class="panel panel-primary">
+                <a asp-controller="Project" asp-action="Index" asp-route-projectid="@item._id" style="text-decoration: none; @(item.WorkDoneDate.HasValue? "color:gray": string.Empty)">
+                    <div class="panel @(item.WorkDoneDate.HasValue? "panel-default":"panel-primary")">
                         <div class="panel-heading">@item.ProjectName</div>
                         <div class="panel-body">
 
@@ -71,7 +71,15 @@
                             {
                                 <p>@item.Description</p>
                             }
-                            <p style="margin-top: 4em"><label asp-for="@item.ClosingDate"></label>: @item.ClosingDate.ToShortDateString()</p>
+
+                            @if (item.WorkDoneDate.HasValue)
+                            {
+                                <p style="margin-top: 4em"><label asp-for="@item.WorkDoneDate"></label>: @item.WorkDoneDate.Value.ToShortDateString()</p>
+                            }
+                            else
+                            {
+                                <p style="margin-top: 4em"><label asp-for="@item.ClosingDate"></label>: @item.ClosingDate.ToShortDateString()</p>
+                            }
                         </div>
                     </div>
                 </a>

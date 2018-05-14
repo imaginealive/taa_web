@@ -62,6 +62,7 @@ namespace project_v2.Services
                 .Set(it => it.Description, model.Description)
                 .Set(it => it.Department, model.Department)
                 .Set(it => it.LogoUrl, model.LogoUrl)
+                .Set(it => it.WorkDoneDate, model.WorkDoneDate)
                 .Set(it => it.ClosingDate, DateTime.SpecifyKind(model.ClosingDate, DateTimeKind.Local))
             );
         }

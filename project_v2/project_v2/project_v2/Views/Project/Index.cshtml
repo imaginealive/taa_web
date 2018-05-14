@@ -140,8 +140,16 @@
             </div>
 
             <div style="margin-top: 2em">
-                <div class="col-sm-3 col-sm-offset-9">
-                    <a asp-controller="Project" asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
+                <div class="col-sm-6 col-sm-offset-6">
+                    <div class="col-sm-6">
+                        @if (!Model.Project.WorkDoneDate.HasValue && totalWorks == done.Sum())
+                        {
+                            <a data-toggle="modal" data-target="#ConfirmCompleteProjectModal" class="btn btn-block btn-danger">โปรเจคเสร็จสิ้น</a>
+                        }
+                    </div>
+                    <div class="col-sm-6">
+                        <a asp-action="Detail" asp-route-projectid="@Model.Project._id" class="btn btn-block btn-default">ดูรายละเอียดของโปรเจค</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -620,4 +628,118 @@
         }
     </div>
 
+</div>
+
+<!-- Confirm Complete Project Modal -->
+<div class="modal fade" id="ConfirmCompleteProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">ต้องการให้โปรเจคนี้มีสถานะเสร็จสิ้นหรือไม่</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <h3>ข้อมูลโปรเจค</h3>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label asp-for="Project.ProjectName"></label>
+                            </div>
+                            <div class="col-lg-8">
+                                <p>@Model.Project.ProjectName</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label asp-for="Project.Description"></label>
+                            </div>
+                            <div class="col-lg-8">
+                                <p>@Model.Project.Description</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label asp-for="Project.CreateDate"></label>
+                            </div>
+                            <div class="col-lg-8">
+                                <p>@Model.Project.CreateDate.ToShortDateString()</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label asp-for="Project.ClosingDate"></label>
+                            </div>
+                            <div class="col-lg-8">
+                                <p>@Model.Project.ClosingDate.ToShortDateString()</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <h3>ภาพรวมของงาน</h3>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label>งานทั้งหมด</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <p>@totalWorks งาน</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label>จำนวนงานเสร็จ</label>
+                            </div>
+                            <div class="col-lg-8">
+                                @if (totalWorks > 0)
+                                {
+                                    <p>@(done.Sum()) งาน (@((done.Sum() / totalWorks * 100).ToString("#0.#"))%)</p>
+                                }
+                                else
+                                {
+                                    <p>0 งาน</p>
+                                }
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label>จำนวนงานเหลือ</label>
+                            </div>
+                            <div class="col-lg-8">
+                                @if (totalWorks > 0)
+                                {
+                                    <p>@(remaining.LastOrDefault()) งาน (@((remaining.LastOrDefault() / totalWorks * 100).ToString("#0.#"))%)</p>
+                                }
+                                else
+                                {
+                                    <p>0 งาน</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-6">
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-block btn-default" data-dismiss="modal">ยกเลิก</button>
+                        </div>
+                        <div class="col-sm-6">
+                            <a class="btn btn-block btn-danger" asp-action="ProjectComplete" asp-route-projectid="@Model.Project._id">ยืนยัน</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

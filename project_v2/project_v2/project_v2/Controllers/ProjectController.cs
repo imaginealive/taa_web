@@ -271,6 +271,14 @@ namespace project_v2.Controllers
             return View(model);
         }
 
+        public IActionResult ProjectComplete(string projectid)
+        {
+            var project = projectSvc.GetProject(projectid);
+            project.WorkDoneDate = DateTime.Now;
+            projectSvc.EditProject(project);
+            return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
         public IActionResult Report(string id)
         {
             var allAcc = accountSvc.GetAllAccount();
@@ -282,7 +290,7 @@ namespace project_v2.Controllers
                 var feature_CreateByAccount = allAcc.FirstOrDefault(it => it._id == feature.CreateByMember_id);
                 var feature_AssginByAccount = allAcc.FirstOrDefault(it => it._id == feature.AssginByMember_id);
                 var feature_BeassginByAccount = allAcc.FirstOrDefault(it => it._id == feature.BeAssignedMember_id);
-                
+
                 var AllStories = new List<DisplayStoryModel>();
                 var stories = storySvc.GetStories(feature._id);
                 foreach (var story in stories)
@@ -290,7 +298,7 @@ namespace project_v2.Controllers
                     var story_AssginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
                     var story_BeassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
                     var story_CreateByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
-                    
+
                     var AllTasks = new List<DisplayTaskModel>();
                     var tasks = taskSvc.GetTasks(story._id);
                     foreach (var task in tasks)
