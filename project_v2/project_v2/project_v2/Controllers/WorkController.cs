@@ -432,16 +432,32 @@ namespace project_v2.Controllers
                 var CanBeAssign = membership != null ? ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).BeAssigned : false;
                 if (CanBeAssign)
                 {
+
+                    var allWorkHasBeenAssigned = 0;
+                    var features = featureSvc.GetFeatures(projectid);
+                    foreach (var feature in features)
+                    {
+                        var stories = storySvc.GetStories(feature._id);
+                        foreach (var story in stories)
+                        {
+                            var tasks = taskSvc.GetTasks(story._id);
+                            allWorkHasBeenAssigned += tasks.Where(it => it.BeAssignedMember_id == membership.Account_id).Count();
+                        }
+                        allWorkHasBeenAssigned += stories.Where(it => it.BeAssignedMember_id == membership.Account_id).Count();
+                    }
+                    allWorkHasBeenAssigned += features.Where(it => it.BeAssignedMember_id == membership.Account_id).Count();
+
                     var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
                     var modelMembership = new DisplayMembership(membership);
                     modelMembership.AccountName = $"{item.FirstName} {item.LastName}";
                     modelMembership.Email = item.Email;
                     modelMembership.RankName = rankName;
+                    modelMembership.AllWorkHasBeenAssigned = allWorkHasBeenAssigned;
 
                     displayMemberships.Add(modelMembership);
                 }
             };
-            
+
             var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
             var currentUser = JsonConvert.DeserializeObject<AccountModel>(userString);
 

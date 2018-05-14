@@ -67,10 +67,10 @@
                         <div class="form-group">
                             <label asp-for="BeAssignedMember_id" class="control-label"></label>
                             <select asp-for="BeAssignedMember_id" class="form-control">
-                                <option value="@(null)">ยังไม่ระบุ</option>
+                                <option value="@(null)">ยังไม่ระบุ ( ตำแหน่ง : งานที่รับมอบหมายทั้งหมด )</option>
                                 @foreach (var item in ViewBag.Memberships)
                                 {
-                                    <option value="@item.Account_id">@item.AccountName (@item.RankName)</option>
+                                    <option value="@item.Account_id">@item.AccountName ( @item.RankName : @item.AllWorkHasBeenAssigned งาน )</option>
                                 }
                             </select>
                         </div>

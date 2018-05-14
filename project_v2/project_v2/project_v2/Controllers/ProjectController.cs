@@ -219,15 +219,35 @@ namespace project_v2.Controllers
             foreach (var item in accountMemberships)
             {
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
-                var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
-                var model = new DisplayMembership(membership)
+                if (membership != null)
                 {
-                    AccountName = $"{item.FirstName} {item.LastName}",
-                    Email = item.Email,
-                    RankName = rankName
-                };
+                    var allWorkHasBeenAssigned = 0;
 
-                displayMemberships.Add(model);
+                    var features = featureSvc.GetFeatures(projectid);
+                    foreach (var feature in features)
+                    {
+                        var stories = storySvc.GetStories(feature._id);
+                        foreach (var story in stories)
+                        {
+                            var tasks = taskSvc.GetTasks(story._id);
+                            allWorkHasBeenAssigned += tasks.Where(it => it.BeAssignedMember_id == membership.Account_id).Count();
+                        }
+                        allWorkHasBeenAssigned += stories.Where(it => it.BeAssignedMember_id == membership.Account_id).Count();
+                    }
+                    allWorkHasBeenAssigned += features.Where(it => it.BeAssignedMember_id == membership.Account_id).Count();
+
+
+                    var rankName = ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).RankName;
+                    var model = new DisplayMembership(membership)
+                    {
+                        AccountName = $"{item.FirstName} {item.LastName}",
+                        Email = item.Email,
+                        RankName = rankName,
+                        AllWorkHasBeenAssigned = allWorkHasBeenAssigned
+                    };
+
+                    displayMemberships.Add(model);
+                }
             };
 
             var isLogin = HttpContext.User.Identity.IsAuthenticated;

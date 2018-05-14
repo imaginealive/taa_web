@@ -17,6 +17,7 @@ namespace project_v2.Models
         public string AccountName { get; set; }
         public string Email { get; set; }
         public string RankName { get; set; }
+        public int AllWorkHasBeenAssigned { get; set; }
 
         public DisplayMembership()
         {
