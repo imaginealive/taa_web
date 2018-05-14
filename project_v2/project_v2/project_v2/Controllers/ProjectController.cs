@@ -21,7 +21,8 @@ namespace project_v2.Controllers
         private IMembershipService membershipSvc;
         private IAccountService accountSvc;
         private IRankService rankSvc;
-        IServiceConfigurations serviceConfig;
+        private IServiceConfigurations serviceConfig;
+
         public ProjectController(IProjectService projectSvc,
             IFeatureService featureSvc,
             IStoryService storySvc,
@@ -88,6 +89,7 @@ namespace project_v2.Controllers
             ViewBag.CanCreateTask = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateTaskUnderSelf) : false;
             ViewBag.CanEditAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) : false;
             ViewBag.CanSeeAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanSeeAllWork) : false;
+            ViewBag.CanCompleteProject = member != null ? (member.ProjectRank_id == serviceConfig.MasterRankId) : false;
 
             var displayFeatures = new List<DisplayFeatureModel>();
             var AllFeatures = new List<DisplayFeatureModel>();

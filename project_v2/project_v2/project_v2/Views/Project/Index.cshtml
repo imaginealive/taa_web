@@ -142,7 +142,7 @@
             <div style="margin-top: 2em">
                 <div class="col-sm-6 col-sm-offset-6">
                     <div class="col-sm-6">
-                        @if (!Model.Project.WorkDoneDate.HasValue && totalWorks == done.Sum())
+                        @if (ViewBag.CanCompleteProject && !Model.Project.WorkDoneDate.HasValue && totalWorks == done.Sum())
                         {
                             <a data-toggle="modal" data-target="#ConfirmCompleteProjectModal" class="btn btn-block btn-danger">โปรเจคเสร็จสิ้น</a>
                         }
