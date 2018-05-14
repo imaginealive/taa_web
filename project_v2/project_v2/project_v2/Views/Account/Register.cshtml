@@ -4,33 +4,35 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>สมัครบัญชีผู้ใช้งานใหม่</h2>
+<h2>สมัครบัญชีผู้ใช้งานใหม่ </h2>
 
 <hr />
 <form asp-action="Register">
     <div class="panel panel-default">
         <div class="panel-body bg-info">
-            <div class="row">
-                <div class="col-md-4">
-                    <h3>ข้อมูลการสมัคร</h3>
+            <div class="col-md-4">
+                <h3>ข้อมูลการสมัคร</h3>
+                <p><i>* กรุณากรอกข้อมูล</i></p>
+            </div>
+            <div class="col-md-8">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    *
+                    <label asp-for="AccountName" class="control-label"></label>
+                    <input asp-for="AccountName" class="form-control" />
+                    <span asp-validation-for="AccountName" class="text-danger"></span>
                 </div>
-                <div class="col-md-8">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
-                        <label asp-for="AccountName" class="control-label"></label>
-                        <input asp-for="AccountName" class="form-control" />
-                        <span asp-validation-for="AccountName" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Password" class="control-label"></label>
-                        <input asp-for="Password" type="password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="ComfirmPassword" class="control-label"></label>
-                        <input asp-for="ComfirmPassword" type="password" class="form-control" />
-                        <span asp-validation-for="ComfirmPassword" class="text-danger"></span>
-                    </div>
+                <div class="form-group">
+                    *
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" type="password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    *
+                    <label asp-for="ComfirmPassword" class="control-label"></label>
+                    <input asp-for="ComfirmPassword" type="password" class="form-control" />
+                    <span asp-validation-for="ComfirmPassword" class="text-danger"></span>
                 </div>
             </div>
         </div>
@@ -41,19 +43,23 @@
         <div class="panel-body">
             <div class="col-md-4">
                 <h3>ข้อมูลส่วนตัวผู้ใช้งาน</h3>
+                <p><i>* กรุณากรอกข้อมูล</i></p>
             </div>
             <div class="col-md-8">
                 <div class="form-group">
+                    *
                     <label asp-for="FirstName" class="control-label"></label>
                     <input asp-for="FirstName" class="form-control" />
                     <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
+                    *
                     <label asp-for="LastName" class="control-label"></label>
                     <input asp-for="LastName" class="form-control" />
                     <span asp-validation-for="LastName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
+                    *
                     <label asp-for="Email" class="control-label"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
@@ -69,6 +75,7 @@
                     <span asp-validation-for="Department" class="text-danger"></span>
                 </div>
                 <div class="form-group">
+                    *
                     <label asp-for="Telephone" class="control-label"></label>
                     <input asp-for="Telephone" type="tel" class="form-control" />
                     <span asp-validation-for="Telephone" class="text-danger"></span>

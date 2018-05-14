@@ -14,6 +14,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <h3>รายละเอียดงาน</h3>
+                    <p><i>* กรุณากรอกข้อมูล</i></p>
                 </div>
                 <div class="col-md-8">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -22,11 +23,13 @@
                         <input class="form-control" value="@ViewBag.ProjectName" disabled />
                     </div>
                     <div class="form-group">
+                        *
                         <label asp-for="Name" class="control-label"></label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                     <div class="form-group">
+                        *
                         <label asp-for="Description" class="control-label"></label>
                         <textarea asp-for="Description" class="form-control" rows="6"></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
@@ -50,6 +53,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <h3>การติดตามงาน</h3>
+                    <p><i>* กรุณากรอกข้อมูล</i></p>
                 </div>
                 <div class="col-md-8">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -72,6 +76,7 @@
                         </div>
                     }
                     <div class="form-group">
+                        *
                         <label asp-for="ClosingDate" class="control-label"></label>
                         <input asp-for="ClosingDate" type="date" value=@DateTime.Now class="form-control" />
                         <span asp-validation-for="ClosingDate" class="text-danger"></span>
