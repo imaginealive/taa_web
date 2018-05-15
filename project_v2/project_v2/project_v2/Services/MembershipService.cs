@@ -53,6 +53,13 @@ namespace project_v2.Services
                 Builders<ProjectMembershipModel>.Update
                 .Set(it => it.ProjectRank_id, model.ProjectRank_id)
                 .Set(it => it.RemoveDate, model.RemoveDate)
+                .Set(it => it.CanSeeAllWork, model.CanSeeAllWork)
+                .Set(it => it.CanEditAllWork, model.CanEditAllWork)
+                .Set(it => it.CanAssign, model.CanAssign)
+                .Set(it => it.BeAssigned, model.BeAssigned)
+                .Set(it => it.CanCreateFeature, model.CanCreateFeature)
+                .Set(it => it.CanCreateStoryUnderSelf, model.CanCreateStoryUnderSelf)
+                .Set(it => it.CanCreateTaskUnderSelf, model.CanCreateTaskUnderSelf)
             );
         }
 

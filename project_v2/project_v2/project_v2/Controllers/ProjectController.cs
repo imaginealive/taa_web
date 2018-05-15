@@ -443,6 +443,8 @@ namespace project_v2.Controllers
         {
             var account = accountSvc.GetAllAccount().First(it => it._id == accountid);
             var ranks = rankSvc.GetAllRank().Where(it => it._id != serviceConfig.MasterRankId).ToList();
+            var member = membershipSvc.GetAllProjectMember(projectid).FirstOrDefault(it => it.Account_id == account._id);
+
             var model = new EditRankModel
             {
                 ProjectId = projectid,
@@ -450,7 +452,14 @@ namespace project_v2.Controllers
                 Email = account.Email,
                 Name = account.AccountName,
                 RankId = rankid,
-                Ranks = ranks
+                Ranks = ranks,
+                CanSeeAllWork = member.CanSeeAllWork,
+                CanEditAllWork = member.CanEditAllWork,
+                CanAssign = member.CanAssign,
+                BeAssigned = member.BeAssigned,
+                CanCreateFeature = member.CanCreateFeature,
+                CanCreateStoryUnderSelf = member.CanCreateStoryUnderSelf,
+                CanCreateTaskUnderSelf = member.CanCreateTaskUnderSelf
             };
 
             return View(model);
@@ -462,6 +471,13 @@ namespace project_v2.Controllers
             var memberships = membershipSvc.GetAllProjectMember(projectid);
             var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);
             membership.ProjectRank_id = rankid;
+            membership.CanSeeAllWork = body.CanSeeAllWork;
+            membership.CanEditAllWork = body.CanEditAllWork;
+            membership.CanAssign = body.CanAssign;
+            membership.BeAssigned = body.BeAssigned;
+            membership.CanCreateFeature = body.CanCreateFeature;
+            membership.CanCreateStoryUnderSelf = body.CanCreateStoryUnderSelf;
+            membership.CanCreateTaskUnderSelf = body.CanCreateTaskUnderSelf;
 
             membershipSvc.EditMember(membership);
             return RedirectToAction(nameof(AllMemberships), new { projectid = projectid });

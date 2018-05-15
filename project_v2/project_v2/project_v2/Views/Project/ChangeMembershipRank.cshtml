@@ -39,6 +39,52 @@
                 </select>
             </div>
         </div>
+
+        <hr />
+
+        <h4>ความสามารถเพิ่มเติม</h4>
+        <div class="row">
+            <div class="col-sm-11 col-sm-offset-1">
+
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CanSeeAllWork" /> @Html.DisplayNameFor(model => model.CanSeeAllWork)
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CanEditAllWork" /> @Html.DisplayNameFor(model => model.CanEditAllWork)
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CanAssign" /> @Html.DisplayNameFor(model => model.CanAssign)
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="BeAssigned" /> @Html.DisplayNameFor(model => model.BeAssigned)
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CanCreateFeature" /> @Html.DisplayNameFor(model => model.CanCreateFeature)
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CanCreateStoryUnderSelf" /> @Html.DisplayNameFor(model => model.CanCreateStoryUnderSelf)
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CanCreateTaskUnderSelf" /> @Html.DisplayNameFor(model => model.CanCreateTaskUnderSelf)
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">ยกเลิก</button>
