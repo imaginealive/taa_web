@@ -84,11 +84,11 @@ namespace project_v2.Controllers
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 
             ViewBag.CurrentUser = currentUser;
-            ViewBag.CanCreateFeature = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateFeature) : false;
-            ViewBag.CanCreateStory = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateStoryUnderSelf) : false;
-            ViewBag.CanCreateTask = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateTaskUnderSelf) : false;
-            ViewBag.CanEditAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) : false;
-            ViewBag.CanSeeAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanSeeAllWork) : false;
+            ViewBag.CanCreateFeature = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateFeature) || member.CanCreateFeature : false;
+            ViewBag.CanCreateStory = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateStoryUnderSelf) || member.CanCreateStoryUnderSelf : false;
+            ViewBag.CanCreateTask = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanCreateTaskUnderSelf) || member.CanCreateTaskUnderSelf : false;
+            ViewBag.CanEditAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) || member.CanEditAllWork : false;
+            ViewBag.CanSeeAllWork = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanSeeAllWork) || member.CanSeeAllWork : false;
             ViewBag.CanCompleteProject = member != null ? (member.ProjectRank_id == serviceConfig.MasterRankId) : false;
 
             var displayFeatures = new List<DisplayFeatureModel>();

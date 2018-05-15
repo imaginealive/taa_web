@@ -123,7 +123,8 @@ namespace project_v2.Controllers
                     var ranks = rankSvc.GetAllRank();
                     var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
-                    if (userRank.CanAssign)
+                    var canAssign = userRank.CanAssign || member.CanAssign;
+                    if (canAssign)
                     {
                         model.ClosingDate = model.ClosingDate.AddDays(1);
                         model.AssginByMember_id = user._id;
@@ -244,7 +245,8 @@ namespace project_v2.Controllers
                     var ranks = rankSvc.GetAllRank();
                     var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
-                    if (userRank.CanAssign)
+                    var canAssign = userRank.CanAssign || member.CanAssign;
+                    if (canAssign)
                     {
                         model.ClosingDate = model.ClosingDate.AddDays(1);
                         model.AssginByMember_id = user._id;
@@ -380,7 +382,8 @@ namespace project_v2.Controllers
                     var ranks = rankSvc.GetAllRank();
                     var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
-                    if (userRank.CanAssign)
+                    var canAssign = userRank.CanAssign || member.CanAssign;
+                    if (canAssign)
                     {
                         model.ClosingDate = model.ClosingDate.AddDays(1);
                         model.AssginByMember_id = user._id;
@@ -429,10 +432,9 @@ namespace project_v2.Controllers
             foreach (var item in accountMemberships)
             {
                 var membership = memberships.FirstOrDefault(it => it.Account_id == item._id);
-                var CanBeAssign = membership != null ? ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).BeAssigned : false;
+                var CanBeAssign = membership != null ? ranks.FirstOrDefault(it => it._id == membership.ProjectRank_id).BeAssigned || membership.BeAssigned : false;
                 if (CanBeAssign)
                 {
-
                     var allWorkHasBeenAssigned = 0;
                     var features = featureSvc.GetFeatures(projectid);
                     foreach (var feature in features)
@@ -474,15 +476,16 @@ namespace project_v2.Controllers
 
                 ViewBag.CanEditOrUpdateThisWork = member != null ?
                     work.BeAssignedMember_id == currentUser._id ||
-                    (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) : false;
-                ViewBag.CanEditWorkInformation = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) : false;
+                    (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) ||
+                    member.CanEditAllWork : false;
+                ViewBag.CanEditWorkInformation = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) || member.CanEditAllWork : false;
             }
             else
             {
                 ViewBag.CreateByUser = new DisplayMembership { Account_id = currentUser._id, AccountName = $"{currentUser.FirstName} {currentUser.LastName}" };
             }
 
-            ViewBag.CanAssign = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanAssign) : false;
+            ViewBag.CanAssign = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanAssign) || member.CanAssign : false;
             ViewBag.ProjectName = projectInfo.ProjectName;
             ViewBag.Memberships = displayMemberships;
             ViewBag.Statuses = statuses;
