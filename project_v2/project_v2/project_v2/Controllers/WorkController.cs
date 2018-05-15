@@ -475,9 +475,8 @@ namespace project_v2.Controllers
                 ViewBag.BeAssignedMemberName = assignedByAccount != null ? $"{assignedByAccount.FirstName} {assignedByAccount.LastName}" : string.Empty;
 
                 ViewBag.CanEditOrUpdateThisWork = member != null ?
-                    work.BeAssignedMember_id == currentUser._id ||
-                    (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) ||
-                    member.CanEditAllWork : false;
+                    (work.BeAssignedMember_id == currentUser._id && (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).BeAssigned || member.BeAssigned)) ||
+                    (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) || member.CanEditAllWork : false;
                 ViewBag.CanEditWorkInformation = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) || member.CanEditAllWork : false;
             }
             else
