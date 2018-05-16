@@ -8,6 +8,7 @@
 <form asp-controller="Project" asp-action="Edit" method="post" class="panel panel-primary">
     @Html.HiddenFor(model => model._id)
     @Html.HiddenFor(model => model.CreateDate)
+    @Html.HiddenFor(model => model.WorkDoneDate)
 
     <div class="panel-body">
 
