@@ -124,12 +124,10 @@ namespace project_v2.Controllers
                     var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
                     var canAssign = userRank.CanAssign || member.CanAssign;
-                    if (canAssign)
-                    {
-                        model.ClosingDate = model.ClosingDate.AddDays(1);
-                        model.AssginByMember_id = user._id;
-                    }
+                    if (canAssign) model.AssginByMember_id = user._id;
                 }
+                else model.AssginByMember_id = string.Empty;
+                model.ClosingDate = model.ClosingDate.AddDays(1);
 
                 featureSvc.EditFeature(model);
                 return RedirectToAction(nameof(FeatureDetail), new { projectid = model.Project_id, featureid = model._id });
@@ -246,12 +244,10 @@ namespace project_v2.Controllers
                     var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
                     var canAssign = userRank.CanAssign || member.CanAssign;
-                    if (canAssign)
-                    {
-                        model.ClosingDate = model.ClosingDate.AddDays(1);
-                        model.AssginByMember_id = user._id;
-                    }
+                    if (canAssign) model.AssginByMember_id = user._id;
                 }
+                else model.AssginByMember_id = string.Empty;
+                model.ClosingDate = model.ClosingDate.AddDays(1);
 
                 storySvc.EditStory(model);
                 return RedirectToAction(nameof(StoryDetail), new { projectid = projectid, featureid = model.Feature_id, storyid = model._id });
@@ -321,9 +317,9 @@ namespace project_v2.Controllers
             var task = taskSvc.GetTasks(storyid).FirstOrDefault(it => it._id == taskid);
             var allAcc = accountSvc.GetAllAccount();
 
-            var createByAccount = allAcc.FirstOrDefault(it => it._id == story.CreateByMember_id);
-            var assginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
-            var beassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
+            var createByAccount = allAcc.FirstOrDefault(it => it._id == task.CreateByMember_id);
+            var assginByAccount = allAcc.FirstOrDefault(it => it._id == task.AssginByMember_id);
+            var beassginByAccount = allAcc.FirstOrDefault(it => it._id == task.BeAssignedMember_id);
 
             ViewBag.ProjectId = projectid;
             ViewBag.FeatureId = feature._id;
@@ -383,12 +379,10 @@ namespace project_v2.Controllers
                     var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
                     var canAssign = userRank.CanAssign || member.CanAssign;
-                    if (canAssign)
-                    {
-                        model.ClosingDate = model.ClosingDate.AddDays(1);
-                        model.AssginByMember_id = user._id;
-                    }
+                    if (canAssign) model.AssginByMember_id = user._id;
                 }
+                else model.AssginByMember_id = string.Empty;
+                model.ClosingDate = model.ClosingDate.AddDays(1);
 
                 taskSvc.EditTask(model);
                 return RedirectToAction(nameof(TaskDetail), new { projectid = projectid, featureid = featureid, storyid = model.Story_id, taskid = model._id });
