@@ -246,9 +246,9 @@
 
     <div class="col-sm-2">
         <ul class="nav nav-pills nav-stacked">
-            @foreach (var item in ViewBag.displayFeatures)
+            @foreach (var item in Model.Features)
             {
-                <li class="@((ViewBag.displayFeatures as List<DisplayFeatureModel>).FirstOrDefault()._id == item._id? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
+                <li class="@(Model.Features.FirstOrDefault()._id == item._id? "active": string.Empty)"><a data-toggle="tab" href="#feature@(featureSideMenuCount)">@item.Name</a></li>
                 featureSideMenuCount++;
             }
             @if (ViewBag.CanCreateFeature)
@@ -263,9 +263,9 @@
             <div class="panel panel-primary">
                 <div class="tab-content panel-body">
 
-                    @foreach (var featureContent in ViewBag.displayFeatures as List<DisplayFeatureModel>)
+                    @foreach (var featureContent in Model.Features)
                     {
-                        <div id="feature@(featureContentCount)" class="row tab-pane fade in @((ViewBag.displayFeatures as List<DisplayFeatureModel>).FirstOrDefault()._id == featureContent._id ? "active" : string.Empty)">
+                        <div id="feature@(featureContentCount)" class="row tab-pane fade in @(Model.Features.FirstOrDefault()._id == featureContent._id ? "active" : string.Empty)">
 
                             <div style="margin-bottom: 2em">
                                 <div class="col-sm-3">
