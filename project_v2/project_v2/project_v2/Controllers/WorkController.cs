@@ -5,13 +5,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
 namespace project_v2.Controllers
 {
-    [Authorize]
     public class WorkController : Controller
     {
         private IProjectService projectSvc;
@@ -22,6 +22,7 @@ namespace project_v2.Controllers
         private IAccountService accountSvc;
         private IRankService rankSvc;
         private IStatusService statusSvc;
+        public IDistributedCache cache;
         public WorkController(
             IProjectService projectSvc,
             IFeatureService featureSvc,
@@ -30,8 +31,10 @@ namespace project_v2.Controllers
             IMembershipService membershipSvc,
             IAccountService accountSvc,
             IRankService rankSvc,
-            IStatusService statusSvc)
+            IStatusService statusSvc,
+            IDistributedCache _cache)
         {
+            cache = _cache;
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
             this.storySvc = storySvc;
@@ -46,6 +49,10 @@ namespace project_v2.Controllers
 
         public IActionResult CreateFeature(string projectid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             PrepareDataForDisplay(projectid);
             return View(new FeatureModel { Project_id = projectid });
         }
@@ -53,6 +60,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult CreateFeature(FeatureModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             if (ModelState.IsValid)
             {
                 var project = projectSvc.GetProject(model.Project_id);
@@ -73,6 +84,10 @@ namespace project_v2.Controllers
 
         public IActionResult FeatureDetail(string projectid, string featureid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
             var allAcc = accountSvc.GetAllAccount();
 
@@ -92,6 +107,10 @@ namespace project_v2.Controllers
 
         public IActionResult EditFeature(string projectid, string featureid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var model = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
             PrepareDataForDisplay(projectid, model);
             return View(model);
@@ -100,6 +119,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult EditFeature(FeatureModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             if (ModelState.IsValid)
             {
                 var project = projectSvc.GetProject(model.Project_id);
@@ -115,16 +138,12 @@ namespace project_v2.Controllers
                     var isLogin = HttpContext.User.Identity.IsAuthenticated;
                     if (!isLogin) return RedirectToAction("Login", "Account");
 
-                    // Check current user permission
-                    var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-                    var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-
                     var memberships = membershipSvc.GetAllProjectMember(model.Project_id);
                     var ranks = rankSvc.GetAllRank();
-                    var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
+                    var member = ViewBag.User != null ? memberships.FirstOrDefault(it => it.Account_id == ViewBag.User._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
                     var canAssign = userRank.CanAssign || member.CanAssign;
-                    if (canAssign) model.AssginByMember_id = user._id;
+                    if (canAssign) model.AssginByMember_id = ViewBag.User._id;
                 }
                 else model.AssginByMember_id = string.Empty;
                 model.ClosingDate = model.ClosingDate.AddDays(1);
@@ -138,6 +157,10 @@ namespace project_v2.Controllers
 
         public IActionResult DeleteFeature(string projectid, string featureid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             featureSvc.DeleteFeature(featureid);
             return RedirectToAction(nameof(ProjectController.Index), "Project", new { projectid = projectid });
         }
@@ -148,6 +171,10 @@ namespace project_v2.Controllers
 
         public IActionResult CreateStory(string projectid, string featureid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             PrepareDataForDisplay(projectid);
             ViewBag.ProjectId = projectid;
             ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
@@ -158,6 +185,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult CreateStory(string projectid, StoryModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var project = projectSvc.GetProject(projectid);
             var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == model.Feature_id);
             if (ModelState.IsValid)
@@ -184,6 +215,10 @@ namespace project_v2.Controllers
 
         public IActionResult StoryDetail(string projectid, string featureid, string storyid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
             var story = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid);
             var allAcc = accountSvc.GetAllAccount();
@@ -206,6 +241,10 @@ namespace project_v2.Controllers
 
         public IActionResult EditStory(string projectid, string featureid, string storyid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             ViewBag.ProjectId = projectid;
             ViewBag.Feature = featureid;
             ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
@@ -217,6 +256,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult EditStory(string projectid, StoryModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var project = projectSvc.GetProject(projectid);
             var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == model.Feature_id);
             if (ModelState.IsValid)
@@ -235,16 +278,12 @@ namespace project_v2.Controllers
                     var isLogin = HttpContext.User.Identity.IsAuthenticated;
                     if (!isLogin) return RedirectToAction("Login", "Account");
 
-                    // Check current user permission
-                    var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-                    var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-
                     var memberships = membershipSvc.GetAllProjectMember(projectid);
                     var ranks = rankSvc.GetAllRank();
-                    var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
+                    var member = ViewBag.User != null ? memberships.FirstOrDefault(it => it.Account_id == ViewBag.User._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
                     var canAssign = userRank.CanAssign || member.CanAssign;
-                    if (canAssign) model.AssginByMember_id = user._id;
+                    if (canAssign) model.AssginByMember_id = ViewBag.User._id;
                 }
                 else model.AssginByMember_id = string.Empty;
                 model.ClosingDate = model.ClosingDate.AddDays(1);
@@ -260,6 +299,10 @@ namespace project_v2.Controllers
 
         public IActionResult DeleteStory(string projectid, string storyid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             storySvc.DeleteStory(storyid);
             return RedirectToAction(nameof(ProjectController.Index), "Project", new { projectid = projectid });
         }
@@ -270,6 +313,10 @@ namespace project_v2.Controllers
 
         public IActionResult CreateTask(string projectid, string featureid, string storyid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
             PrepareDataForDisplay(projectid);
             ViewBag.ProjectId = projectid;
@@ -282,6 +329,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult CreateTask(string projectid, string featureid, TaskModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var project = projectSvc.GetProject(projectid);
             var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == featureid);
             var story = storySvc.GetStories(feature._id).FirstOrDefault(it => it._id == model.Story_id);
@@ -312,6 +363,10 @@ namespace project_v2.Controllers
 
         public IActionResult TaskDetail(string projectid, string featureid, string storyid, string taskid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var feature = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid);
             var story = storySvc.GetStories(featureid).FirstOrDefault(it => it._id == storyid);
             var task = taskSvc.GetTasks(storyid).FirstOrDefault(it => it._id == taskid);
@@ -337,6 +392,10 @@ namespace project_v2.Controllers
 
         public IActionResult EditTask(string projectid, string featureid, string storyid, string taskid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             ViewBag.ProjectId = projectid;
             ViewBag.FeatureId = featureid;
             ViewBag.FeatureName = featureSvc.GetFeatures(projectid).FirstOrDefault(it => it._id == featureid).Name;
@@ -349,6 +408,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult EditTask(string projectid, string featureid, TaskModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var project = projectSvc.GetProject(projectid);
             var feature = featureSvc.GetFeatures(project._id).FirstOrDefault(it => it._id == featureid);
             var story = storySvc.GetStories(feature._id).FirstOrDefault(it => it._id == model.Story_id);
@@ -370,16 +433,12 @@ namespace project_v2.Controllers
                     var isLogin = HttpContext.User.Identity.IsAuthenticated;
                     if (!isLogin) return RedirectToAction("Login", "Account");
 
-                    // Check current user permission
-                    var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-                    var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-
                     var memberships = membershipSvc.GetAllProjectMember(projectid);
                     var ranks = rankSvc.GetAllRank();
-                    var member = user != null ? memberships.FirstOrDefault(it => it.Account_id == user._id && !it.RemoveDate.HasValue) : null;
+                    var member = ViewBag.User != null ? memberships.FirstOrDefault(it => it.Account_id == ViewBag.User._id && !it.RemoveDate.HasValue) : null;
                     var userRank = (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id));
                     var canAssign = userRank.CanAssign || member.CanAssign;
-                    if (canAssign) model.AssginByMember_id = user._id;
+                    if (canAssign) model.AssginByMember_id = ViewBag.User._id;
                 }
                 else model.AssginByMember_id = string.Empty;
                 model.ClosingDate = model.ClosingDate.AddDays(1);
@@ -397,6 +456,10 @@ namespace project_v2.Controllers
 
         public IActionResult DeleteTask(string projectid, string taskid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             taskSvc.DeleteTask(taskid);
             return RedirectToAction(nameof(ProjectController.Index), "Project", new { projectid = projectid });
         }
@@ -453,9 +516,8 @@ namespace project_v2.Controllers
                     displayMemberships.Add(modelMembership);
                 }
             };
-
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var currentUser = JsonConvert.DeserializeObject<AccountModel>(userString);
+            
+            var currentUser = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
 
             // Check current user permission
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;

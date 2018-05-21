@@ -5,13 +5,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
 namespace project_v2.Controllers
 {
-    [Authorize]
     public class ProjectController : Controller
     {
         private IProjectService projectSvc;
@@ -22,6 +22,7 @@ namespace project_v2.Controllers
         private IAccountService accountSvc;
         private IRankService rankSvc;
         private IServiceConfigurations serviceConfig;
+        public IDistributedCache cache;
 
         public ProjectController(IProjectService projectSvc,
             IFeatureService featureSvc,
@@ -30,8 +31,10 @@ namespace project_v2.Controllers
             IMembershipService membershipSvc,
             IAccountService accountSvc,
             IRankService rankSvc,
-            IServiceConfigurations serviceConfig)
+            IServiceConfigurations serviceConfig,
+            IDistributedCache _cache)
         {
+            cache = _cache;
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
             this.storySvc = storySvc;
@@ -46,6 +49,10 @@ namespace project_v2.Controllers
 
         public IActionResult Index(string projectid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var project = projectSvc.GetProject(projectid);
             var allAcc = accountSvc.GetAllAccount();
             var memberships = membershipSvc.GetAllProjectMember(projectid);
@@ -73,14 +80,8 @@ namespace project_v2.Controllers
                     displayMemberships.Add(model);
                 }
             }
-
-            var isLogin = HttpContext.User.Identity.IsAuthenticated;
-            if (!isLogin) return RedirectToAction("Login", "Account");
-
-            // Check current user permission
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-            var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
+            
+            var currentUser = allAcc.FirstOrDefault(it => it._id == ViewBag.User._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 
             ViewBag.CurrentUser = currentUser;
@@ -159,12 +160,20 @@ namespace project_v2.Controllers
 
         public IActionResult Create()
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             return View();
         }
 
         [HttpPost]
         public IActionResult Create(ProjectModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             if (ModelState.IsValid)
             {
                 if (model.ClosingDate.Date < DateTime.Now.Date)
@@ -177,12 +186,7 @@ namespace project_v2.Controllers
                 var isLogin = HttpContext.User.Identity.IsAuthenticated;
                 if (!isLogin) return RedirectToAction("Login", "Account");
 
-                // Check current user permission
-                var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-                var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-                ViewBag.User = user;
-
-                projectSvc.CreateProject(user._id, model);
+                projectSvc.CreateProject(ViewBag.User._id, model);
                 return RedirectToAction(nameof(Index), "Home");
             }
             return View(model);
@@ -190,6 +194,10 @@ namespace project_v2.Controllers
 
         public IActionResult Detail(string projectid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var accountMemberships = new List<AccountModel>();
             var displayMemberships = new List<DisplayMembership>();
 
@@ -242,11 +250,8 @@ namespace project_v2.Controllers
 
             var isLogin = HttpContext.User.Identity.IsAuthenticated;
             if (!isLogin) return RedirectToAction("Login", "Account");
-
-            // Check current user permission
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-            var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
+            
+            var currentUser = allAcc.FirstOrDefault(it => it._id == ViewBag.User._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 
             ViewBag.CanEditProject = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditProject) : false;
@@ -261,6 +266,10 @@ namespace project_v2.Controllers
 
         public IActionResult Edit(string projectid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var model = projectSvc.GetProject(projectid);
             return View(model);
         }
@@ -268,6 +277,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult Edit(ProjectModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             if (ModelState.IsValid)
             {
                 if (model.ClosingDate.Date < DateTime.Now.Date)
@@ -285,6 +298,10 @@ namespace project_v2.Controllers
 
         public IActionResult ProjectComplete(string projectid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var project = projectSvc.GetProject(projectid);
             project.WorkDoneDate = DateTime.Now;
             projectSvc.EditProject(project);
@@ -293,6 +310,10 @@ namespace project_v2.Controllers
 
         public IActionResult Report(string id)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var allAcc = accountSvc.GetAllAccount();
             var features = featureSvc.GetFeatures(id);
             var project = projectSvc.GetProject(id);
@@ -301,11 +322,8 @@ namespace project_v2.Controllers
 
             var isLogin = HttpContext.User.Identity.IsAuthenticated;
             if (!isLogin) return RedirectToAction("Login", "Account");
-
-            // Check current user permission
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-            var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
+            
+            var currentUser = allAcc.FirstOrDefault(it => it._id == ViewBag.User._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 
             ViewBag.ProjectId = project._id;
@@ -377,6 +395,10 @@ namespace project_v2.Controllers
 
         public IActionResult AllMemberships(string projectid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var nonMemberships = new List<AccountModel>();
             var accountMemberships = new List<AccountModel>();
             var displayMemberships = new List<DisplayMembership>();
@@ -409,11 +431,8 @@ namespace project_v2.Controllers
 
             var isLogin = HttpContext.User.Identity.IsAuthenticated;
             if (!isLogin) return RedirectToAction("Login", "Account");
-
-            // Check current user permission
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-            ViewBag.CurrentUser = user;
+            
+            ViewBag.CurrentUser = ViewBag.User;
 
             ViewBag.RankMaster = serviceConfig.MasterRankId;
             return View(new MembershipManagementModel
@@ -426,6 +445,10 @@ namespace project_v2.Controllers
 
         public IActionResult AddMembership(string projectid, string accountid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var memberships = membershipSvc.GetAllProjectMember(projectid);
             var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);
             if (membership != null && membership.RemoveDate.HasValue)
@@ -443,6 +466,10 @@ namespace project_v2.Controllers
 
         public IActionResult RemoveMembership(string projectid, string accountid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var memberships = membershipSvc.GetAllProjectMember(projectid);
             var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);
             membership.RemoveDate = DateTime.Now;
@@ -453,6 +480,10 @@ namespace project_v2.Controllers
 
         public IActionResult ChangeMembershipRank(string projectid, string accountid, string rankid)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var account = accountSvc.GetAllAccount().First(it => it._id == accountid);
             var ranks = rankSvc.GetAllRank().Where(it => it._id != serviceConfig.MasterRankId).ToList();
             var member = membershipSvc.GetAllProjectMember(projectid).FirstOrDefault(it => it.Account_id == account._id);
@@ -480,6 +511,10 @@ namespace project_v2.Controllers
         [HttpPost]
         public IActionResult ChangeMembershipRank(string projectid, string accountid, string rankid, EditRankModel body)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             var memberships = membershipSvc.GetAllProjectMember(projectid);
             var membership = memberships.FirstOrDefault(it => it.Account_id == accountid);
             membership.ProjectRank_id = rankid;
