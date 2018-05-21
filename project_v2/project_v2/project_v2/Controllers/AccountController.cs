@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using project_v2.Models;
 using project_v2.Services.Interface;
@@ -16,9 +17,11 @@ namespace project_v2.Controllers
     public class AccountController : Controller
     {
         public IAccountService svc;
+        public IDistributedCache cache;
 
-        public AccountController(IAccountService _svc)
+        public AccountController(IAccountService _svc, IDistributedCache _cache)
         {
+            cache = _cache;
             svc = _svc;
         }
 
@@ -36,6 +39,9 @@ namespace project_v2.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+
             if (ModelState.IsValid)
             {
                 var json = JsonConvert.SerializeObject(model);
@@ -43,22 +49,7 @@ namespace project_v2.Controllers
                 svc.CreateAccount(newUser);
                 var user = svc.Login(model.AccountName, model.Password);
 
-
-                // create claims
-                List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, JsonConvert.SerializeObject(user)),
-                new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
-            };
-
-                // create identity
-                ClaimsIdentity identity = new ClaimsIdentity(claims, "cookie");
-
-                // create principal
-                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
-                // sign-in
-                await HttpContext.SignInAsync(scheme: "FiverSecurityScheme", principal: principal);
+                cache.SetString("user", JsonConvert.SerializeObject(user));
                 return RedirectToAction("Index", "Home");
             }
             return View(model);
@@ -67,80 +58,59 @@ namespace project_v2.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(AccountModel model)
+        public IActionResult Login(AccountModel model)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+
             var user = svc.Login(model.AccountName, model.Password);
             if (user == null)
             {
                 ViewBag.ErrorMessage = "ไม่พบผู้ใช้งาน กรุณาตรวจสอบชื่อผู้ใช้ และรหัสผ่านอีกครั้ง";
                 return View(model);
             }
-            else if (user.SuspendDate.HasValue)
-            {
-                ViewBag.ErrorMessage = "ไม่สามารถเข้าสู่ระบบได้ เนื่องจากบัญชีนี้ถูกระงับใช้งาน กรุณาติดต่อผู้ดูแลระบบ";
-                return View(model);
-            }
-
-            // create claims
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, JsonConvert.SerializeObject(user)),
-                new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
-            };
-
-            // create identity
-            ClaimsIdentity identity = new ClaimsIdentity(claims, "cookie");
-
-            // create principal
-            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
-            // sign-in
-            await HttpContext.SignInAsync(scheme: "FiverSecurityScheme", principal: principal);
+            cache.SetString("user", JsonConvert.SerializeObject(user));
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            await HttpContext.SignOutAsync();
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
+            cache.SetString("user", string.Empty);
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize]
         public IActionResult EditProfile()
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
 
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var userdata = JsonConvert.DeserializeObject<AccountModel>(userString);
+            var userdata = ViewBag.User;
             return View(userdata);
         }
 
-        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> EditProfile(AccountModel body)
+        public IActionResult EditProfile(AccountModel body)
         {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
             if (ModelState.IsValid)
             {
                 svc.EditAccount(body);
-                // create claims
-                List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, JsonConvert.SerializeObject(body)),
-                new Claim(ClaimTypes.Role, body.IsAdmin ? "Admin" : "User")
-            };
 
-                // create identity
-                ClaimsIdentity identity = new ClaimsIdentity(claims, "cookie");
-
-                // create principal
-                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
-                // sign-in
-                await HttpContext.SignInAsync(scheme: "FiverSecurityScheme", principal: principal);
+                cache.SetString("user", JsonConvert.SerializeObject(body));
                 return RedirectToAction("Index", "Home");
             }
             return View(body);

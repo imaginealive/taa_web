@@ -7,24 +7,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using project_v2.Models;
 using project_v2.Services.Interface;
 
 namespace project_v2.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         private IProjectService projectSvc;
         private IFeatureService featureSvc;
         private IStoryService storySvc;
         private ITaskService taskSvc;
+        public IDistributedCache cache;
         public HomeController(IProjectService projectSvc,
             IFeatureService featureSvc,
             IStoryService storySvc,
-            ITaskService taskSvc)
+            ITaskService taskSvc,
+            IDistributedCache _cache)
         {
+            cache = _cache;
             this.projectSvc = projectSvc;
             this.featureSvc = featureSvc;
             this.storySvc = storySvc;
@@ -33,15 +36,17 @@ namespace project_v2.Controllers
 
         public IActionResult Index()
         {
-            //Check, Did user login?
-            var isLogin = HttpContext.User.Identity.IsAuthenticated;
-            if (!isLogin) return RedirectToAction("Login", "Account");
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var user = JsonConvert.DeserializeObject<AccountModel>(userString);
-            ViewBag.User = user;
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
 
-            var model = projectSvc.GetProjects(user._id);
-            
+            User = ViewBag.User;
+            //isLogin = HttpContext.User.Identity.IsAuthenticated;
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            //var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+
+            var model = projectSvc.GetProjects(User._id);
+
             var GraphData = new List<ProjectGraphModel>() { };
             foreach (var project in model)
             {

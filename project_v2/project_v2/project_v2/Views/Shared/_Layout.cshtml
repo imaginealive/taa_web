@@ -1,5 +1,4 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -33,17 +32,13 @@
 
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    @{
-                        var userString = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.Name)?.Value;
-                    }
-                    @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                    @if (!ViewBag.IsLogin)
                     {
                         <li><a asp-controller="Account" asp-action="Login">เข้าสู่ระบบ</a></li>
                     }
                     else
                     {
-                        var user = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountModel>(userString);
-                        if (user.IsAdmin)
+                        if (ViewBag.User.IsAdmin)
                         {
                             <li><a asp-controller="Admin" asp-action="AccountManage">จัดการสมาชิก</a></li>
                             <li><a asp-controller="Admin" asp-action="ProjectSystem">จัดการระบบ</a></li>
