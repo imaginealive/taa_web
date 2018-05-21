@@ -39,13 +39,10 @@ namespace project_v2.Controllers
             ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
             if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
             else return RedirectToAction("Login", "Account");
-
-            User = ViewBag.User;
-            //isLogin = HttpContext.User.Identity.IsAuthenticated;
+            
             ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
-            //var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
 
-            var model = projectSvc.GetProjects(User._id);
+            var model = projectSvc.GetProjects(ViewBag.User._id);
 
             var GraphData = new List<ProjectGraphModel>() { };
             foreach (var project in model)
@@ -55,15 +52,15 @@ namespace project_v2.Controllers
                     ProjectId = project._id,
                     ProjectName = project.ProjectName
                 };
-                var features = featureSvc.GetFeatures(project._id);
+                List<FeatureModel> features = featureSvc.GetFeatures(project._id);
                 var AllWork = 0;
                 var WorkDone = 0;
                 foreach (var feature in features)
                 {
-                    var stories = storySvc.GetStories(feature._id);
+                    List<StoryModel> stories = storySvc.GetStories(feature._id);
                     foreach (var story in stories)
                     {
-                        var tasks = taskSvc.GetTasks(story._id);
+                        List<TaskModel> tasks = taskSvc.GetTasks(story._id);
                         AllWork = AllWork + tasks.Count();
                         WorkDone = WorkDone + tasks.Where(it => it.WorkDoneDate.HasValue).Count();
 

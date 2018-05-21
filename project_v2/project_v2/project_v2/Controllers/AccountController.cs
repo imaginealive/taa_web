@@ -75,6 +75,11 @@ namespace project_v2.Controllers
                 ViewBag.ErrorMessage = "ไม่พบผู้ใช้งาน กรุณาตรวจสอบชื่อผู้ใช้ และรหัสผ่านอีกครั้ง";
                 return View(model);
             }
+            else if (user.SuspendDate.HasValue)
+            {
+                ViewBag.ErrorMessage = "ไม่สามารถเข้าสู่ระบบได้ เนื่องจากบัญชีนี้ถูกระงับใช้งาน กรุณาติดต่อผู้ดูแลระบบ";
+                return View(model);
+            }
             cache.SetString("user", JsonConvert.SerializeObject(user));
             return RedirectToAction("Index", "Home");
         }
