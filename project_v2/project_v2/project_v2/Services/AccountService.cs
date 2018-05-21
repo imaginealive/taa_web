@@ -77,7 +77,7 @@ namespace project_v2.Services
 
         public AccountModel Login(string accountName, string password)
         {
-            return accountCollection.Find(it => it.AccountName == accountName && it.Password == password && !it.SuspendDate.HasValue).FirstOrDefault();
+            return accountCollection.Find(it => it.AccountName == accountName && it.Password == password).FirstOrDefault();
         }
     }
 }

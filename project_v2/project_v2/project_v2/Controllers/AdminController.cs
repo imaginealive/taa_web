@@ -43,25 +43,46 @@ namespace project_v2.Controllers
             var json = JsonConvert.SerializeObject(user);
             var model = JsonConvert.DeserializeObject<RegisterModel>(json);
             model.IsSuspend = model.SuspendDate.HasValue;
-            return View(model);
+            return View(new EditAccountModel
+            {
+                _id = model._id,
+                AccountName = model.AccountName,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                WorkPosition = model.WorkPosition,
+                Department = model.Department,
+                Telephone = model.Telephone,
+                BirthDate = model.BirthDate,
+                IsAdmin = model.IsAdmin,
+                ProjectCreatable = model.ProjectCreatable,
+                IsSuspend = model.IsSuspend
+            });
         }
 
         [HttpPost]
-        public IActionResult EditAccount(RegisterModel body, string id)
+        public IActionResult EditAccount(EditAccountModel model, string id)
         {
             if (ModelState.IsValid)
             {
-                var json = JsonConvert.SerializeObject(body);
-                var user = JsonConvert.DeserializeObject<AccountModel>(json);
-                if (body.IsSuspend)
-                    user.SuspendDate = DateTime.Now;
-                else
-                    user.SuspendDate = null;
+                var allAcc = accountsvc.GetAllAccount();
+                var currentAccount = allAcc.FirstOrDefault(it => it._id == model._id);
+                currentAccount.FirstName = model.FirstName;
+                currentAccount.LastName = model.LastName;
+                currentAccount.Email = model.Email;
+                currentAccount.WorkPosition = model.WorkPosition;
+                currentAccount.Department = model.Department;
+                currentAccount.Telephone = model.Telephone;
+                currentAccount.BirthDate = model.BirthDate;
+                currentAccount.ProjectCreatable = model.ProjectCreatable;
 
-                accountsvc.EditAccount(user);
+                if (model.IsSuspend) currentAccount.SuspendDate = DateTime.Now;
+                else currentAccount.SuspendDate = null;
+
+                accountsvc.EditAccount(currentAccount);
                 return RedirectToAction(nameof(AccountManage));
             }
-            return View(body);
+            return View(model);
         }
 
         public IActionResult ProjectSystem()

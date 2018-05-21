@@ -1,4 +1,4 @@
-﻿@model project_v2.Models.RegisterModel
+﻿@model project_v2.Models.EditAccountModel
 
 @{
     ViewData["Title"] = "EditAccount";
@@ -9,7 +9,7 @@
 <form asp-action="EditAccount">
     @Html.HiddenFor(model => model._id)
     @Html.HiddenFor(model => model.AccountName)
-    @Html.HiddenFor(model => model.Password)
+
     <div class="panel panel-default">
         <div class="panel-body bg-info">
             <div class="col-md-4">
