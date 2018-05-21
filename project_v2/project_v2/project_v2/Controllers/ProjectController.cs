@@ -404,8 +404,7 @@ namespace project_v2.Controllers
             var ranks = rankSvc.GetAllRank();
 
             // Check current user permission
-            var userString = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            var user = JsonConvert.DeserializeObject<AccountModel>(userString);
+            var user = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
             var currentUser = allAcc.FirstOrDefault(it => it._id == user._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
 

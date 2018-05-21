@@ -45,15 +45,15 @@ namespace project_v2.Controllers
             ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
             if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
             else return RedirectToAction("Login", "Account");
-            
+
             ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
 
-            var model = projectSvc.GetProjects(currentUser._id);
+            var model = projectSvc.GetProjects(ViewBag.User._id);
             var ranks = rankSvc.GetAllRank();
             var memberships = Enumerable.Empty<ProjectMembershipModel>();
             foreach (var item in model) memberships = membershipSvc.GetAllProjectMember(item._id);
 
-            var members = currentUser != null ? memberships.Where(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
+            var members = ViewBag.User != null ? memberships.Where(it => it.Account_id == ViewBag.User._id && !it.RemoveDate.HasValue) : null;
             var GraphData = new List<ProjectGraphModel>() { };
             foreach (var project in model)
             {
@@ -107,7 +107,7 @@ namespace project_v2.Controllers
                 GraphData.Add(data);
             }
 
-            ViewBag.CanCreateProject = currentUser.ProjectCreatable;
+            ViewBag.CanCreateProject = ViewBag.User.ProjectCreatable;
             ViewBag.Data = GraphData;
             return View(model);
         }
