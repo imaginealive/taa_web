@@ -42,12 +42,15 @@
     }
 </script>
 
-<div class="panel panel-default">
-    <div class="panel-heading">ความก้าวหน้าของโปรเจคทั้งหมด</div>
-    <div class="panel-body">
-        <div id="barchart_values" style="min-width:100%; padding-bottom: 20px;"></div>
+@if ((ViewBag.Data as List<ProjectGraphModel>).Count() >= minimumProjectCount)
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">ความก้าวหน้าของโปรเจคทั้งหมด</div>
+        <div class="panel-body">
+            <div id="barchart_values" style="min-width:100%; padding-bottom: 20px;"></div>
+        </div>
     </div>
-</div>
+}
 
 <!-- Project list -->
 <div class="row">
@@ -92,7 +95,7 @@
         <h1 class="col-sm-12 text-center">ไม่มีรายการโปรเจค</h1>
     }
 
-    @if (ViewBag.User.ProjectCreatable)
+    @if (ViewBag.CanCreateProject)
     {
         <div class="col-sm-4">
             <a id="createProjectBox" asp-controller="Project" asp-action="Create" style="color: gray">
