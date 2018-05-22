@@ -509,7 +509,7 @@ namespace project_v2.Controllers
                     displayMemberships.Add(modelMembership);
                 }
             };
-            
+
             var currentUser = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
 
             // Check current user permission
@@ -527,16 +527,17 @@ namespace project_v2.Controllers
                     (work.BeAssignedMember_id == currentUser._id && (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).BeAssigned || member.BeAssigned)) ||
                     (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) || member.CanEditAllWork : false;
                 ViewBag.CanEditWorkInformation = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanEditAllWork) || member.CanEditAllWork : false;
+                ViewBag.Statuses = !string.IsNullOrEmpty(work.BeAssignedMember_id) ? statuses : statuses.Where(it => !it.IsWorkDone);
             }
             else
             {
                 ViewBag.CreateByUser = new DisplayMembership { Account_id = currentUser._id, AccountName = $"{currentUser.FirstName} {currentUser.LastName}" };
+                ViewBag.Statuses = statuses.Where(it => !it.IsWorkDone);
             }
 
             ViewBag.CanAssign = member != null ? (ranks.FirstOrDefault(it => it._id == member.ProjectRank_id).CanAssign) || member.CanAssign : false;
             ViewBag.ProjectName = projectInfo.ProjectName;
             ViewBag.Memberships = displayMemberships;
-            ViewBag.Statuses = statuses;
         }
 
         /// <summary>
