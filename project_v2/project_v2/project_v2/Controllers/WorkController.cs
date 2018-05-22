@@ -135,8 +135,6 @@ namespace project_v2.Controllers
 
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
                 {
-                    var isLogin = HttpContext.User.Identity.IsAuthenticated;
-                    if (!isLogin) return RedirectToAction("Login", "Account");
 
                     var memberships = membershipSvc.GetAllProjectMember(model.Project_id);
                     var ranks = rankSvc.GetAllRank();
@@ -275,8 +273,6 @@ namespace project_v2.Controllers
 
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
                 {
-                    var isLogin = HttpContext.User.Identity.IsAuthenticated;
-                    if (!isLogin) return RedirectToAction("Login", "Account");
 
                     var memberships = membershipSvc.GetAllProjectMember(projectid);
                     var ranks = rankSvc.GetAllRank();
@@ -430,9 +426,6 @@ namespace project_v2.Controllers
 
                 if (!string.IsNullOrEmpty(model.BeAssignedMember_id))
                 {
-                    var isLogin = HttpContext.User.Identity.IsAuthenticated;
-                    if (!isLogin) return RedirectToAction("Login", "Account");
-
                     var memberships = membershipSvc.GetAllProjectMember(projectid);
                     var ranks = rankSvc.GetAllRank();
                     var member = ViewBag.User != null ? memberships.FirstOrDefault(it => it.Account_id == ViewBag.User._id && !it.RemoveDate.HasValue) : null;

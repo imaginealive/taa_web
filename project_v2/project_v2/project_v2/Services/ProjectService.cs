@@ -76,7 +76,7 @@ namespace project_v2.Services
         {
             var beMember = memberCollection.Find(it => it.Account_id == accountId).ToList();
             var project = projectCollection.Find(it => true).ToList();
-            return project.Where(pj => beMember.Any(member => member.Project_id == pj._id) && beMember.Any(member => !member.RemoveDate.HasValue)).ToList();
+            return project.Where(pj => beMember.Any(member => member.Project_id == pj._id && !member.RemoveDate.HasValue)).ToList();
         }
     }
 }

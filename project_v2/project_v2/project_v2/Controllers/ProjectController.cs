@@ -115,9 +115,6 @@ namespace project_v2.Controllers
                 }
                 model.ClosingDate = model.ClosingDate.AddDays(1);
 
-                var isLogin = HttpContext.User.Identity.IsAuthenticated;
-                if (!isLogin) return RedirectToAction("Login", "Account");
-
                 projectSvc.CreateProject(ViewBag.User._id, model);
                 return RedirectToAction(nameof(Index), "Home");
             }
@@ -179,9 +176,6 @@ namespace project_v2.Controllers
                     displayMemberships.Add(model);
                 }
             };
-
-            var isLogin = HttpContext.User.Identity.IsAuthenticated;
-            if (!isLogin) return RedirectToAction("Login", "Account");
             
             var currentUser = allAcc.FirstOrDefault(it => it._id == ViewBag.User._id);
             var member = currentUser != null ? memberships.FirstOrDefault(it => it.Account_id == currentUser._id && !it.RemoveDate.HasValue) : null;
@@ -245,8 +239,6 @@ namespace project_v2.Controllers
             ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
             if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
             else return RedirectToAction("Login", "Account");
-            var isLogin = HttpContext.User.Identity.IsAuthenticated;
-            if (!isLogin) return RedirectToAction("Login", "Account");
 
             var model = GetCurrentUserManagementFeatures(id);
             return View(model);
@@ -291,9 +283,6 @@ namespace project_v2.Controllers
 
                 displayMemberships.Add(model);
             };
-
-            var isLogin = HttpContext.User.Identity.IsAuthenticated;
-            if (!isLogin) return RedirectToAction("Login", "Account");
             
             ViewBag.CurrentUser = ViewBag.User;
 
