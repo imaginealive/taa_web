@@ -31,6 +31,7 @@ namespace project_v2
             services.AddTransient<IFeatureService, FeatureService>();
             services.AddTransient<IStoryService, StoryService>();
             services.AddTransient<ITaskService, TaskService>();
+            services.AddTransient<IAssignmentService, AssignmentService>();
             services.AddTransient<IServiceConfigurations>(x => Configuration.GetSection(nameof(ServiceConfigurations)).Get<ServiceConfigurations>());
 
             services.AddAuthentication("FiverSecurityScheme")

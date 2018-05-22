@@ -4,18 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using project_v2.Models;
+using project_v2.Services.Interface;
 
 namespace project_v2.Services
 {
     public class StoryService : Interface.IStoryService
     {
         IServiceConfigurations svcConfig;
+        IAssignmentService assignSvc;
         IMongoCollection<StoryModel> storyCollection;
         IMongoCollection<TaskModel> taskCollection;
         IMongoCollection<StatusModel> statusCollection;
 
-        public StoryService(IServiceConfigurations _svcConfig)
+        public StoryService(IServiceConfigurations _svcConfig, IAssignmentService assignSvc)
         {
+            this.assignSvc = assignSvc;
             svcConfig = _svcConfig;
             var cred = MongoCredential.CreateCredential(svcConfig.DatabaseName, svcConfig.DbUser, svcConfig.DbPassword);
             var sett = new MongoClientSettings
@@ -73,6 +76,8 @@ namespace project_v2.Services
                 .Set(it => it.WorkDoneDate, model.WorkDoneDate)
                 .Set(it => it.ClosingDate, DateTime.SpecifyKind(model.ClosingDate, DateTimeKind.Local))
             );
+
+            assignSvc.UpdateAssignment(model._id, model.BeAssignedMember_id, model.StatusName, WorkType.Story);
         }
 
         public List<StoryModel> GetStories(string featureId)

@@ -4,20 +4,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using project_v2.Models;
+using project_v2.Services.Interface;
 
 namespace project_v2.Services
 {
     public class FeatureService : Interface.IFeatureService
     {
         IServiceConfigurations svcConfig;
+        IAssignmentService assignSvc;
         IMongoCollection<FeatureModel> featureCollection;
         IMongoCollection<StoryModel> storyCollection;
         IMongoCollection<TaskModel> taskCollection;
         IMongoCollection<StatusModel> statusCollection;
 
-        public FeatureService(IServiceConfigurations _svcConfig)
+        public FeatureService(IServiceConfigurations _svcConfig, IAssignmentService assignSvc)
         {
             svcConfig = _svcConfig;
+            this.assignSvc = assignSvc;
             var cred = MongoCredential.CreateCredential(svcConfig.DatabaseName, svcConfig.DbUser, svcConfig.DbPassword);
             var sett = new MongoClientSettings
             {
@@ -80,6 +83,8 @@ namespace project_v2.Services
                 .Set(it => it.WorkDoneDate, model.WorkDoneDate)
                 .Set(it => it.ClosingDate, DateTime.SpecifyKind(model.ClosingDate, DateTimeKind.Local))
             );
+
+            assignSvc.UpdateAssignment(model._id, model.BeAssignedMember_id, model.StatusName, WorkType.Feature);
         }
 
         public List<FeatureModel> GetFeatures(string projectId)

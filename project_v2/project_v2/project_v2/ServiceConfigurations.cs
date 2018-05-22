@@ -20,6 +20,7 @@ namespace project_v2
         public string TaskCollection { get; set; }
         public string RankCollection { get; set; }
         public string StatusCollection { get; set; }
+        public string AssignmentCollection { get; set; }
         public string StatusNewId { get; set; }
         public string GuestRankId { get; set; }
         public string MasterRankId { get; set; }
