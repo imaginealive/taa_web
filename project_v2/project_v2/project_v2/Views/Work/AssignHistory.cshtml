@@ -1,0 +1,61 @@
+﻿@model List<project_v2.Models.AssignHistoryViewModel>
+@{
+    ViewData["Title"] = "AssignHistory";
+}
+
+<h2>ประวัติการมอบหมายงาน</h2>
+<hr />
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>วันที่มอบหมายงาน</th>
+                    <th>มอบหมายงานให้</th>
+                    <th>สถานะล่าสุดของงาน</th>
+                    <th>วันที่ถูกเปลี่ยนออก</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.AssignDate.ToShortDateString()</td>
+                        <td>@item.MemberName</td>
+                        <td>@item.LastestWorkStatus</td>
+                        <td>
+                            @if (item.AbandonDate.HasValue)
+                            {
+                                <span>@item.AbandonDate.Value.ToShortDateString()</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-offset-10">
+        @if (ViewBag.type == project_v2.Models.WorkType.Feature)
+        {
+            <a asp-action="FeatureDetail" asp-route-projectid="@ViewBag.projectid" asp-route-featureid="@ViewBag.workid" class="btn btn-block btn-default">ย้อนกลับ</a>
+        }
+        @if (ViewBag.type == project_v2.Models.WorkType.Story)
+        {
+            <a asp-action="StoryDetail" asp-route-projectid="@ViewBag.projectid" asp-route-featureid="@ViewBag.featureid" asp-route-storyid="@ViewBag.storyid" class="btn btn-block btn-default">ย้อนกลับ</a>
+        }
+        @if (ViewBag.type == project_v2.Models.WorkType.Task)
+        {
+            <a asp-action="TaskDetail" asp-route-projectid="@ViewBag.projectid" asp-route-featureid="@ViewBag.featureid" asp-route-storyid="@ViewBag.storyid" asp-route-taskid="@ViewBag.workid" class="btn btn-block btn-default">ย้อนกลับ</a>
+        }
+    </div>
+</div>

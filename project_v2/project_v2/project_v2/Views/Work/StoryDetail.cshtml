@@ -109,54 +109,25 @@
 
 <div class="row">
     <div class="col-md-offset-8">
-        <div class="@(ViewBag.CanEditOrUpdateThisWork? "col-md-6": "col-md-6 col-md-offset-6")">
+        <div class="@(ViewBag.CanEditOrUpdateThisWork? "col-md-4": "col-md-4 col-md-offset-4")">
             <a asp-controller="Project" asp-action="Index" asp-route-projectid="@ViewBag.ProjectId" class="btn btn-block btn-default">ย้อนกลับ</a>
+        </div>
+        <div class="col-md-4">
+
+            @if (Model.assignmentHistories != null && Model.assignmentHistories.Count() > minimumValue)
+            {
+                <a asp-action="AssignHistory" asp-route-projectid="@ViewBag.ProjectId" asp-route-workid="@Model._id" asp-route-featureid="@Model.Feature_id" asp-route-type="@project_v2.Models.WorkType.Story" class="btn btn-block btn-default">ประวัติมอบหมายงาน</a>
+            }
+            else
+            {
+                <button class="btn btn-block btn-default" disabled>ไม่มีประวัติมอบหมายงาน</button>
+            }
         </div>
         @if (ViewBag.CanEditOrUpdateThisWork)
         {
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <a class="btn btn-block btn-primary" asp-action="EditStory" asp-route-projectid="@ViewBag.ProjectId" asp-route-featureid="@Model.Feature_id" asp-route-storyid="@Model._id">ปรับปรุงรายละเอียด</a>
             </div>
         }
     </div>
 </div>
-
-@if (Model.assignmentHistories != null && Model.assignmentHistories.Count() > minimumValue)
-{
-    <h3>รายการย้อนหลัง</h3>
-
-    @foreach (var item in Model.assignmentHistories)
-    {
-        <div class="row">
-            <div class="col-md-offset-1 col-md-10">
-                <div class="panel @(!item.AbandonDate.HasValue? "panel-success":"panel-default")">
-                    @if (!item.AbandonDate.HasValue)
-                    {
-                        <div class="panel-heading">
-                            <span>กำลังดำเนินการ</span>
-                        </div>
-                    }
-                    <dvi class="panel-body">
-                        <div class="col-md-12">
-                            <p><b>ผู้รับมอบหมาย: </b>@item.MemberName</p>
-                            <p><b>สถานะงานล่าสุด: </b>@item.LastestWorkStatus</p>
-                            <p><b>วันที่รับมอบหมายงาน: </b>@item.AssignDate.ToShortDateString()</p>
-                            <p>
-                                <b>วันที่เปลี่ยนคนรับมอบหมาย: </b>
-                                @if (item.AbandonDate.HasValue)
-                                {
-                                    <span>@item.AbandonDate.Value.ToShortDateString()</span>
-                                }
-                                else
-                                {
-                                    <span>กำลังดำเนินการ</span>
-                                }
-                            </p>
-                        </div>
-                    </dvi>
-                </div>
-            </div>
-        </div>
-    }
-
-}

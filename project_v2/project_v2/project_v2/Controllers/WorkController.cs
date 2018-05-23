@@ -576,6 +576,23 @@ namespace project_v2.Controllers
             ViewBag.Memberships = displayMemberships;
         }
 
+        public IActionResult AssignHistory(string projectid, string workid, WorkType type, string featureid = "", string storyid = "")
+        {
+            ViewBag.IsLogin = !string.IsNullOrEmpty(cache.GetString("user"));
+            if (ViewBag.IsLogin) ViewBag.User = JsonConvert.DeserializeObject<AccountModel>(cache.GetString("user"));
+            else return RedirectToAction("Login", "Account");
+
+            ViewBag.featureid = featureid;
+            ViewBag.storyid = storyid;
+            ViewBag.projectid = projectid;
+            ViewBag.type = type;
+            ViewBag.workid = workid;
+            var data = assignmentSvc.GetAssignments(workid, type);
+            var allAcc = accountSvc.GetAllAccount();
+            var model = data.Select(it => { var user = allAcc.FirstOrDefault(acc => acc._id == it.Member_id); return new AssignHistoryViewModel { AssignDate = it.AssignDate, AbandonDate = it.AbandonDate, LastestWorkStatus = it.LastestWorkStatus, MemberName =  user == null ? "-" : $"{user.FirstName} {user.LastName}"}; }).OrderByDescending(it => it.AssignDate).ToList();
+            return View(model);
+        }
+
         /// <summary>
         /// Validation ClosingDate each WorkModel
         /// </summary>
