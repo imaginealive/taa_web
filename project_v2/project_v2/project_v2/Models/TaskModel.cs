@@ -16,6 +16,8 @@ namespace project_v2.Models
         public string AssginByMemberName { get; set; }
         public string BeAssignedMemberName { get; set; }
 
+        public IEnumerable<DisplayAssignmentModel> assignmentHistories { get; set; }
+
         public DisplayTaskModel(TaskModel model)
         {
             this._id = model._id;

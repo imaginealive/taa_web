@@ -23,6 +23,8 @@ namespace project_v2.Controllers
         private IRankService rankSvc;
         private IStatusService statusSvc;
         public IDistributedCache cache;
+        public IAssignmentService assignmentSvc;
+
         public WorkController(
             IProjectService projectSvc,
             IFeatureService featureSvc,
@@ -32,7 +34,8 @@ namespace project_v2.Controllers
             IAccountService accountSvc,
             IRankService rankSvc,
             IStatusService statusSvc,
-            IDistributedCache _cache)
+            IDistributedCache _cache,
+            IAssignmentService assignmentSvc)
         {
             cache = _cache;
             this.projectSvc = projectSvc;
@@ -43,6 +46,7 @@ namespace project_v2.Controllers
             this.accountSvc = accountSvc;
             this.rankSvc = rankSvc;
             this.statusSvc = statusSvc;
+            this.assignmentSvc = assignmentSvc;
         }
 
         #region Features
@@ -95,12 +99,23 @@ namespace project_v2.Controllers
             var assginByAccount = allAcc.FirstOrDefault(it => it._id == feature.AssginByMember_id);
             var beassginByAccount = allAcc.FirstOrDefault(it => it._id == feature.BeAssignedMember_id);
 
+            var assignmentHistories = assignmentSvc.GetAssignments(feature._id, WorkType.Feature);
+            var displayAssignmentHistories = new List<DisplayAssignmentModel>();
+            foreach (var item in assignmentHistories)
+            {
+                var assignedAccountHistory = allAcc.FirstOrDefault(it => it._id == item.Member_id);
+                var display = new DisplayAssignmentModel(item) { MemberName = assignedAccountHistory != null ? $"{assignedAccountHistory.FirstName} {assignedAccountHistory.LastName}" : string.Empty };
+                displayAssignmentHistories.Add(display);
+            }
+
             var model = new DisplayFeatureModel(feature)
             {
                 CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
                 AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
                 BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
+                assignmentHistories = displayAssignmentHistories.OrderByDescending(it => it.AssignDate)
             };
+
             PrepareDataForDisplay(projectid, feature);
             return View(model);
         }
@@ -225,6 +240,15 @@ namespace project_v2.Controllers
             var assginByAccount = allAcc.FirstOrDefault(it => it._id == story.AssginByMember_id);
             var beassginByAccount = allAcc.FirstOrDefault(it => it._id == story.BeAssignedMember_id);
 
+            var assignmentHistories = assignmentSvc.GetAssignments(feature._id, WorkType.Story);
+            var displayAssignmentHistories = new List<DisplayAssignmentModel>();
+            foreach (var item in assignmentHistories)
+            {
+                var assignedAccountHistory = allAcc.FirstOrDefault(it => it._id == item.Member_id);
+                var display = new DisplayAssignmentModel(item) { MemberName = assignedAccountHistory != null ? $"{assignedAccountHistory.FirstName} {assignedAccountHistory.LastName}" : string.Empty };
+                displayAssignmentHistories.Add(display);
+            }
+
             ViewBag.ProjectId = projectid;
             ViewBag.FeatureName = feature.Name;
             var model = new DisplayStoryModel(story)
@@ -232,6 +256,8 @@ namespace project_v2.Controllers
                 CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
                 AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
                 BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
+                assignmentHistories = displayAssignmentHistories.OrderByDescending(it => it.AssignDate)
+
             };
             PrepareDataForDisplay(projectid, story);
             return View(model);
@@ -372,6 +398,15 @@ namespace project_v2.Controllers
             var assginByAccount = allAcc.FirstOrDefault(it => it._id == task.AssginByMember_id);
             var beassginByAccount = allAcc.FirstOrDefault(it => it._id == task.BeAssignedMember_id);
 
+            var assignmentHistories = assignmentSvc.GetAssignments(feature._id, WorkType.Task);
+            var displayAssignmentHistories = new List<DisplayAssignmentModel>();
+            foreach (var item in assignmentHistories)
+            {
+                var assignedAccountHistory = allAcc.FirstOrDefault(it => it._id == item.Member_id);
+                var display = new DisplayAssignmentModel(item) { MemberName = assignedAccountHistory != null ? $"{assignedAccountHistory.FirstName} {assignedAccountHistory.LastName}" : string.Empty };
+                displayAssignmentHistories.Add(display);
+            }
+
             ViewBag.ProjectId = projectid;
             ViewBag.FeatureId = feature._id;
             ViewBag.FeatureName = feature.Name;
@@ -381,6 +416,7 @@ namespace project_v2.Controllers
                 CreateByMemberName = createByAccount != null ? $"{createByAccount.FirstName} {createByAccount.LastName}" : string.Empty,
                 AssginByMemberName = assginByAccount != null ? $"{assginByAccount.FirstName} {assginByAccount.LastName}" : string.Empty,
                 BeAssignedMemberName = beassginByAccount != null ? $"{beassginByAccount.FirstName} {beassginByAccount.LastName}" : string.Empty,
+                assignmentHistories = displayAssignmentHistories.OrderByDescending(it => it.AssignDate)
             };
             PrepareDataForDisplay(projectid, task);
             return View(model);

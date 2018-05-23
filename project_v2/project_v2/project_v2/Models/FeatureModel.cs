@@ -17,7 +17,8 @@ namespace project_v2.Models
         public string BeAssignedMemberName { get; set; }
 
         public IEnumerable<DisplayStoryModel> Stories { get; set; }
-        
+        public IEnumerable<DisplayAssignmentModel> assignmentHistories { get; set; }
+
         public DisplayFeatureModel(FeatureModel model)
         {
             this._id = model._id;

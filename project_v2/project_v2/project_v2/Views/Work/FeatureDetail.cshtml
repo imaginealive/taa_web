@@ -1,6 +1,8 @@
 ﻿@model project_v2.Models.DisplayFeatureModel
 @{
     ViewData["Title"] = "FeatureDetail";
+
+    const int minimumValue = 0;
 }
 
 <h2>รายละเอียดงานหลัก</h2>
@@ -117,3 +119,43 @@
         }
     </div>
 </div>
+
+@if (Model.assignmentHistories != null && Model.assignmentHistories.Count() > minimumValue)
+{
+    <h3>รายการย้อนหลัง</h3>
+
+    @foreach (var item in Model.assignmentHistories)
+    {
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10">
+                <div class="panel @(!item.AbandonDate.HasValue? "panel-success":"panel-default")">
+                    @if (!item.AbandonDate.HasValue)
+                    {
+                        <div class="panel-heading">
+                            <span>กำลังดำเนินการ</span>
+                        </div>
+                    }
+                    <dvi class="panel-body">
+                        <div class="col-md-12">
+                            <p><b>ผู้รับมอบหมาย: </b>@item.MemberName</p>
+                            <p><b>สถานะงานล่าสุด: </b>@item.LastestWorkStatus</p>
+                            <p><b>วันที่รับมอบหมายงาน: </b>@item.AssignDate.ToShortDateString()</p>
+                            <p>
+                                <b>วันที่เปลี่ยนคนรับมอบหมาย: </b>
+                                @if (item.AbandonDate.HasValue)
+                                {
+                                    <span>@item.AbandonDate.Value.ToShortDateString()</span>
+                                }
+                                else
+                                {
+                                    <span>กำลังดำเนินการ</span>
+                                }
+                            </p>
+                        </div>
+                    </dvi>
+                </div>
+            </div>
+        </div>
+    }
+
+}

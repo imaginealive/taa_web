@@ -17,6 +17,7 @@ namespace project_v2.Models
         public string BeAssignedMemberName { get; set; }
         
         public IEnumerable<DisplayTaskModel> Tasks { get; set; }
+        public IEnumerable<DisplayAssignmentModel> assignmentHistories { get; set; }
 
         public DisplayStoryModel(StoryModel model)
         {

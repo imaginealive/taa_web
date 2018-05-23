@@ -16,6 +16,22 @@ namespace project_v2.Models
         public DateTime? AbandonDate { get; set; }
     }
 
+    public class DisplayAssignmentModel : AssignmentModel
+    {
+        public string MemberName { get; set; }
+
+        public DisplayAssignmentModel(AssignmentModel model)
+        {
+            _id = model._id;
+            Type = model.Type;
+            Work_id = model.Work_id;
+            Member_id = model.Work_id;
+            LastestWorkStatus = model.LastestWorkStatus;
+            AssignDate = model.AssignDate;
+            AbandonDate = model.AbandonDate;
+        }
+    }
+
     public enum WorkType
     {
         Feature, Story, Task
