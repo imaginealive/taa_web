@@ -107,26 +107,32 @@
 </div>
 
 <div class="row">
-    <div class="col-md-offset-6">
-        <div class="@(ViewBag.CanEditOrUpdateThisWork? "col-md-4": "col-md-4 col-md-offset-4")">
-            <a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model.Project_id" class="btn btn-block btn-default">ย้อนกลับ</a>
-        </div>
-        <div class="col-md-4">
+    @{
+        var canCurrentUserEditOrUpdateThisWork = ViewBag.CanEditOrUpdateThisWork;
+        var hasAnyAssignmentHistories = Model.assignmentHistories != null && Model.assignmentHistories.Count() > minimumValue;
 
-            @if (Model.assignmentHistories != null && Model.assignmentHistories.Count() > minimumValue)
+        <div class="@(canCurrentUserEditOrUpdateThisWork && hasAnyAssignmentHistories? "col-md-offset-4":"col-md-offset-6")">
+            <div class="@(canCurrentUserEditOrUpdateThisWork? "col-md-4": "col-md-4 col-md-offset-4")">
+                <a asp-controller="Project" asp-action="Index" asp-route-projectid="@Model.Project_id" class="btn btn-block btn-default">ย้อนกลับ</a>
+            </div>
+            <div class="col-md-4">
+
+                @if (hasAnyAssignmentHistories)
+                {
+                    <a asp-action="AssignHistory" asp-route-projectid="@Model.Project_id" asp-route-workid="@Model._id" asp-route-type="@project_v2.Models.WorkType.Feature" class="btn btn-block btn-default">ประวัติมอบหมายงาน</a>
+                }
+                else
+                {
+                    <button class="btn btn-block btn-default" disabled>ไม่มีประวัติมอบหมายงาน</button>
+                }
+            </div>
+            @if (canCurrentUserEditOrUpdateThisWork)
             {
-                <a asp-action="AssignHistory" asp-route-projectid="@Model.Project_id" asp-route-workid="@Model._id" asp-route-type="@project_v2.Models.WorkType.Feature" class="btn btn-block btn-default">ประวัติมอบหมายงาน</a>
-            }
-            else
-            {
-                <button class="btn btn-block btn-default" disabled>ไม่มีประวัติมอบหมายงาน</button>
+                <div class="col-md-4">
+                    <a class="btn btn-block btn-primary" asp-action="EditFeature" asp-route-projectid="@Model.Project_id" asp-route-featureid="@Model._id">ปรับปรุงรายละเอียด</a>
+                </div>
             }
         </div>
-        @if (ViewBag.CanEditOrUpdateThisWork)
-        {
-            <div class="col-md-4">
-                <a class="btn btn-block btn-primary" asp-action="EditFeature" asp-route-projectid="@Model.Project_id" asp-route-featureid="@Model._id">ปรับปรุงรายละเอียด</a>
-            </div>
-        }
-    </div>
+    }
+
 </div>
